@@ -1,6 +1,6 @@
 import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useState } from 'react'
-import { View, Text,Image, TouchableOpacity, Share, SectionList, Platform } from 'react-native'
+import { View, Text,Image, TouchableOpacity, Share, SectionList, Platform , Modal} from 'react-native'
 import Header from '../../layout/Header';
 import { IMAGES } from '../../constants/Images';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
@@ -18,7 +18,7 @@ import { addTowishList } from '../../redux/reducer/wishListReducer';
 import data from '../../data/data.json';
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from 'react-native-toast-message';
-
+import ImageViewer from 'react-native-image-zoom-viewer';
 // Importa las imágenes
 import producto1 from '../../assets/images/producto/item.webp';
 import producto2 from '../../assets/images/producto/item1.webp';
@@ -249,8 +249,9 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
     const { productId } = route.params;
     const product = data.find(item => item.id === productId);
 
-    // const navagation = useNavigation();
-    
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
     const [Select, setSelect] = useState(offerData[0]);
     
     const theme = useTheme();
@@ -297,7 +298,15 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
           </View>
         );
       }
-    
+        const openModal = (index: number) => {
+        setSelectedImageIndex(index);
+        setIsModalVisible(true);
+    };
+
+    const closeModal = () => {
+        setIsModalVisible(false);
+    };
+
     // const addItemToCart = () => {
     //     dispatch(addToCart({
     //         id:"0",
@@ -354,9 +363,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                         }}
                     >
                         {ItemImages.map((data:any, index:any) => (
-                            <View
-                                key={index}
-                            >
+                            <TouchableOpacity key={index} onPress={() => openModal(index)}>
                                 <Image
                                     style={{
                                         height:350,
@@ -366,7 +373,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                                     }}
                                     source={images[product.image]}
                                 />
-                            </View>
+                            </TouchableOpacity>
                         ))}
                     </Swiper>
                     <View
@@ -637,6 +644,25 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                 </View>
             </View>
             <Toast ref={(ref) => Toast.setRef(ref)} />
+            <Modal visible={isModalVisible} transparent={true}>
+                <ImageViewer
+                    imageUrls={ItemImages.map(img => ({ url: '', props: { source: images[product.image] } }))}
+                    index={selectedImageIndex}
+                    onSwipeDown={closeModal}
+                    enableSwipeDown={true}
+                />
+                <TouchableOpacity
+                    style={{
+                        position: 'absolute',
+                        top: 40,
+                        right: 20,
+                        zIndex: 1,
+                    }}
+                    onPress={closeModal}
+                >
+                    <Feather name="x" size={30} color="#fff" />
+                </TouchableOpacity>
+            </Modal>
        </View>
     )
 }
