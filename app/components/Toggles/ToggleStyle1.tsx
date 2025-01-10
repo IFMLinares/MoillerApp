@@ -5,28 +5,36 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 import { COLORS } from '../../constants/theme';
 
 const ToggleStyle1 = (props:any) => {
-    
     const theme = useTheme();
-    const {colors} = theme;
+    const { colors } = theme;
 
-    const [active , setActive] = useState(false);
+    const [active, setActive] = useState(false);
 
     const offset = useSharedValue(0);
-    const toggleStyle = useAnimatedStyle(() => { 
+    const toggleStyle = useAnimatedStyle(() => {
         return {
             transform: [
-                { 
-                    translateX:  offset.value
+                {
+                    translateX: offset.value
                 }
             ],
         };
     });
+
     useEffect(() => {
-        if(props.active){
+        if (props.active) {
             setActive(true);
-            offset.value = withSpring(28)
+            offset.value = withSpring(28);
         }
-    },[props.active])
+    }, [props.active, offset]);
+
+    useEffect(() => {
+        if (active) {
+            offset.value = withSpring(28);
+        } else {
+            offset.value = withSpring(0);
+        }
+    }, [active, offset]);
 
     return (
         <>

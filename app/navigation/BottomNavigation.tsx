@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomTabParamList } from './BottomTabParamList';
 import WishlistScreen from '../screens/Wishlist/Wishlist';
@@ -7,10 +7,24 @@ import HomeScreen from '../screens/Home/Home';
 import CategoryScreen from '../screens/Category/Category';
 import ProfileScreen from '../screens/Profile/Profile';
 import BottomMenu from '../layout/BottomMenu';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 const BottomNavigation = () => {
+    const [username, setUsername] = useState('');
+
+    useEffect(() => {
+      const getUsername = async () => {
+        const storedUsername = await AsyncStorage.getItem('username');
+        if (storedUsername) {
+          setUsername(storedUsername);
+        }
+      };
+  
+      getUsername();
+    }, []);
+  
     return (
         <Tab.Navigator
             initialRouteName='Home'
@@ -20,23 +34,23 @@ const BottomNavigation = () => {
             tabBar={(props:any) => <BottomMenu {...props}/>}
         >
             <Tab.Screen 
-                name='Home'
+                name='Inicio'
                 component={HomeScreen}
             />
             <Tab.Screen 
-                name='Category'
+                name='Categoría'
                 component={CategoryScreen}
             />
             <Tab.Screen 
-                name='MyCart'
+                name='Mi Carrito'
                 component={MyCartScreen}
             />
-            <Tab.Screen 
-                name='Wishlist'
+            {/* <Tab.Screen 
+                name='-'
                 component={WishlistScreen}
-            />
+            /> */}
             <Tab.Screen 
-                name='Profile'
+                name={username ? username : 'Profile'}
                 component={ProfileScreen}
             />
         </Tab.Navigator>

@@ -5,6 +5,7 @@ export type RootStackParamList = {
     DrawerNavigation: NavigatorScreenParams<BottomTabParamList>;
     Demo: undefined;
     ChooseLanguage: undefined;
+    SplashScreen: undefined;
     SignUp: undefined;
     SingIn: undefined;
     OnBoarding: undefined;

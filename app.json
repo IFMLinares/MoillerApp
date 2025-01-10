@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "clickcart",
-    "slug": "molliers",
+    "name": "Mollier",
+    "slug": "mollierapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -34,9 +34,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "a33a92b9-e735-44b5-9313-e2ec6cdf60a8"
+        "projectId": "d75baef3-fc36-445a-b7ed-3d9553293c64"
       }
     },
-    "owner": "ifmlinares"
+    "owner": "danorex27"
   }
 }

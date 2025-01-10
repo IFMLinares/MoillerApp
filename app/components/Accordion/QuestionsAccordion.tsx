@@ -19,38 +19,38 @@ const QuestionsAccordion = () => {
     };
 
     const SECTIONS = [
-        {
-            title: 'What is included with my purchase?',
-            content: 'Package have the JavaScript JS, JavaScript JSON, XML, .apk, .java, JavaScript JSON, .java, .plist, Well Define Documentation, Fonts and Icons, Responsive Designs, Image Assets, Customization Options, and many more.',
-        },
-        {
-            title: 'What features does ClickCart offer?',
-            content: 'ClickCart offers a wide range of features including responsive design, customizable layouts, product catalog pages, shopping cart functionality, checkout pages, user account management, and more.',
+        // {
+        //     title: 'What is included with my purchase?',
+        //     content: 'Package have the JavaScript JS, JavaScript JSON, XML, .apk, .java, JavaScript JSON, .java, .plist, Well Define Documentation, Fonts and Icons, Responsive Designs, Image Assets, Customization Options, and many more.',
+        // },
+        // {
+        //     title: 'What features does ClickCart offer?',
+        //     content: 'ClickCart offers a wide range of features including responsive design, customizable layouts, product catalog pages, shopping cart functionality, checkout pages, user account management, and more.',
 
-        },
-        {
-            title: "Can I customize the template's design?",
-            content: 'Absolutely! ClickCart is built using JSX, which makes it highly customizable. You can easily adjust colors, fonts, layout structures, and more to match your brand identity.',
+        // },
+        // {
+        //     title: "Can I customize the template's design?",
+        //     content: 'Absolutely! ClickCart is built using JSX, which makes it highly customizable. You can easily adjust colors, fonts, layout structures, and more to match your brand identity.',
 
-        },
-        {
-            title: 'Are there pre-designed page templates included?',
-            content: 'Yes, ClickCart typically includes pre-designed templates for essential pages like the homepage, product listings, product details, shopping cart, checkout, and user account pages.',
-        },
-        {
-            title: 'Does ClickCart provide customer support?',
-            content: 'ClickCart offers customer support options for their clients. Check the template documentation or you can directly contact to our support team from here - Click Here',
+        // },
+        // {
+        //     title: 'Are there pre-designed page templates included?',
+        //     content: 'Yes, ClickCart typically includes pre-designed templates for essential pages like the homepage, product listings, product details, shopping cart, checkout, and user account pages.',
+        // },
+        // {
+        //     title: 'Does ClickCart provide customer support?',
+        //     content: 'ClickCart offers customer support options for their clients. Check the template documentation or you can directly contact to our support team from here - Click Here',
 
-        },
-        {
-            title: "Is coding knowledge required to use ClickCart?",
-            content: "Basic knowledge of JavaScript JS, XML, and JSX can be helpful for customizing ClickCart to your needs. However, it's designed to be user- friendly and doesn't necessarily require extensive coding skills.",
+        // },
+        // {
+        //     title: "Is coding knowledge required to use ClickCart?",
+        //     content: "Basic knowledge of JavaScript JS, XML, and JSX can be helpful for customizing ClickCart to your needs. However, it's designed to be user- friendly and doesn't necessarily require extensive coding skills.",
 
-        },
-        {
-            title: 'How can I get started with ClickCart?',
-            content: "To get started, purchase and download the ClickCart template. Then, follow the included documentation to set up and customize your e-commerce website based on your specific requirements.",
-        },
+        // },
+        // {
+        //     title: 'How can I get started with ClickCart?',
+        //     content: "To get started, purchase and download the ClickCart template. Then, follow the included documentation to set up and customize your e-commerce website based on your specific requirements.",
+        // },
     ];
 
     const AccordionHeader = (item:any, _:any, isActive:any) => {

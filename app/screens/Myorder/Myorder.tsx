@@ -12,72 +12,72 @@ import { RootStackParamList } from '../../navigation/RootStackParamList';
 
 
 const MyorderData = [
-    {
-        image:IMAGES.item9,
-        title:'Echo Vibe Urban Runners',
-        price:"$179",
-        delevery:"FREE Delivery",
-        offer:"40% OFF",
-        btntitle:'Track Order',
-        brand:"Apple",
-        trackorder:true,
-        status : "ongoing",
-    },
-    {
-        image:IMAGES.item05,
-        title:"Polka dot wrap blouse dress",
-        price:"$99",
-        discount:"$118",
-        offer:"70% OFF",
-        hascolor:true,
-        completed:true,
-        status : "completed",
-    },
-    {
-        image:IMAGES.item10,
-        title:'Swift Glide Sprinter Soles',
-        price:"$199",
-        delevery:"FREE Delivery",
-        offer:"40% OFF",
-        btntitle:'Track Order',
-        brand:"OLG",
-        EditReview:true,
-        completed:true,
-        status : "completed",
-    },
-    {
-        image:IMAGES.item11,
-        title:'Sky Burst Skyline Burst Shoes',
-        price:"$149",
-        delevery:"FREE Delivery",
-        offer:"40% OFF",
-        btntitle:'Track Order',
-        brand:"Sony",
-        completed:true,
-        status : "completed",
-    },
-    {
-        image:IMAGES.item12,
-        title:'Zen Dash Active Flex Shoes',
-        price:"$299",
-        delevery:"FREE Delivery",
-        offer:"40% OFF",
-        btntitle:'Track Order',
-        brand:"Deslar",
-        trackorder:true,
-        status : "ongoing",
-    },
-    {
-        image:IMAGES.item13,
-        title:'Nova Stride Street Stompers',
-        price:"$99",
-        delevery:"FREE Delivery",
-        offer:"40% OFF",
-        btntitle:'Track Order',
-        brand:"Apple",
-        trackorder:true,
-        status : "ongoing",
-    },
+    // {
+    //     image:IMAGES.item9,
+    //     title:'Echo Vibe Urban Runners',
+    //     price:"$179",
+    //     delevery:"FREE Delivery",
+    //     offer:"40% OFF",
+    //     btntitle:'Track Order',
+    //     brand:"Apple",
+    //     trackorder:true,
+    //     status : "ongoing",
+    // },
+    // {
+    //     image:IMAGES.item05,
+    //     title:"Polka dot wrap blouse dress",
+    //     price:"$99",
+    //     discount:"$118",
+    //     offer:"70% OFF",
+    //     hascolor:true,
+    //     completed:true,
+    //     status : "completed",
+    // },
+    // {
+    //     image:IMAGES.item10,
+    //     title:'Swift Glide Sprinter Soles',
+    //     price:"$199",
+    //     delevery:"FREE Delivery",
+    //     offer:"40% OFF",
+    //     btntitle:'Track Order',
+    //     brand:"OLG",
+    //     EditReview:true,
+    //     completed:true,
+    //     status : "completed",
+    // },
+    // {
+    //     image:IMAGES.item11,
+    //     title:'Sky Burst Skyline Burst Shoes',
+    //     price:"$149",
+    //     delevery:"FREE Delivery",
+    //     offer:"40% OFF",
+    //     btntitle:'Track Order',
+    //     brand:"Sony",
+    //     completed:true,
+    //     status : "completed",
+    // },
+    // {
+    //     image:IMAGES.item12,
+    //     title:'Zen Dash Active Flex Shoes',
+    //     price:"$299",
+    //     delevery:"FREE Delivery",
+    //     offer:"40% OFF",
+    //     btntitle:'Track Order',
+    //     brand:"Deslar",
+    //     trackorder:true,
+    //     status : "ongoing",
+    // },
+    // {
+    //     image:IMAGES.item13,
+    //     title:'Nova Stride Street Stompers',
+    //     price:"$99",
+    //     delevery:"FREE Delivery",
+    //     offer:"40% OFF",
+    //     btntitle:'Track Order',
+    //     brand:"Apple",
+    //     trackorder:true,
+    //     status : "ongoing",
+    // },
 ]
 
 
@@ -109,7 +109,7 @@ const Myorder = ({navigation} : MyorderScreenProps) => {
     return (
        <View style={{backgroundColor:colors.background,flex:1}}>
             <Header
-                title='My Order'
+                title='Mis ordenes'
                 leftIcon='back'
                 titleRight
             />
@@ -138,7 +138,7 @@ const Myorder = ({navigation} : MyorderScreenProps) => {
                     >
                         <Text style={[
                             FONTS.fontMedium,{fontSize:15,color: activeFilter === 'all' ? COLORS.primary : colors.title },
-                        ]}>All</Text>
+                        ]}>Todo</Text>
                     </TouchableOpacity>
                    <View style={{width:1,height:40,backgroundColor:COLORS.primaryLight,}}/>
                     <TouchableOpacity
@@ -150,7 +150,7 @@ const Myorder = ({navigation} : MyorderScreenProps) => {
                         />
                         <Text style={[
                             FONTS.fontMedium,{fontSize:15,color: activeFilter === 'ongoing' ? COLORS.primary :colors.title },
-                        ]}>Ongoing</Text>
+                        ]}>En camino</Text>
                     </TouchableOpacity>
                    <View style={{width:1,height:40,backgroundColor:COLORS.primaryLight,}}/>
                     <TouchableOpacity
@@ -162,7 +162,7 @@ const Myorder = ({navigation} : MyorderScreenProps) => {
                         />
                          <Text style={[
                             FONTS.fontMedium,{fontSize:15,color: activeFilter === 'completed' ? COLORS.primary : colors.title },
-                        ]}>Completed</Text>
+                        ]}>Completado</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -220,7 +220,7 @@ const Myorder = ({navigation} : MyorderScreenProps) => {
                                     >
                                         <Feather color={COLORS.primary} size={24} name='shopping-cart'/>
                                     </View>
-                                    <Text style={{...FONTS.h5,color:colors.title,marginBottom:8}}>Your My Order is Empty!</Text>    
+                                    <Text style={{...FONTS.h5,color:colors.title,marginBottom:8}}>No tienes ordenes disponibles</Text>    
                                     <Text
                                         style={{
                                             ...FONTS.fontSm,
@@ -229,7 +229,7 @@ const Myorder = ({navigation} : MyorderScreenProps) => {
                                             paddingHorizontal:40,
                                             //marginBottom:30,
                                         }}
-                                    >Add Product to you addcart and shop now.</Text>
+                                    >Agregue el producto a su carrito de compras y compre ahora.</Text>
                                 </View>
                             </View>
                         }

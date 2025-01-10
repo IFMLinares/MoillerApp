@@ -20,7 +20,7 @@ const Payment = ({navigation} : PaymentScreenProps) => {
     return (
         <View style={{backgroundColor:colors.background,flex:1,}}>
             <Header
-                title='Payment'
+                title='Método de pago'
                 leftIcon='back'
                 titleRight
             />
@@ -44,26 +44,26 @@ const Payment = ({navigation} : PaymentScreenProps) => {
                         <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primary,alignItems:'center',justifyContent:'center'}}>
                             <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.card}]}>1</Text>
                         </View>
-                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>Cart</Text>
+                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>MI CARRITO</Text>
                     </View>
                     <View style={{height:2,flex:1,backgroundColor:COLORS.primary,marginHorizontal:10}}/>
                     <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
                     <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primary,alignItems:'center',justifyContent:'center'}}>
                             <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.card}]}>2</Text>
                         </View>
-                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>Address</Text>
+                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>DIRECCIÓN</Text>
                     </View>
                     <View style={{height:2,flex:1,backgroundColor:COLORS.primary,marginHorizontal:10}}/>
                     <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
                         <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primary,alignItems:'center',justifyContent:'center'}}>
                             <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.card}]}>3</Text>
                         </View>
-                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>payment</Text>
+                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>MÉTODO DE PAGO</Text>
                     </View>
                 </View>
             </View>
             <ScrollView contentContainerStyle={{flexGrow:1}}>
-                <View style={[GlobalStyleSheet.container, { marginTop:15,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card }]}>
+                {/* <View style={[GlobalStyleSheet.container, { marginTop:15,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card }]}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',borderBottomWidth:1,marginHorizontal:-15,paddingHorizontal:15,paddingBottom:15,borderBottomColor:COLORS.primaryLight }}>
                         <Text style={{ ...FONTS.fontMedium, fontSize: 18, color: colors.title }}>Credit/Debit Card</Text>
                         <TouchableOpacity
@@ -95,7 +95,7 @@ const Payment = ({navigation} : PaymentScreenProps) => {
                             />
                         </ScrollView>
                     </View>
-                </View>
+                </View> */}
                 <View style={[GlobalStyleSheet.container, {padding:0 }]}>
                     <View style={{ marginTop: 30 }}>
                         <PaymentAccordion

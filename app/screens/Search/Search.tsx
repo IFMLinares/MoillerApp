@@ -112,7 +112,7 @@ const Search = ({navigation} : any)  => {
                 </TouchableOpacity>
                 <View style={{flex:1}}>
                     <TextInput
-                        placeholder='Search Best items for You'
+                        placeholder='Busque los mejores artículos para usted'
                         placeholderTextColor={colors.text}
                         style={[FONTS.fontRegular,{
                         height:48,
@@ -130,7 +130,7 @@ const Search = ({navigation} : any)  => {
         </View>
         <View style={[GlobalStyleSheet.container,{paddingTop:0}]}>
             <View style={{}}>
-                <View style={{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginHorizontal:-15,paddingHorizontal:15,marginBottom:15}}>
+                {/* <View style={{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginHorizontal:-15,paddingHorizontal:15,marginBottom:15}}>
                     {Search2Data.map((data,index) => {
                         return(
                             <TouchableOpacity
@@ -159,8 +159,8 @@ const Search = ({navigation} : any)  => {
                             </TouchableOpacity>
                         )
                     })}
-                </View>
-                {items.length > 0 &&
+                </View> */}
+                {/* {items.length > 0 &&
                     <View>
                         <View style={[GlobalStyleSheet.row,{alignItems:'center',justifyContent:'space-between',backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginHorizontal:-15,paddingHorizontal:15,paddingVertical:15,borderBottomWidth:1,borderBottomColor:COLORS.primaryLight}]}>
                             <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Discover More</Text>
@@ -181,7 +181,7 @@ const Search = ({navigation} : any)  => {
                             })}
                         </View>
                     </View>
-                }
+                } */}
             </View>
         </View>
     </View>

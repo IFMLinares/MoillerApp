@@ -1,5 +1,5 @@
 import { useNavigation, useTheme } from '@react-navigation/native';
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { View, Text ,TouchableOpacity,Image,ScrollView, SectionList} from 'react-native'
 import Header from '../../layout/Header';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
@@ -11,68 +11,69 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
 import { useDispatch } from 'react-redux';
 import { openDrawer } from '../../redux/actions/drawerAction';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const btnData = [
   {
-      title: "Your order",
+      title: "Tus pedidos",
       navigate: 'Myorder',
   },
-  {
-      title: "Wishlist",
-      navigate: 'Wishlist',
-  },
-  {
-      title: "Coupons",
-      navigate: 'Coupons',
-  },
-  {
-      title: "Track order",
-      navigate: 'Trackorder',
-  },
+//   {
+//       title: "",
+//       navigate: 'Wishlist',
+//   },
+//   {
+//       title: "Cupones",
+//       navigate: 'Coupons',
+//   },
+//   {
+//       title: "Seguimiento del pedido",
+//       navigate: 'Trackorder',
+//   },
 ]
 
 const ListwithiconData = [
   {
-      title: 'Account Settings',
+      title: 'Configuracion de la cuenta',
       data: [
           {
               icon: IMAGES.user3,
-              title: "Edit profile",
+              title: "Editar Perfil",
               navigate: 'EditProfile'
           },
-          {
-              icon: IMAGES.card2,
-              title: "Saved Cards & Wallet",
-              navigate: 'Payment'
-          },
-          {
-              icon: IMAGES.map,
-              title: "Saved Addresses",
-              navigate: 'AddDeliveryAddress'
-          },
-          {
-              icon: IMAGES.translation,
-              title: "Select Language",
-              navigate: 'Language'
-          },
-          {
-              icon: IMAGES.ball,
-              title: "Notifications Settings",
-              navigate: 'Notification'
-          },
+        //   {
+        //       icon: IMAGES.card2,
+        //       title: "Saved Cards & Wallet",
+        //       navigate: 'Payment'
+        //   },
+        //   {
+        //       icon: IMAGES.map,
+        //       title: "Saved Addresses",
+        //       navigate: 'AddDeliveryAddress'
+        //   },
+        //   {
+        //       icon: IMAGES.translation,
+        //       title: "Select Language",
+        //       navigate: 'Language'
+        //   },
+        //   {
+        //       icon: IMAGES.ball,
+        //       title: "Notifications Settings",
+        //       navigate: 'Notification'
+        //   },
       ],
   },
   {
-      title: 'My Activity',
+      title: 'Mi Actividad',
       data: [
-          {
-              icon: IMAGES.star,
-              title: "Reviews",
-              navigate: 'Writereview'
-          },
+        //   {
+        //       icon: IMAGES.star,
+        //       title: "Reviews",
+        //       navigate: 'Writereview'
+        //   },
           {
               icon: IMAGES.chat,
-              title: "Questions & Answers",
+              title: "Preguntas y respuestas",
               navigate: 'Questions'
           },
       ],
@@ -84,6 +85,19 @@ type ProfileScreenProps = StackScreenProps<RootStackParamList, 'Profile'>;
 
 const Profile = ({navigation} : ProfileScreenProps) => {
 
+    const [username, setUsername] = useState('');
+
+    useEffect(() => {
+      const getUsername = async () => {
+        const storedUsername = await AsyncStorage.getItem('username');
+        if (storedUsername) {
+          setUsername(storedUsername);
+        }
+      };
+  
+      getUsername();
+    }, []);
+  
   const theme = useTheme();
   const { colors } : {colors : any} = theme;
 
@@ -98,7 +112,7 @@ const Profile = ({navigation} : ProfileScreenProps) => {
             <View style={[GlobalStyleSheet.container,{paddingHorizontal:20}]}>
                 <View style={[GlobalStyleSheet.row,{alignItems:'center',justifyContent:'space-between'}]}>
                     <View style={{flexDirection:'row',alignItems:'center',gap:10}}>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             style={{margin:5}}
                             onPress={() => dispatch(openDrawer())}
                         >
@@ -106,7 +120,7 @@ const Profile = ({navigation} : ProfileScreenProps) => {
                                 style={{height:22,width:22,tintColor:COLORS.card,resizeMode:'contain'}}
                                 source={IMAGES.grid5}
                             />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <Image
                             style={{resizeMode:'contain',width:114,height:25}}
                             source={IMAGES.appname}
@@ -129,7 +143,7 @@ const Profile = ({navigation} : ProfileScreenProps) => {
                             source={IMAGES.search}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={() => navigation.navigate('Notification')} 
                             style={{
                                 height:35,
@@ -144,7 +158,7 @@ const Profile = ({navigation} : ProfileScreenProps) => {
                             style={{height:20,width:20,tintColor:COLORS.card,resizeMode:'contain'}}
                             source={IMAGES.ball}
                             />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
             </View>
@@ -153,9 +167,9 @@ const Profile = ({navigation} : ProfileScreenProps) => {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingBottom: 20 }}>
                 <Image
                     style={{ height: 40, width: 40, borderRadius: 50 }}
-                    source={IMAGES.small6}
+                    source={IMAGES.write1}
                 />
-                <Text style={{ ...FONTS.fontRegular, fontSize: 20, color: colors.title }}>James Smith</Text>
+                <Text style={{ ...FONTS.fontRegular, fontSize: 20, color: colors.title }}>{username}</Text>
             </View>
             <View style={GlobalStyleSheet.row}>
                 {btnData.map((data:any,index) => {

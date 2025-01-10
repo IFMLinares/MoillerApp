@@ -38,9 +38,9 @@ const OTPAuthentication = ({navigation} : OTPAuthenticationScreenProps) => {
                     </TouchableOpacity>
                     <Text style={[FONTS.fontMedium,{fontSize:20,color:COLORS.card}]}>OTP</Text>
                 </View>
-                {/* <TouchableOpacity>
+                <TouchableOpacity>
                     <Text style={[FONTS.fontRegular,{fontSize:16,color:colors.card,textDecorationLine:'underline'}]}>Skip</Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
             </View>
         </View>
         <View style={{flex:1,backgroundColor:theme.dark ? colors.background :colors.card,borderTopLeftRadius:10,borderTopRightRadius:10}}>

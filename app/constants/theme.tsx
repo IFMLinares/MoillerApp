@@ -1,8 +1,9 @@
 import { Dimensions } from "react-native";
+import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 const {width,height} = Dimensions.get('screen');
 
 export const COLORS = {
-	primary: "#2874F0",
+	primary: "#193561",
 	primaryLight: "#DFE7F4",
 	secondary: "#FFE019",
 	success: "#159E42",
@@ -14,7 +15,7 @@ export const COLORS = {
 	white: "#fff",
 	label: "#8A8A8A",
 	backgroundColor: "#fff",
-	black: "#000",
+	black: "#000", 
 	
 	//light theme
 	card : "#fff",
@@ -64,28 +65,28 @@ export const SIZES = {
 };
 
 export const FONTS = {
-	fontLg: { fontSize: SIZES.fontLg, color: COLORS.text, lineHeight: 20, fontFamily: 'JostRegular' },
-	font: { fontSize: SIZES.font, color: COLORS.text, lineHeight: 20, fontFamily: 'JostRegular' },
-	fontSm: { fontSize: SIZES.fontSm, color: COLORS.text, lineHeight: 18, fontFamily: 'JostRegular' },
-	fontXs: { fontSize: SIZES.fontXs, color: COLORS.text, lineHeight: 14, fontFamily: 'JostRegular' },
-	h1: { fontSize: SIZES.h1, color: COLORS.title, fontFamily: 'JostSemiBold' },
-	h2: { fontSize: SIZES.h2, color: COLORS.title, fontFamily: 'JostSemiBold' },
-	h3: { fontSize: SIZES.h3, color: COLORS.title, fontFamily: 'JostSemiBold' },
-	h4: { fontSize: SIZES.h4, color: COLORS.title, fontFamily: 'JostSemiBold' },
-	h5: { fontSize: SIZES.h5, color: COLORS.title, fontFamily: 'JostSemiBold' },
-	h6: { fontSize: SIZES.h6, color: COLORS.title, fontFamily: 'JostSemiBold' },
-	fontBold: { fontFamily: 'JostBold' },
-	fontMedium: { fontFamily: 'JostMedium' },
-	fontTitle: { fontFamily: 'JostMedium' },
-	fontRegular: { fontFamily: 'JostRegular' },
-	fontSemiBold: { fontFamily: 'JostSemiBold' },
-	fontJostLight: { fontFamily: 'JostLight' },
-	fontJostExtraLight: { fontFamily: 'JostExtraLight' },
+	fontLg: { fontSize: SIZES.fontLg, color: COLORS.text, lineHeight: 20, fontFamily: 'RalewayRegular' },
+	font: { fontSize: SIZES.font, color: COLORS.text, lineHeight: 20, fontFamily: 'RalewayRegular' },
+	fontSm: { fontSize: SIZES.fontSm, color: COLORS.text, lineHeight: 18, fontFamily: 'RalewayRegular' },
+	fontXs: { fontSize: SIZES.fontXs, color: COLORS.text, lineHeight: 14, fontFamily: 'RalewayRegular' },
+	h1: { fontSize: SIZES.h1, color: COLORS.title, fontFamily: 'RalewaySemiBold' },
+	h2: { fontSize: SIZES.h2, color: COLORS.title, fontFamily: 'RalewaySemiBold' },
+	h3: { fontSize: SIZES.h3, color: COLORS.title, fontFamily: 'RalewaySemiBold' },
+	h4: { fontSize: SIZES.h4, color: COLORS.title, fontFamily: 'RalewaySemiBold' },
+	h5: { fontSize: SIZES.h5, color: COLORS.title, fontFamily: 'RalewaySemiBold' },
+	h6: { fontSize: SIZES.h6, color: COLORS.title, fontFamily: 'RalewaySemiBold' },
+	fontBold: { fontFamily: 'RalewayBold' },
+	fontMedium: { fontFamily: 'RalewayMedium' },
+	fontTitle: { fontFamily: 'RalewayMedium' },
+	fontRegular: { fontFamily: 'RalewayRegular' },
+	fontSemiBold: { fontFamily: 'RalewaySemiBold' },
+	fontJostLight: { fontFamily: 'RalewayLight' },
+	fontJostExtraLight: { fontFamily: 'RalewayExtraLight' },
 	Marcellus: { fontFamily: 'MarcellusRegular' },
-	fontJostItalic: { fontFamily: 'JostItalic' },
-	fontJostSemiBoldItalic: { fontFamily: 'JostSemiBoldItalic' },
-	fontJostLightItalic: { fontFamily: 'JostLightItalic' },
-	fontJostMediumItalic: { fontFamily: 'JostMediumItalic' },
+	fontJostItalic: { fontFamily: 'RalewayItalic' },
+	fontJostSemiBoldItalic: { fontFamily: 'RalewaySemiBoldItalic' },
+	fontJostLightItalic: { fontFamily: 'RalewayLightItalic' },
+	fontJostMediumItalic: { fontFamily: 'RalewayMediumItalic' },
 }
 
 

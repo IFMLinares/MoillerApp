@@ -3,8 +3,8 @@ export const IMAGES = {
     user : require('../assets/images/user.png'),
     card : require('../assets/images/card.png'),
     card1 : require('../assets/images/card1.png'),
-    appname : require('../assets/images/appname.png'),
-    headerlogo : require('../assets/images/headerlogo.png'),
+    appname : require('../assets/images/logo/logoblanco.png'),
+    headerlogo : require('../assets/images/logo/logoblanco.png'),
     google2 : require('../assets/images/icons/google2.png'),
     facebook : require('../assets/images/icons/facebook.png'),
     Home: require('../assets/images/icons/home.png'),
@@ -51,6 +51,7 @@ export const IMAGES = {
     shieldcheck: require('../assets/images/icons/shieldcheck.png'),
     card2: require('../assets/images/icons/card2.png'),
     write: require('../assets/images/icons/write.png'),
+    write1: require('../assets/images/logo/user1.png'),
     downaeeowsmall: require('../assets/images/icons/downaeeowsmall.png'),
     home: require('../assets/images/icons/home4.png'),
     producta: require('../assets/images/icons/producta.png'),
@@ -91,7 +92,7 @@ export const IMAGES = {
     banner3 : require('../assets/images/banner/pic3.png'),
     bannerborder1 : require('../assets/images/banner/border1.png'),
     bannerborder2 : require('../assets/images/banner/border2.png'),
-
+    slide: require('../assets/images/carousel/slide1.png'),
     onborder1 : require('../assets/images/onbording/pic1.png'),
     item1: require('../assets/images/item/pic1.png'),
     item2: require('../assets/images/item/pic2.png'),
@@ -184,7 +185,39 @@ export const IMAGES = {
     ads9: require('../assets/images/ads/pic9.png'),
     ads10: require('../assets/images/ads/pic10.png'),
     ads11: require('../assets/images/ads/pic11.png'),
+    // home
+    ads12: require('../assets/images/home/refrigeracion.png'),
+    ads13: require('../assets/images/home/herramientas.png'),
 
+    // home
+    // marcas
+    marca: require('../assets/images/home/steinmann.png'), 
+    marca1: require('../assets/images/home/maslex.png'), 
+    marca2: require('../assets/images/home/secop.png'), 
+    marca3: require('../assets/images/home/americold.png'), 
+    // marcas 
+    // productos
+    producto1: require('../assets/images/producto/item.webp'),
+    producto2: require('../assets/images/producto/item1.webp'),
+    producto3: require('../assets/images/producto/item2.png'),
+    producto4: require('../assets/images/producto/item3.jpg'),
+    producto5: require('../assets/images/producto/item4.webp'),
+    producto6: require('../assets/images/producto/item5.webp'),
+    producto7: require('../assets/images/producto/item6.webp'),
+    producto8: require('../assets/images/producto/item7.webp'),
+    producto9: require('../assets/images/producto/item8.jpg'),
+    producto10: require('../assets/images/producto/item9.webp'),
+    producto11: require('../assets/images/producto/item10.webp'),
+    producto12: require('../assets/images/producto/item11.webp'),
+    producto13: require('../assets/images/producto/item12.webp'),
+    producto14: require('../assets/images/producto/item13.jpg'),
+    producto15: require('../assets/images/producto/item14.webp'),
+    producto16: require('../assets/images/producto/item15.png'),
+    producto17: require('../assets/images/producto/item16.webp'),
+    producto18: require('../assets/images/producto/item17.webp'), 
+    producto19: require('../assets/images/producto/item18.jpg'), 
+
+    // productos
     flags1: require('../assets/images/flags/pic1.png'),
     flags2: require('../assets/images/flags/pic2.png'),
     flags3: require('../assets/images/flags/pic3.png'),

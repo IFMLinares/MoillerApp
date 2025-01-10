@@ -1,5 +1,5 @@
 {
-  "name": "clickcart",
+  "name": "Mollier",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
@@ -14,6 +14,7 @@
     "@expo/webpack-config": "~19.0.1",
     "@gorhom/bottom-sheet": "^4.6.0",
     "@lunalee/react-native-raw-bottom-sheet": "^2.2.4",
+    "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-community/slider": "^4.5.0",
     "@react-navigation/bottom-tabs": "^6.5.11",
@@ -58,6 +59,7 @@
     "react-native-svg": "^14.1.0",
     "react-native-swiper": "^1.6.0",
     "react-native-tab-view": "^3.5.2",
+    "react-native-toast-message": "^2.2.1",
     "react-native-web": "~0.19.6",
     "react-redux": "^9.1.0",
     "redux": "^5.0.1",

@@ -87,7 +87,7 @@ const Cardstyle1 = ({id,title,price,image,offer,color,hascolor,onPress,brand,dis
             <Text  style={[FONTS.fontMedium,{fontSize:12,color:COLORS.primary,paddingRight:30}]}>{brand}</Text>
             <Text numberOfLines={1} style={[FONTS.fontMedium,{fontSize:12,color:colors.title,marginTop:5,paddingRight:10}]}>{title}</Text>
             <View style={{flexDirection:'row',alignItems:'center',marginTop:5,gap:5}}>
-                <Text style={[FONTS.fontMedium,{fontSize:14,color:colors.title}]}>{price}</Text>
+                <Text style={[FONTS.fontMediumItalic,{fontSize:14,color:colors.title}]}>{price}</Text>
                 <Text style={[FONTS.fontJostLight,{fontSize:12,color:colors.title,textDecorationLine:'line-through',opacity:.6}]}>{discount}</Text>
                 <Text style={[FONTS.fontRegular,{fontSize:12,color:COLORS.danger,}]}>{offer}</Text>
 
@@ -109,7 +109,7 @@ const Cardstyle1 = ({id,title,price,image,offer,color,hascolor,onPress,brand,dis
                         backgroundColor:show ? COLORS.primary : colors.card
                     }}
                 >
-                        <Text style={[FONTS.fontMedium,{fontSize:14,color:show ? COLORS.card :COLORS.primary}]}>Add To Cart</Text>
+                        <Text style={[FONTS.fontMedium,{fontSize:14,color:show ? COLORS.card :COLORS.primary}]}>Agregar al carrito</Text>
                 </TouchableOpacity>
             </View>
             :

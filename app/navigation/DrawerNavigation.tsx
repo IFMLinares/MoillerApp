@@ -22,7 +22,7 @@ function DrawerNavigation() {
             <SideMenu
                 overlayColor={'rgba(9,42,96,.8)'}
                 isOpen={isOpen}
-                menu={<DrawerMenu/>}
+                // menu={<DrawerMenu/>}
                 onChange={(e)=> {(e === false) ? dispatch(closeDrawer()) : null}}
             >
                 <BottomNavigation/>

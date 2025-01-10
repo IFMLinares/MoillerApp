@@ -15,10 +15,51 @@ import Cardstyle1 from '../../components/Card/Cardstyle1';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../../redux/reducer/cartReducer';
 import { addTowishList } from '../../redux/reducer/wishListReducer';
+import data from '../../data/data.json';
+import FontAwesome from "react-native-vector-icons/FontAwesome6";
+import Toast from 'react-native-toast-message';
 
+// Importa las imágenes
+import producto1 from '../../assets/images/producto/item.webp';
+import producto2 from '../../assets/images/producto/item1.webp';
+import producto3 from '../../assets/images/producto/item2.png';
+import producto5 from '../../assets/images/producto/item3.jpg';
+import producto6 from '../../assets/images/producto/item4.webp';
+import producto7 from '../../assets/images/producto/item5.webp';
+import producto8 from '../../assets/images/producto/item6.webp';
+import producto9 from '../../assets/images/producto/item7.webp';
+import producto10 from '../../assets/images/producto/item8.jpg';
+import producto11 from '../../assets/images/producto/item9.webp';
+import producto12 from '../../assets/images/producto/item11.webp';
+import producto13 from '../../assets/images/producto/item12.webp';
+import producto14 from '../../assets/images/producto/item13.jpg';
+import producto15 from '../../assets/images/producto/item14.webp';
+import producto16 from '../../assets/images/producto/item15.png';
+import producto17 from '../../assets/images/producto/item16.webp';
+import producto18 from '../../assets/images/producto/item17.webp';
+import producto19 from '../../assets/images/producto/item18.jpg';
 
-
-
+// Mapea las rutas de las imágenes a las importaciones
+const images = {
+  "IMAGES.producto1": producto1,
+  "IMAGES.producto2": producto2,
+  "IMAGES.producto3": producto3,
+  "IMAGES.producto5": producto5,
+  "IMAGES.producto6": producto6,
+  "IMAGES.producto7": producto7,
+  "IMAGES.producto8": producto8,
+  "IMAGES.producto9": producto9,
+  "IMAGES.producto10": producto10,
+  "IMAGES.producto11": producto11,
+  "IMAGES.producto12": producto12,
+  "IMAGES.producto13": producto13,
+  "IMAGES.producto14": producto14,
+  "IMAGES.producto15": producto15,
+  "IMAGES.producto16": producto16,
+  "IMAGES.producto17": producto17,
+  "IMAGES.producto18": producto18,
+  "IMAGES.producto19": producto19,
+};
 
 const SelectData =[
     {
@@ -42,29 +83,29 @@ const SelectData =[
 const offerData = [
     {
         image:IMAGES.deliverytruck,
-        title:"Free Shipping",
-        text:"For all orders over $99",
+        title:"Envío gratis",
+        text:"Para todos los pedidos superiores a $99",
     },
     {
         image:IMAGES.check3,
-        title:"Secure Payment",
-        text:"We ensure secure payment",
+        title:"Pago Seguro",
+        text:"Nosotros aseguramos el pago seguro",
     },
     {
         image:IMAGES.savemoney,
-        title:"Money Back Guarantee",
-        text:"Any back within 30 days",
+        title:"Garantía de devolución de dinero",
+        text:"Cualquier devolución dentro de los 30 días",
     },
     {
         image:IMAGES.technicalsupport,
-        title:"Customer Support",
-        text:"Call or email us 24/7",
+        title:"Atención al cliente",
+        text:"Llámanos o envíanos un correo electrónico 24 horas al día, 7 días a la semana",
     },
-    {
-        image:IMAGES.wallet2,
-        title:"Flexible Payment",
-        text:"Pay with Multiple Credit Card",
-    },
+    // {
+    //     image:IMAGES.wallet2,
+    //     title:"Pago Flexible",
+    //     text:"Pague con varias tarjetas de crédito",
+    // },
 ]
 
 const ListwithiconData = [
@@ -72,85 +113,85 @@ const ListwithiconData = [
         title: 'GENERAL',
         data: [
             {
-                title: "Country of Origin",
-                text: 'China'
+                title: "Marca",
+                text: ' '
             },
             {
-                title: "Sim Type",
-                text: 'Dual Sim, GSM+GSM'
+                title: "Modelo",
+                text: ' '
             },
             {
-                title: "Dual Sim",
-                text: 'Yes'
+                title: "Categoría",
+                text: ' '
             },
-            {
-                title: "Sim Size",
-                text: 'Nano + eSIM'
-            },
-            {
-                title: "Device Type",
-                text: 'Smartphone'
-            },
-            {
-                title: "Release Date",
-                text: 'September 07, 2022'
-            },
+            // {
+            //     title: " ",
+            //     text: ' '
+            // },
+            // {
+            //     title: " ",
+            //     text: ' '
+            // },
+            // {
+            //     title: " ",
+            //     text: ' '
+            // },
         ],
     },
     {
-        title: 'DESIGN',
+        title: 'DISEÑO',
         data: [
             {
-                title: "Dimensions",
-                text: '71.5 x 146.7 x 7.8 mm'
+                title: "Dimensiones",
+                // text: '71.5 x 146.7 x 7.8 mm'
             },
             {
-                title: "Weight",
-                text: '172 g'
+                title: "Peso",
+                // text: '172 g'
             },
             {
-                title: "Colors",
-                text: 'Blue, Purple, Yellow, Midnight'
+                title: "Color",
+                // text: 'Negro, blanco,'
             },
         ],
     },
-    {
-        title: 'DISPLAY',
-        data: [
-            {
-                title: "Type",
-                text: 'Color OLED Screen (16M Colors)'
-            },
-            {
-                title: "Touch",
-                text: 'Yes'
-            },
-            {
-                title: "Size",
-                text: '6.1inches, 1170x2532pixels'
-            },
-            {
-                title: "Aspect Ratio",
-                text: '19.5:9'
-            },
-            {
-                title: "PPI",
-                text: '~ 460PPI'
-            },
-            {
-                title: "Glass Type",
-                text: 'Ceramic Shield Front, Glass Back'
-            },
-            {
-                title: "Features",
-                text: 'HDR Display'
-            },
-            {
-                title: "Notch",
-                text: 'Yes, Small Notch'
-            },
-        ],
-    },
+    // {
+    //     title: 'DISPLAY',
+    //     data: [
+    //         {
+    //             title: "Type",
+    //             text: 'Color OLED Screen (16M Colors)'
+    //         },
+    //         {
+    //             title: "Touch",
+    //             text: 'Yes'
+    //         },
+    //         {
+    //             title: "Size",
+    //             text: '6.1inches, 1170x2532pixels'
+    //         },
+    //         {
+    //             title: "Aspect Ratio",
+    //             text: '19.5:9'
+    //         },
+    //         {
+    //             title: "PPI",
+    //             text: '~ 460PPI'
+    //         },
+    //         {
+    //             title: "Glass Type",
+    //             text: 'Ceramic Shield Front, Glass Back'
+    //         },
+    //         {
+    //             title: "Features",
+    //             text: 'HDR Display'
+    //         },
+    //         {
+    //             title: "Notch",
+    //             text: 'Yes, Small Notch'
+    //         },
+    //     ],
+    // },
 ];
 
 const card2Data =[
@@ -204,8 +245,10 @@ const ItemImages = [IMAGES.product12, IMAGES.product13, IMAGES.product14, IMAGES
 
 type ProductsDetailsScreenProps = StackScreenProps<RootStackParamList, 'ProductsDetails'>;
 
-const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
-    
+const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
+    const { productId } = route.params;
+    const product = data.find(item => item.id === productId);
+
     // const navagation = useNavigation();
     
     const [Select, setSelect] = useState(offerData[0]);
@@ -236,27 +279,47 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
     const dispatch = useDispatch();
 
     const addItemToCart = () => {
-        dispatch(addToCart({
-            id:"0",
-            image:IMAGES.item1,
-            title:"APPLE iPhone 14 (Bluetooth)",
-            price:"$199",
-            discount:"$112",
-            offer:"70% OFF",
-            brand:"Apple",
-            color:false,
-            hascolor:true
-        } as any ));
-    }
-
-    const addItemToWishList = (data: any) => {
+        dispatch(addToCart(product));
+        Toast.show({
+            type: 'success',
+            text1: 'Producto agregado al carrito',
+        });
+    };
+    
+      const addItemToWishList = (data: any) => {
         dispatch(addTowishList(data));
-        }
+      };
+    
+      if (!product) {
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Producto no encontrado</Text>
+          </View>
+        );
+      }
+    
+    // const addItemToCart = () => {
+    //     dispatch(addToCart({
+    //         id:"0",
+    //         image:IMAGES.item1,
+    //         title:"APPLE iPhone 14 (Bluetooth)",
+    //         price:"$199",
+    //         discount:"$112",
+    //         offer:"70% OFF",
+    //         brand:"Apple",
+    //         color:false,
+    //         hascolor:true
+    //     } as any ));
+    // }
+
+    // const addItemToWishList = (data: any) => {
+    //     dispatch(addTowishList(data));
+    //     }
 
     return (
        <View style={{backgroundColor:colors.background,flex:1}}>
             <Header
-                title='Product Details'
+                title='Detalles del producto'
                 leftIcon='back'
                 rightIcon2={'cart'}
                 rightIcon1={'search'}
@@ -301,7 +364,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                                         resizeMode:'contain',
                                         marginTop:50
                                     }}
-                                    source={data}
+                                    source={images[product.image]}
                                 />
                             </View>
                         ))}
@@ -321,7 +384,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                         }}
                     >
                         <View style={{  }}>
-                            <View
+                            {/* <View
                                 style={{
                                     marginTop:10,
                                     backgroundColor:COLORS.success,
@@ -330,7 +393,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                                 }}
                             >
                                 <Text style={[FONTS.fontSemiBold,{fontSize:12,color:COLORS.card}]}>70% OFF</Text>
-                            </View>
+                            </View> */}
                         </View>
                         <View>
                             <TouchableOpacity
@@ -349,7 +412,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                         </View>
                     </View>
                 </View>
-                <   View style={[GlobalStyleSheet.container,{padding:0}]}>
+                {/* <View style={[GlobalStyleSheet.container,{padding:0}]}>
                     <View style={{height:45,backgroundColor:'#87E8FF',marginVertical:10,flexDirection:'row',alignItems:'center',width:'100%',justifyContent:'space-between',paddingLeft:15}}>
                         <View>
                             <Text style={[FONTS.fontRegular,{fontSize:15,color:COLORS.title}]} >You're saving<Text style={[FONTS.fontSemiBold,{color:'#07A3C5'}]}> $5,565 </Text>on this time</Text>
@@ -365,33 +428,30 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                             />
                         </View>
                     </View>
-                </View>
-                <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card}]}>
-                    <Text numberOfLines={1} style={[FONTS.fontMedium,{fontSize:18,color:colors.title,}]}>APPLE iPhone 14 (Blue, 128 GB)</Text>
-                    <View style={{flexDirection:'row',alignItems:'center',gap:10,marginTop:2}}>
+                </View> */}
+                <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginVertical:10,}]}>
+                    <Text numberOfLines={1} style={[FONTS.fontMedium,{fontSize:18,color:colors.title,}]}>{product.title}</Text>
+                    {/* <View style={{flexDirection:'row',alignItems:'center',gap:10,marginTop:2}}>
                         <Image
                             style={{height:14,width:74}}
                             source={IMAGES.star7}
                         />
                         <Text style={[FONTS.fontRegular,{fontSize:14,color:colors.title,opacity:.5}]}>(270 Review)</Text>
-                    </View>
+                    </View> */}
                     <View style={{flexDirection:'row',alignItems:'center',marginTop:2,gap:5}}>
-                        <Text style={[FONTS.fontSemiBold,{fontSize:20,color:COLORS.success}]}>$6,499</Text>
-                        <Text style={[FONTS.fontMedium,{fontSize:20,color:colors.title,textDecorationLine:'line-through',opacity:.6}]}>$7,000</Text>    
-                        <Text style={[FONTS.fontMedium,{fontSize:14,color:COLORS.danger}]}>  70% OFF</Text>    
-                        <Text style={[FONTS.fontMedium,{fontSize:15,color:COLORS.success,}]}>  In Stock </Text>
+                        <Text style={[FONTS.fontSemiBold,{fontSize:20,color:COLORS.success}]}>{product.price}</Text>
+                        {/* <Text style={[FONTS.fontMedium,{fontSize:20,color:colors.title,textDecorationLine:'line-through',opacity:.6}]}>$7,000(precio de oferta)</Text>     */}
+                        {/* <Text style={[FONTS.fontMedium,{fontSize:14,color:COLORS.danger}]}>  70% OFF(porcentaje de la oferta)</Text>     */}
+                        <Text style={[FONTS.fontMedium,{fontSize:15,color:COLORS.success,}]}>  En Stock </Text>
                     </View>
                     <View style={{flexDirection:'row',alignItems:'center',gap:5,marginTop:10}}>
-                        <Image
-                            style={{height:14,width:14}}
-                            source={IMAGES.leftarrow}
-                        />
-                        <Text style={[FONTS.fontRegular,{fontSize:15,color:colors.text}]}>14 Days return available</Text>
-                        <Text style={[FONTS.fontSemiBold,{fontSize:15,color:COLORS.success}]}>  Free delivery</Text>
+                          <FontAwesome name="car" size={20} color="black" />
+                        {/* <Text style={[FONTS.fontRegular,{fontSize:15,color:colors.text}]}>Devolución de 14 días disponible</Text> */}
+                        <Text style={[FONTS.fontSemiBold,{fontSize:15,color:COLORS.success}]}>  Delivery Gratis</Text>
                     </View>
                 </View>
-                <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginVertical:10,paddingBottom:0,paddingTop:10}]}>
-                    <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title,paddingBottom:10}]}>Select Variant</Text>
+                {/* <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginVertical:10,paddingBottom:0,paddingTop:10}]}>
+                    <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title,paddingBottom:10}]}>Seleccionar variante</Text>
                     <View style={{flexDirection:'row',flexWrap:'wrap',marginHorizontal:-15}}>
                         {SelectData.map((data:any,index) => {
                             return(
@@ -417,8 +477,8 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                             )
                         })}
                     </View>
-                </View>
-                <View style={[GlobalStyleSheet.container,{paddingHorizontal:-15,paddingVertical:0,marginBottom:10}]}> 
+                </View> */}
+                {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:-15,paddingVertical:0,marginBottom:10}]}> 
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
@@ -453,17 +513,17 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                             })}
                         </View>
                     </ScrollView>
-                </View>
-                <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card}]}>
+                </View> */}
+                {/* <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card}]}>
                     <View style={{}}>
-                        <Text  style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Description:</Text>
+                        <Text  style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Descripción del producto</Text>
                         <Text style={[FONTS.fontRegular,{fontSize:15,color:colors.text,lineHeight:20,marginTop:10,opacity:.8}]}>
-                        Apple iPhone 14 price in India starts from ₹54,994. It is available at lowest price on Croma in India as on Feb 22, 2024. Take a look at Apple iPhone 14 detailed specifications and features.
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam sapiente tempore excepturi quos suscipit impedit. Iure error soluta accusantium quasi? Consequuntur porro amet sed vero voluptates corrupti incidunt, ducimus quas!
                         </Text>
                     </View>
-                </View>
+                </View> */}
                 <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginTop:10,marginBottom:10}]}>
-                    <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Apple iPhone 14 Full Specs</Text>
+                    <Text style={[FONTS.fontRegular,{fontSize:16,color:colors.title}]}>{product.title} Todas las especificaciones</Text>
                 </View>
                 <View style={[GlobalStyleSheet.container,{flex:1,paddingTop:0}]}>
                     <View style={{ marginHorizontal: -15, marginTop: 0, flex: 1 }}>
@@ -514,7 +574,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                         />
                     </View>
                 </View>
-                <View style={[GlobalStyleSheet.container,{paddingHorizontal:15,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,borderBottomWidth:1,borderBottomColor:COLORS.primaryLight,paddingVertical:15,marginTop:-5}]}>
+                {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:15,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,borderBottomWidth:1,borderBottomColor:COLORS.primaryLight,paddingVertical:15,marginTop:-5}]}>
                     <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                         <Text style={[FONTS.fontMedium,{fontSize:18,color:colors.title}]}>Similar Products</Text>
                     </View>
@@ -545,7 +605,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                             })}
                         </View>
                     </ScrollView>
-                </View>
+                </View> */}
             </ScrollView>
             <View style={[GlobalStyleSheet.container,{padding:0,}]}>
                 <View 
@@ -556,26 +616,27 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                         justifyContent:'center'
                     }}
                 >
-                    <View style={{width:'50%'}}>
+                   <View style={{width:'50%'}}>
                         <Button
-                            onPress={() => {addItemToCart(); navigation.navigate('MyCart')}}
-                            title='Add To cart'
+                            onPress={addItemToCart}
+                            title='Agregar al carrito'
                             color={COLORS.white}
                             text={COLORS.primary}
                             style={{borderRadius:0}}
                         />
                     </View>
-                    <View style={{width:'50%'}}>
+                    {/* <View style={{width:'50%'}}>
                         <Button
-                            title='Buy Now'
+                            title='Comprar ahora'
                             color={COLORS.secondary}
                             text={COLORS.title}
                             onPress={() => navigation.navigate('DeliveryAddress')}
                             style={{borderRadius:0}}
                         />
-                    </View>
+                    </View> */}
                 </View>
             </View>
+            <Toast ref={(ref) => Toast.setRef(ref)} />
        </View>
     )
 }

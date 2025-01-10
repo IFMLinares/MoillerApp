@@ -14,12 +14,15 @@ export default function App() {
   const { colors } : {colors : any} = theme;
 
   const [loaded] = useFonts({
-    JostBold: require('./app/assets/fonts/Jost-Bold.ttf'),
-    JostSemiBold : require('./app/assets/fonts/Jost-SemiBold.ttf'),
-    JostLight : require('./app/assets/fonts/Jost-Light.ttf'),
-    JostMedium : require('./app/assets/fonts/Jost-Medium.ttf'),
-    JostRegular : require('./app/assets/fonts/Jost-Regular.ttf'),
-    JostExtraLight : require('./app/assets/fonts/Jost-ExtraLight.ttf'),
+    RalewayBold: require('./app/assets/fonts/Raleway-Bold.ttf'),
+    RalewaySemiBold: require('./app/assets/fonts/Raleway-SemiBold.ttf'),
+    RalewayLight: require('./app/assets/fonts/Raleway-Light.ttf'),
+    RalewayMedium: require('./app/assets/fonts/Raleway-Medium.ttf'),
+    RalewayRegular: require('./app/assets/fonts/Raleway-Regular.ttf'),
+    RalewayExtraLight: require('./app/assets/fonts/Raleway-ExtraLight.ttf'),
+    RalewayItalic: require('./app/assets/fonts/Raleway-Italic.ttf'),
+    RalewayBlack: require('./app/assets/fonts/Raleway-Black.ttf'),
+    RalewayExtraBold: require('./app/assets/fonts/Raleway-ExtraBold.ttf'),
   });  
 
   if(!loaded){

@@ -16,12 +16,14 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = {
     state : any,
     navigation : any,
     descriptors : any
 }
+
 
 const BottomMenu = ({state, navigation, descriptors}: Props) => {
 
@@ -40,7 +42,19 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
     Dimensions.addEventListener('change', val => {
         setWidth(val.window.width);
     });
-    
+
+    const [username, setUsername] = useState('');
+
+    useEffect(() => {
+      const getUsername = async () => {
+        const storedUsername = await AsyncStorage.getItem('username');
+        if (storedUsername) {
+          setUsername(storedUsername);
+        }
+      };
+  
+      getUsername();
+    }, []);
     useEffect(() => {
         Animated.spring(circlePosition, {
             toValue: state.index * tabWD,
@@ -181,11 +195,11 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                                     //tintColor:colors.title
                                                 }}
                                                 source={
-                                                    label === 'Home'    ?  IMAGES.Home:
-                                                    label === 'Category' ?  IMAGES.grid:
-                                                    label === 'MyCart'     ?  IMAGES.mycart:
-                                                    label === 'Wishlist'   ?  IMAGES.heart2:
-                                                    label === 'Profile'  ?  IMAGES.small6 : IMAGES.Home
+                                                    label === 'Inicio'    ?  IMAGES.Home:
+                                                    label === 'Categoría' ?  IMAGES.grid:
+                                                    label === 'Mi Carrito'     ?  IMAGES.mycart:
+                                                    label === '-'   ?  IMAGES.heart2:
+                                                    label === username ? IMAGES.write1 : IMAGES.Home
                                                 }
                                             />
                                         {/* </Animated.View> */}

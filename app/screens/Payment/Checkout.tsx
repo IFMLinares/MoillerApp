@@ -15,14 +15,14 @@ import { RootStackParamList } from '../../navigation/RootStackParamList';
 const checkoutData = [
     {
         image: IMAGES.map,
-        title: "Delivery address",
-        text: "123 Main Street, Anytown, USA 12345",
+        title: "Dirección de entrega",
+        text: " ",
         navigate: "DeliveryAddress"
     },
     {
         image: IMAGES.card2,
-        title: "Payment",
-        text: "XXXX XXXX XXXX 3456",
+        title: "Método de pago",
+        text: " ",
         navigate: "Payment"
     },
 ]
@@ -37,13 +37,13 @@ const Checkout =  ({navigation} : CheckoutScreenProps) => {
     return (
        <View style={{backgroundColor:colors.background,flex:1}}>
             <Header
-                title='Checkout'
+                title='Verificar Pedido'
                 leftIcon='back'
                 titleRight
             />
             <ScrollView contentContainerStyle={{flexGrow:1}}>
                 <View style={[GlobalStyleSheet.container, { paddingTop: 10,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginTop:15 }]}>
-                    {checkoutData.map((data:any, index) => {
+                    {/* {checkoutData.map((data:any, index) => {
                         return (
                             <TouchableOpacity
                                 onPress={() => navigation.navigate(data.navigate)}
@@ -73,12 +73,13 @@ const Checkout =  ({navigation} : CheckoutScreenProps) => {
                                     </View>
                                 </View>
                                 <FeatherIcon size={22} color={colors.title} name={'chevron-right'} />
-                                {/* <Ionicons color={colors.title} name='chevron-forward' size={20}/> */}
+                                <Ionicons color={colors.title} name='chevron-forward' size={20}/>
                             </TouchableOpacity>
                         )
-                    })}
+                    })} */}
                     <View style={{ marginTop: 20, }}>
-                        <Text style={{ ...FONTS.fontRegular, fontSize: 15, color: colors.title }}>Additional Notes:</Text>
+                        <Text style={{ ...FONTS.fontRegular, fontSize: 15, color: colors.title }}>
+                        Notas adicionales:</Text>
                         <TextInput
                             style={{
                                 ...FONTS.fontRegular,
@@ -92,7 +93,7 @@ const Checkout =  ({navigation} : CheckoutScreenProps) => {
                                 paddingBottom:50,
                                 // width: '100%',
                             }}
-                            placeholder='Write Here'
+                            placeholder=' Escribe aquí'
                             multiline
                             placeholderTextColor={colors.text}
                         />
@@ -102,23 +103,28 @@ const Checkout =  ({navigation} : CheckoutScreenProps) => {
                 <View style={[GlobalStyleSheet.container, { paddingTop: 10,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginTop:15, }]}>
                     <View>
                         <View style={{borderBottomWidth:1,borderBottomColor:COLORS.primaryLight,marginHorizontal:-15,paddingHorizontal:15,paddingBottom:15,marginTop:5}}>
-                            <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Price Details</Text>
+                            <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>
+                            Detalles del precio</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5,marginTop:15 }}>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Price (5 Items)</Text>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>$21299</Text>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Precio (0 Items)</Text>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>0$</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Discount</Text>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>$4299</Text>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Descuento</Text>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>0$</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Delivery Charges</Text>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color:COLORS.success }}>Free Delivery</Text>
+                        {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}> Gastos de envío</Text>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color:COLORS.success }}>Delivery Gratis </Text>
+                        </View> */}
+                        <View style={{borderTopWidth:1,borderTopColor:COLORS.primaryLight,marginHorizontal:-0,paddingHorizontal:15,paddingTop:15,paddingBottom:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                            <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Subtotal</Text>
+                            <Text style={[FONTS.fontMedium,{fontSize:16,color:COLORS.success}]}>0$</Text>
                         </View>
-                        <View style={{borderTopWidth:1,borderTopColor:COLORS.primaryLight,marginHorizontal:-15,paddingHorizontal:15,paddingTop:15,paddingBottom:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Price Details</Text>
-                            <Text style={[FONTS.fontMedium,{fontSize:16,color:COLORS.success}]}>$17299</Text>
+                        <View style={{borderTopWidth:1,borderTopColor:COLORS.primaryLight,marginHorizontal:-0,paddingHorizontal:15,paddingTop:15,paddingBottom:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                            <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Detalles del precio</Text>
+                            <Text style={[FONTS.fontMedium,{fontSize:16,color:COLORS.success}]}>0$</Text>
                         </View>
                     </View>
                 </View>
@@ -126,7 +132,7 @@ const Checkout =  ({navigation} : CheckoutScreenProps) => {
             <View style={[GlobalStyleSheet.container,{paddingHorizontal:0,paddingBottom:0}]}>
                 <View style={{height:88,width:'100%',backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,justifyContent:'center',paddingHorizontal:15}}>
                     <Button
-                        title='Submit Order'
+                        title='Enviar pedido'
                         color={COLORS.secondary}
                         text={COLORS.title}
                         onPress={() => navigation.navigate('Myorder')}

@@ -103,7 +103,7 @@ const Wishlist = ({navigation} : WishlistScreenProps) => {
   return (
      <View style={{backgroundColor:colors.background,flex:1}}>
         <Header
-          title='My Wishlist'
+          title='Mi '
           leftIcon={'back'}
           righttitle
           titleLeft
@@ -152,7 +152,8 @@ const Wishlist = ({navigation} : WishlistScreenProps) => {
                             >
                                 <Feather color={COLORS.primary} size={24} name='heart'/>
                             </View>
-                            <Text style={{...FONTS.h5,color:colors.title,marginBottom:8}}>Your Wishlist is Empty!</Text>    
+                            <Text style={{...FONTS.h5,color:colors.title,marginBottom:8}}>
+                            ¡Tu - está vacía!</Text>    
                             <Text
                                 style={{
                                     ...FONTS.fontSm,
@@ -161,7 +162,7 @@ const Wishlist = ({navigation} : WishlistScreenProps) => {
                                     paddingHorizontal:40,
                                     marginBottom:30,
                                 }}
-                            >Add Product to you favourite and shop now.</Text>
+                            >Agregue el producto a su favorito y compre ahora.</Text>
                         </View>
                     }
               </View>

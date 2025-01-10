@@ -9,7 +9,7 @@ const CheckoutItems = () => {
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
 
-    const [itemQuantity, setItemQuantity] = useState(14);
+    const [itemQuantity, setItemQuantity] = useState(1);
 
   return (
     <View

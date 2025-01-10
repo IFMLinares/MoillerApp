@@ -77,19 +77,19 @@ const Cardstyle2 = ({title,price,image,delevery,removelikebtn,offer,btntitle,onP
                     <Text style={[FONTS.fontJostLight,{fontSize:12,color:colors.title,textDecorationLine:'line-through',opacity:.6}]}>{discount}</Text>
                     <Text style={[FONTS.fontRegular,{fontSize:12,color:COLORS.danger,}]}>{offer}</Text>
                 </View>
-                <View style={{flexDirection:'row',alignItems:'center',gap:10,marginTop:2}}>
+                {/* <View style={{flexDirection:'row',alignItems:'center',gap:10,marginTop:2}}>
                     <Image
                         style={{height:12,width:64}}
                         source={IMAGES.star7}
                     />
-                    <Text style={[FONTS.fontRegular,{fontSize:12,color:colors.title,opacity:.5}]}>(270 Review)</Text>
-                </View>
+                    <Text style={[FONTS.fontRegular,{fontSize:12,color:colors.title,opacity:.5}]}>(270 Vistas)</Text>
+                </View> */}
                 <View style={{flexDirection:'row',alignItems:'center',gap:5,marginTop:10}}>
-                    <Image
+                    {/* <Image
                         style={{height:14,width:14}}
                         source={IMAGES.leftarrow}
-                    />
-                    <Text style={[FONTS.fontRegular,{fontSize:14,color:colors.text}]}>14 Days return available</Text>
+                    /> */}
+                    {/* <Text style={[FONTS.fontRegular,{fontSize:14,color:colors.text}]}>14 Days return available</Text> */}
                 </View>
             </View>
             {closebtn ?
@@ -106,8 +106,8 @@ const Cardstyle2 = ({title,price,image,delevery,removelikebtn,offer,btntitle,onP
         {removebottom ?
             null 
             :
-            <View style={{height:40,width:'100%',justifyContent:'space-between',flexDirection:'row',alignItems:'center'}}>
-                {trackorder ? 
+            <View style={{height:40,width:'100%',justifyContent:'space-around',flexDirection:'row',alignItems:'center'}}>
+                {/* {trackorder ? 
                     <TouchableOpacity onPress={onPress2} activeOpacity={0.5} style={{flexDirection:'row',alignItems:'center',gap:5,paddingHorizontal:0}}>
                         <Feather size={14} color={colors.primary} name={'truck'} />
                         <Text style={[FONTS.fontRegular,{fontSize:14,color:colors.text}]}>Track Order</Text>
@@ -120,12 +120,12 @@ const Cardstyle2 = ({title,price,image,delevery,removelikebtn,offer,btntitle,onP
                         />
                         <Text style={[FONTS.fontRegular,{fontSize:14,color:COLORS.success}]}>Completed</Text>
                     </TouchableOpacity>
-                :
+                : */}
                     <View>
                         <CheckoutItems/>
                     </View>
-                }
-                <View style={{width:1,height:40,backgroundColor:COLORS.primaryLight,}}/>
+                {/* } */}
+                {/* <View style={{width:1,height:40,backgroundColor:COLORS.primaryLight,}}/>
                 {trackorder ?
                     <TouchableOpacity onPress={onPress3} activeOpacity={0.5} style={{flexDirection:'row',alignItems:'center',gap:5,paddingHorizontal:0}}>
                         <Image
@@ -157,10 +157,10 @@ const Cardstyle2 = ({title,price,image,delevery,removelikebtn,offer,btntitle,onP
                         style={{flexDirection:'row',alignItems:'center',gap:5,paddingHorizontal:0}}
                     >
                         <Feather size={14} color={colors.text} name={'save'} />
-                        <Text style={[FONTS.fontRegular,{fontSize:14,color:colors.text}]}>Save for later</Text>
+                        <Text style={[FONTS.fontRegular,{fontSize:14,color:colors.text}]}>Guardar para más tarde</Text>
                     </TouchableOpacity>
-                }      
-                <View style={{width:1,height:40,backgroundColor:COLORS.primaryLight,}}/>
+                }       */}
+                <View style={{width:1,height:40,backgroundColor:COLORS.primaryLight, }}/>
                 <TouchableOpacity
                     onPress={onPress4} 
                     activeOpacity={0.5} 
@@ -170,7 +170,7 @@ const Cardstyle2 = ({title,price,image,delevery,removelikebtn,offer,btntitle,onP
                         style={{ height: 16, width: 16, resizeMode: 'contain', tintColor:COLORS.danger }}
                         source={IMAGES.delete}
                     />
-                    <Text style={{ ...FONTS.fontMedium, fontSize: 14, color:COLORS.danger }}>Remove</Text>
+                    <Text style={{ ...FONTS.fontMedium, fontSize: 14, color:COLORS.danger }}>Eliminar</Text>
                 </TouchableOpacity>
             </View>
         }

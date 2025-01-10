@@ -15,24 +15,24 @@ import { RootStackParamList } from '../../navigation/RootStackParamList';
 const saveData = [
     {
         image: IMAGES.Home4,
-        title: "Home Address",
-        text: "123 Main Street, Anytown, USA 12345",
+        title: "Dirección de casa",
+        text: " ",
     },
-    {
-        image: IMAGES.map,
-        title: "Office Address",
-        text: "456 Elm Avenue, Smallville, CA 98765",
-    },
-    {
-        image: IMAGES.Home4,
-        title: "Home Address",
-        text: "789 Maple Lane, Suburbia, NY 54321",
-    },
-    {
-        image: IMAGES.shop,
-        title: "Shop Address",
-        text: "654 Pine Road, Countryside, FL 34567",
-    },
+    // {
+    //     image: IMAGES.map,
+    //     title: "Office Address",
+    //     text: "456 Elm Avenue, Smallville, CA 98765",
+    // },
+    // {
+    //     image: IMAGES.Home4,
+    //     title: "Home Address",
+    //     text: "789 Maple Lane, Suburbia, NY 54321",
+    // },
+    // {
+    //     image: IMAGES.shop,
+    //     title: "Shop Address",
+    //     text: "654 Pine Road, Countryside, FL 34567",
+    // },
 ]
 
 
@@ -48,7 +48,7 @@ const DeliveryAddress = ({navigation} : DeliveryAddressScreenProps) => {
     return (
         <View style={{backgroundColor:colors.background,flex:1}}>
             <Header
-                title='Delivery Address'
+                title='Dirección de entrega'
                 leftIcon='back'
                 titleLeft
                 righttitle='4 address'
@@ -74,21 +74,21 @@ const DeliveryAddress = ({navigation} : DeliveryAddressScreenProps) => {
                         <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primary,alignItems:'center',justifyContent:'center'}}>
                             <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.card}]}>1</Text>
                         </View>
-                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>Cart</Text>
+                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>MI CARRITO</Text>
                     </View>
                     <View style={{height:2,flex:1,backgroundColor:COLORS.primary,marginHorizontal:10}}/>
                     <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
                     <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primary,alignItems:'center',justifyContent:'center'}}>
                             <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.card}]}>2</Text>
                         </View>
-                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>Address</Text>
+                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>DIRECCIÓN</Text>
                     </View>
                     <View style={{height:2,flex:1,backgroundColor:colors.title,opacity:.1,marginHorizontal:10}}/>
                     <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
                         <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primaryLight,alignItems:'center',justifyContent:'center'}}>
                             <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.title}]}>3</Text>
                         </View>
-                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.text}]}>payment</Text>
+                        <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.text}]}>MÉTODOS DE PAGO</Text>
                     </View>
                 </View>
             </View>
@@ -169,7 +169,7 @@ const DeliveryAddress = ({navigation} : DeliveryAddressScreenProps) => {
                                 style={{ height: 20, width: 20, resizeMode: 'contain', tintColor:COLORS.primary }}
                                 source={IMAGES.plus}
                             />
-                            <Text style={{ ...FONTS.fontMedium, fontSize: 14, color: colors.title }}>Add Address</Text>
+                            <Text style={{ ...FONTS.fontMedium, fontSize: 14, color: colors.title }}>AGREGAR DIRECCIÓN</Text>
                         </View>
                         <Feather size={22} color={colors.title} name={'chevron-right'} />
                     </TouchableOpacity>
@@ -193,7 +193,7 @@ const DeliveryAddress = ({navigation} : DeliveryAddressScreenProps) => {
                     }}
                 >
                     <Button
-                        title='Continue'
+                        title='Continuar'
                         color={COLORS.secondary}
                         text={ COLORS.title}
                         onPress={() => navigation.navigate('Payment')}

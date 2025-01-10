@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text,  ScrollView, Image, TouchableOpacity } from 'react-native'
 import { useNavigation, useTheme } from '@react-navigation/native';
 import Header from '../../layout/Header';
@@ -8,6 +8,7 @@ import Input from '../../components/Input/Input';
 //import { Feather } from '@expo/vector-icons';
 import Button from '../../components/Button/Button';
 import { COLORS, FONTS } from '../../constants/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditProfile = () => {
 
@@ -21,10 +22,23 @@ const EditProfile = () => {
     const [isFocused2 , setisFocused2] = useState(false);
     const [isFocused3 , setisFocused3] = useState(false);
 
+    const [username, setUsername] = useState('');
+
+    useEffect(() => {
+      const getUsername = async () => {
+        const storedUsername = await AsyncStorage.getItem('username');
+        if (storedUsername) {
+          setUsername(storedUsername);
+        }
+      };
+  
+      getUsername();
+    }, []);
+
     return (
        <View style={{backgroundColor:colors.background,flex:1}}>
            <Header
-                title='Edit Profile'
+                title='Editar Perfil'
                 leftIcon='back'
                 titleRight
            />
@@ -35,7 +49,7 @@ const EditProfile = () => {
                             <View style={{ borderWidth: 2, borderColor:COLORS.primary, height: 90, width: 90, borderRadius: 50, alignItems: 'center', justifyContent: 'center' }}>
                                 <Image
                                     style={{ height: 82, width: 82, borderRadius: 50 }}
-                                    source={IMAGES.small6}
+                                    source={IMAGES.write1}
                                 />
                             </View>
                             <TouchableOpacity activeOpacity={0.9} style={{ height: 42, width: 42, borderRadius: 40, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', position: 'absolute', bottom: 0, left:60 }}>
@@ -48,20 +62,20 @@ const EditProfile = () => {
                             </TouchableOpacity>
                         </View>
                         <View>
-                            <Text style={[FONTS.fontMedium,{fontSize:24,color:colors.title}]}>James Smith</Text>
-                            <Text style={[FONTS.fontMedium,{fontSize:13,color:COLORS.primary}]}>Last Visit : 17 Jan 2024</Text>
+                            <Text style={[FONTS.fontMedium,{fontSize:24,color:colors.title}]}>{username}</Text>
+                            <Text style={[FONTS.fontMedium,{fontSize:13,color:COLORS.primary}]}>Ultima visita : 17 Jan 2024</Text>
                         </View>
                     </View>
                 </View>
                 <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginTop:10,paddingVertical:10}]}>
                     <View style={{ marginBottom: 20, marginTop: 10 }}>
-                        <Text style={{ ...FONTS.fontMedium, fontSize: 13, color:COLORS.primary, }}>Your Name</Text>
+                        <Text style={{ ...FONTS.fontMedium, fontSize: 13, color:COLORS.primary, }}>Nombre y Apellido</Text>
                         <Input
                              onFocus={() => setisFocused(true)}
                              onBlur={() => setisFocused(false)}
                              isFocused={isFocused}
                             inputBorder
-                            defaultValue="James Smith"
+                            defaultValue={username}
                             onChangeText={(value) => console.log(value)}
                             style={{borderColor:COLORS.primaryLight, paddingLeft:0}}
                         />
@@ -72,7 +86,7 @@ const EditProfile = () => {
                              onBlur={() => setisFocused1(false)}
                              isFocused={isFocused1}
                             inputBorder
-                            placeholder='Mobile Number'
+                            placeholder='Número de teléfono'
                             onChangeText={(value) => console.log(value)}
                             style={{borderColor:COLORS.primaryLight, paddingLeft:0}}
                         />
@@ -94,7 +108,7 @@ const EditProfile = () => {
                              onBlur={() => setisFocused3(false)}
                              isFocused={isFocused3}
                             inputBorder
-                            placeholder='Location'
+                            placeholder='Ubiación'
                             onChangeText={(value) => console.log(value)}
                             style={{borderColor:COLORS.primaryLight, paddingLeft:0}}
                         />
@@ -104,7 +118,7 @@ const EditProfile = () => {
             <View style={[GlobalStyleSheet.container,{paddingHorizontal:0,paddingBottom:0}]}>
                 <View style={{height:88,width:'100%',backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,justifyContent:'center',paddingHorizontal:15}}>
                     <Button
-                        title='Update Profile'
+                        title='Actualizar perfil'
                         color={COLORS.secondary}
                         text={ COLORS.title}
                         onPress={() => navigation.navigate('Profile')}

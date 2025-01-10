@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
@@ -7,11 +7,9 @@ import { ThemeContext } from '../constants/ThemeContext';
 import { IMAGES } from '../constants/Images';
 
 const ThemeBtn = () => {
-
-    const {colors} = useTheme();
+    const { colors } = useTheme();
     const theme = useTheme();
-
-    const {setDarkTheme,setLightTheme} = React.useContext(ThemeContext);
+    const { setDarkTheme, setLightTheme } = React.useContext(ThemeContext);
 
     const offset = useSharedValue(0);
     const opacityDark = useSharedValue(0);
@@ -19,20 +17,21 @@ const ThemeBtn = () => {
 
     const animatedStyles = useAnimatedStyle(() => {
         return {
-          transform: [{ translateX: offset.value}],
+            transform: [{ translateX: offset.value }],
         };
     });
-   
-    if(theme.dark){
-        offset.value = withSpring(34);
-        opacityDark.value = withTiming(1);
-        opacityLight.value = withTiming(0);
-    }else{
-        offset.value = withSpring(0);
-        opacityLight.value = withTiming(1);
-        opacityDark.value = withTiming(0);
-    }
 
+    useEffect(() => {
+        if (theme.dark) {
+            offset.value = withSpring(34);
+            opacityDark.value = withTiming(1);
+            opacityLight.value = withTiming(0);
+        } else {
+            offset.value = withSpring(0);
+            opacityLight.value = withTiming(1);
+            opacityDark.value = withTiming(0);
+        }
+    }, [theme.dark, offset, opacityDark, opacityLight]);
 
     return (
         <TouchableOpacity

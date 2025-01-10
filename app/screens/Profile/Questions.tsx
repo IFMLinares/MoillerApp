@@ -13,7 +13,7 @@ const Questions = () => {
     return (
         <View style={{backgroundColor:colors.background,flex:1}}>
             <Header
-                title='Questions'
+                title='Preguntas'
                 leftIcon='back'
                 titleRight
             />
