@@ -27,7 +27,9 @@ import Swiper from "react-native-swiper/src";
 import data from "../../data/data.json";
 import Toast from "react-native-toast-message";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
-import { addToCart } from '../../redux/reducer/cartReducer';
+import Feather from "react-native-vector-icons/Feather";
+import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import { addToCart } from "../../redux/reducer/cartReducer";
 
 // Importa las imágenes
 import producto1 from "../../assets/images/producto/item.webp";
@@ -548,11 +550,10 @@ const Home = ({ navigation }: HomeScreenProps) => {
     const quantity = quantities[item.id] || 1;
     dispatch(addToCart({ ...item, quantity }));
     Toast.show({
-      type: 'success',
-      text1: 'Producto agregado al carrito',
+      type: "success",
+      text1: "Producto agregado al carrito",
     });
   };
-
 
   const moresheet2 = useRef<any>(null);
 
@@ -572,7 +573,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
         colors={["#001A44", "#193561"]}
         style={{ height: undefined, width: "100%" }}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ height: 60, backgroundColor: COLORS.primary }}>
+          <View style={{ height: 60, backgroundColor: COLORS.primary, marginBottom: 20 }}>
             <View
               style={[GlobalStyleSheet.container, { paddingHorizontal: 20 }]}>
               <View
@@ -604,27 +605,54 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     source={IMAGES.appname}
                   />
                 </View>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("Search")}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}>
+                  <View
                     style={{
-                      height: 35,
-                      width: 35,
-                      // borderRadius:8,
-                      // backgroundColor:theme.dark ? 'rgba(255,255,255,0.10)' : COLORS.background,
+                      flexDirection: "row",
                       alignItems: "center",
-                      justifyContent: "center",
+                      backgroundColor: COLORS.card,
+                      borderRadius: 18,
+                      // paddingHorizontal: 10,
                     }}>
-                    <Image
+                    <View
                       style={{
-                        height: 22,
-                        width: 22,
-                        tintColor: COLORS.card,
-                        resizeMode: "contain",
+                        transform: [{ rotate: "90deg" }],
+                        marginLeft: 20,
+                      }}>
+                      <Feather name="search" size={20} color={COLORS.title} />
+                    </View>
+                    <TextInput
+                      placeholder="Buscar"
+                      placeholderTextColor={COLORS.title}
+                      style={{
+                        backgroundColor: COLORS.card,
+                        width: 140,
+                        height: 45,
+                        borderRadius: 18,
+                        paddingLeft: 10,
+                        color: COLORS.title,
+                        fontSize: 16,
+                        // flex: 1,
                       }}
-                      source={IMAGES.search}
                     />
-                  </TouchableOpacity>
+                    <View
+                      style={{
+                        transform: [{ rotate: "90deg" }],
+                        marginRight: 20,
+                        
+                      }}>
+                      <SimpleLineIcons
+                        name="equalizer"
+                        size={18}
+                        color={COLORS.white}
+                        style={{ padding: 12,backgroundColor: COLORS.primary,borderRadius: 18 }}
+                      />
+                    </View>
+                  </View>
                   {/* <TouchableOpacity
                     //onPress={() => navigation.navigate('Notification')}
                     onPress={() => moresheet2.current.openSheet("notification")}
@@ -1482,15 +1510,25 @@ const Home = ({ navigation }: HomeScreenProps) => {
                         alignItems: "center",
                         justifyContent: "flex-end",
                         marginVertical: 10,
-                        marginHorizontal: 10, 
+                        marginHorizontal: 10,
                       }}>
-                      <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: COLORS.light }}> 
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          backgroundColor: COLORS.light,
+                        }}>
                         <TouchableOpacity
                           onPress={() => decrementQuantity(item.id)}
                           style={{ padding: 10 }}>
                           <Text style={{ fontSize: 18 }}>-</Text>
                         </TouchableOpacity>
-                        <Text style={{ fontSize: 18, marginHorizontal: 10, fontWeight: "bold" }}>
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            marginHorizontal: 10,
+                            fontWeight: "bold",
+                          }}>
                           {quantity}
                         </Text>
                         <TouchableOpacity
@@ -1502,7 +1540,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                       <TouchableOpacity
                         onPress={() => addItemToCart(item)}
                         style={{
-                          marginLeft: 10, 
+                          marginLeft: 10,
                           flexDirection: "row",
                           alignItems: "center",
                           justifyContent: "center",
