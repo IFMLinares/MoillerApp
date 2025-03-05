@@ -96,7 +96,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                         }]}
                     >
 
-                        <Animated.View style={{transform: [{translateX: circlePosition}]}}>
+                        {/* <Animated.View style={{transform: [{translateX: circlePosition}]}}>
                             <View
                                 style={{
                                     width: tabWidth < SIZES.container ? tabWidth / 5 : SIZES.container / 5,
@@ -109,7 +109,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                     justifyContent: 'center',
                                 }}
                             >
-                                {/* <View
+                                <View
                                     style={{
                                         height:65,
                                         width:65,
@@ -117,7 +117,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                         backgroundColor:'rgba(255,255,255,.1)',
                                         position:'absolute',
                                     }}
-                                /> */}
+                                />
                                 <View
                                     style={{
                                         height:4,
@@ -129,7 +129,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                     }}
                                 />
                             </View>
-                        </Animated.View>
+                        </Animated.View> */}
 
                         {state.routes.map((route:any , index:string) => {
 
@@ -198,7 +198,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                                     label === 'Inicio'    ?  IMAGES.Home:
                                                     label === 'Categoría' ?  IMAGES.grid:
                                                     label === 'Mi Carrito'     ?  IMAGES.mycart:
-                                                    label === '-'   ?  IMAGES.heart2:
+                                                    label === 'Wishlist'   ?  IMAGES.heart2:
                                                     label === username ? IMAGES.write1 : IMAGES.Home
                                                 }
                                             />

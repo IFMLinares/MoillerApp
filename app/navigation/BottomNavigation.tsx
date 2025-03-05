@@ -46,7 +46,7 @@ const BottomNavigation = () => {
                 component={MyCartScreen}
             />
             {/* <Tab.Screen 
-                name='-'
+                name='Wishlist'
                 component={WishlistScreen}
             /> */}
             <Tab.Screen 

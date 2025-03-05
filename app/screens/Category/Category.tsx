@@ -70,7 +70,7 @@ const Category = ({navigation, route} : CategoryScreenProps) => {
           title='Categorías'
           leftIcon='back'
           titleLeft
-          rightIcon1={'search'}
+          // rightIcon1={'search'}
         />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <View style={[GlobalStyleSheet.container, { padding: 0, flex: 1 }]}>

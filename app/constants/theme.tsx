@@ -1,5 +1,6 @@
 import { Dimensions } from "react-native";
 import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 const {width,height} = Dimensions.get('screen');
 
 export const COLORS = {
@@ -16,7 +17,8 @@ export const COLORS = {
 	label: "#8A8A8A",
 	backgroundColor: "#fff",
 	black: "#000", 
-	
+	red: "red",
+	mostaza: "#c28400",
 	//light theme
 	card : "#fff",
 	background : "#F2F3F8",

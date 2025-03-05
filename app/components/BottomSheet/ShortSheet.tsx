@@ -15,7 +15,7 @@ const ShortSheet2 = ({shortRef} : Props)  => {
     const { colors } : {colors : any} = theme;
 
 
-    const SortData = ["Relevance", "Popularity", "Price -- Low to High","Price -- High to Low","Newest First"];
+    const SortData = ["Relevante", "Popularidad", "Precio: menor a mayor","Precio: mayor a menor","Lo más nuevo primero"];
 
     const [activeSize, setActiveSize] = useState(SortData[0]);
 
@@ -34,7 +34,7 @@ const ShortSheet2 = ({shortRef} : Props)  => {
                         paddingHorizontal: 15
                     }}
                 >
-                    <Text style={[FONTS.fontMedium, { color: colors.title, fontSize: 16 }]}>SORT BY</Text>
+                    <Text style={[FONTS.fontMedium, { color: colors.title, fontSize: 16 }]}>Ordenar por:</Text>
                     <TouchableOpacity
                         style={{ height: 38, width: 38, backgroundColor: colors.card, borderRadius: 38, alignItems: 'center', justifyContent: 'center' }}
                         onPress={() => shortRef.current.close()}

@@ -30,6 +30,11 @@ import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Feather from "react-native-vector-icons/Feather";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { addToCart } from "../../redux/reducer/cartReducer";
+import { Dimensions } from "react-native";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 // Importa las imágenes
 import producto1 from "../../assets/images/producto/item.webp";
@@ -103,7 +108,7 @@ const PopoulerData = [
   },
   {
     title: "Más vendidos",
-    // image: true,
+    image: true,
   },
   {
     title: "Nuevo",
@@ -527,7 +532,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const { colors }: { colors: any } = theme;
 
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
-
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const addItemToWishList = (data: any) => {
     dispatch(addTowishList(data));
   };
@@ -551,7 +556,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
     dispatch(addToCart({ ...item, quantity }));
     Toast.show({
       type: "success",
-      text1: "Producto agregado al carrito",
+      text1: "¡Producto/s añadido a su carrito exitosamente!",
     });
   };
 
@@ -573,7 +578,12 @@ const Home = ({ navigation }: HomeScreenProps) => {
         colors={["#001A44", "#193561"]}
         style={{ height: undefined, width: "100%" }}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ height: 60, backgroundColor: COLORS.primary, marginBottom: 20 }}>
+          <View
+            style={{
+              height: 40,
+              backgroundColor: COLORS.primary,
+              marginBottom: 20,
+            }}>
             <View
               style={[GlobalStyleSheet.container, { paddingHorizontal: 20 }]}>
               <View
@@ -601,7 +611,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     />
                   </TouchableOpacity> */}
                   <Image
-                    style={{ resizeMode: "contain", width: 150, height: 40 }}
+                    style={{ resizeMode: "contain", width: wp('30.5%'), height: hp('5%') }}
                     source={IMAGES.appname}
                   />
                 </View>
@@ -621,37 +631,42 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     <View
                       style={{
                         transform: [{ rotate: "90deg" }],
-                        marginLeft: 20,
-                      }}>
-                      <Feather name="search" size={20} color={COLORS.title} />
+                        marginLeft: wp('5%'),
+                      }}
+                    >
+                      <Feather name="search" size={hp('2.5%')} color={COLORS.title} />
                     </View>
                     <TextInput
                       placeholder="Buscar"
                       placeholderTextColor={COLORS.title}
                       style={{
                         backgroundColor: COLORS.card,
-                        width: 140,
-                        height: 45,
+                        width: wp('35%'),
+                        height: hp('4%'),
                         borderRadius: 18,
-                        paddingLeft: 10,
+                        paddingLeft: wp('2.5%'),
                         color: COLORS.title,
-                        fontSize: 16,
-                        // flex: 1,
+                        fontSize: hp('2%'),
                       }}
                     />
-                    <View
+                    {/* <View
                       style={{
                         transform: [{ rotate: "90deg" }],
-                        marginRight: 20,
-                        
-                      }}>
+                        position: "relative",
+                        left: wp('1%'),
+                      }}
+                    >
                       <SimpleLineIcons
                         name="equalizer"
-                        size={18}
+                        size={hp('2.25%')}
                         color={COLORS.white}
-                        style={{ padding: 12,backgroundColor: COLORS.primary,borderRadius: 18 }}
+                        style={{
+                          padding: hp('1.75%'),
+                          backgroundColor: COLORS.primary,
+                          borderRadius: 18,
+                        }}
                       />
-                    </View>
+                    </View> */}
                   </View>
                   {/* <TouchableOpacity
                     //onPress={() => navigation.navigate('Notification')}
@@ -857,52 +872,63 @@ const Home = ({ navigation }: HomeScreenProps) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={[{ paddingVertical: 0 }]}>
-            <View style={{ marginHorizontal: 0, marginVertical: 10 }}>
-              {/* <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{}}> */}
-              {absData.map((data, index) => {
-                return (
-                  <View
-                    key={index}
-                    style={{
-                      marginRight: -34,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}>
-                    <View style={{ flexDirection: "row" }}>
-                      <TouchableOpacity
-                        style={{ width: 235, height: 150, marginRight: 0 }}
-                        onPress={() =>
-                          navigation.navigate("Category", { initialIndex: 1 })
-                        } // Cambia el índice según la pestaña deseada
-                      >
-                        <Image
-                          style={{ width: 201, height: 150 }}
-                          source={IMAGES.ads12}
-                          resizeMode="stretch"
-                        />
-                      </TouchableOpacity>
+          <View
+            style={[
+              {
+                paddingVertical: 0,
+                width: "100%",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              },
+            ]}>
+            <View style={{ marginHorizontal: 0, marginVertical: 0 }}>
+              <ScrollView contentContainerStyle={{ width: "100%" }}>
+                {absData.map((data, index) => {
+                  return (
+                    <View
+                      key={index}
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                      }}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "center",
+                          width: "100%",
+                          height: 150,
+                        }}>
+                        <TouchableOpacity
+                          style={{ width: "40%",height: '100%' , marginRight:10 }}
+                          onPress={() =>
+                            navigation.navigate("Category", { initialIndex: 1 })
+                          } // Cambia el índice según la pestaña deseada
+                        >
+                          <Image
+                            style={{ width: "100%", height: "100%", borderRadius:20 }}
+                            source={IMAGES.ads12}
+                            resizeMode="stretch"
+                          />
+                        </TouchableOpacity>
 
-                      <TouchableOpacity
-                        style={{ marginRight: 0, width: 235, height: 150 }}
-                        onPress={() =>
-                          navigation.navigate("Category", { initialIndex: 2 })
-                        } // Cambia el índice según la pestaña deseada
-                      >
-                        <Image
-                          style={{ width: 201, height: 150 }}
-                          source={IMAGES.ads13}
-                          resizeMode="stretch"
-                        />
-                      </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{ width: "60%", height: '100%' }}
+                          onPress={() =>
+                            navigation.navigate("Category", { initialIndex: 2 })
+                          } // Cambia el índice según la pestaña deseada
+                        >
+                          <Image
+                            style={{ width: "100%", height: "100%", borderRadius:20, }}
+                            source={IMAGES.ads13}
+                            resizeMode="stretch"
+                          />
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  </View>
-                );
-              })}
-              {/* </ScrollView> */}
+                  );
+                })}
+              </ScrollView>
             </View>
           </View>
           <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
@@ -937,13 +963,13 @@ const Home = ({ navigation }: HomeScreenProps) => {
               </View>
             </View>
           </View>
-          <View style={{ height: 40, marginBottom: 10 }}>
+          <View style={{ height: 50 }}>
             <View
               style={[
                 GlobalStyleSheet.container,
                 { padding: 10, paddingHorizontal: 0 },
               ]}>
-              <View>
+              <View style={{}}>
                 <ScrollView
                   horizontal
                   contentContainerStyle={{ paddingHorizontal: 20, flexGrow: 1 }}
@@ -952,38 +978,48 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      gap: 70,
+                      gap: 60,
                     }}>
                     {PopoulerData.map((data: any, index) => {
+                      const isSelected = selectedCategory === data.title;
                       return (
-                        // <TouchableOpacity
-                        //   onPress={() => navigation.navigate("Products")}
-                        //   key={index}>
-                        <View
+                        <TouchableOpacity
+                          key={index}
+                          onPress={() => setSelectedCategory(data.title)}
                           style={{
-                            flexDirection: "row",
                             alignItems: "center",
-                            gap: 5,
+                            justifyContent: "center",
+                            paddingBottom: 5,
+                            borderBottomWidth: isSelected ? 2 : 0,
+                            borderBottomColor: isSelected
+                              ? "white"
+                              : "transparent",
                           }}>
-                          {data.image ? (
-                            <Image
-                              style={{
-                                height: 16,
-                                width: 16,
-                                resizeMode: "contain",
-                              }}
-                              source={IMAGES.fire}
-                            />
-                          ) : null}
-                          <Text
-                            style={[
-                              FONTS.fontMedium,
-                              { fontSize: 13, color: "white" },
-                            ]}>
-                            {data.title}
-                          </Text>
-                        </View>
-                        // </TouchableOpacity>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: 5,
+                            }}>
+                            {data.image ? (
+                              <Image
+                                style={{
+                                  height: 16,
+                                  width: 16,
+                                  resizeMode: "contain",
+                                }}
+                                source={IMAGES.fire}
+                              />
+                            ) : null}
+                            <Text
+                              style={[
+                                FONTS.fontBold,
+                                { fontSize: 13, color: "white" },
+                              ]}>
+                              {data.title}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
                       );
                     })}
                   </View>
@@ -1495,6 +1531,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                       id={item.id}
                       title={item.title}
                       image={images[item.image]}
+                      modelo={item.modelo}
                       price={item.price}
                       hascolor={item.hascolor}
                       onPress={() =>
@@ -1509,56 +1546,64 @@ const Home = ({ navigation }: HomeScreenProps) => {
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "flex-end",
-                        marginVertical: 10,
-                        marginHorizontal: 10,
+                        marginBottom: hp("0.4%"),
+                        paddingRight: wp("2.5%"),
+                        width: "100%",
+                        // marginHorizontal: wp('2.5%'),
+                        borderRightWidth: 1,
+                        borderRightColor: COLORS.primaryLight,
                       }}>
                       <View
                         style={{
                           flexDirection: "row",
                           alignItems: "center",
                           backgroundColor: COLORS.light,
+                          borderRadius: 10,
+                          height: hp("4.0%"),
                         }}>
                         <TouchableOpacity
                           onPress={() => decrementQuantity(item.id)}
-                          style={{ padding: 10 }}>
-                          <Text style={{ fontSize: 18 }}>-</Text>
+                          style={{ paddingHorizontal: wp("2.10%") }}>
+                          <Text style={{ fontSize: hp("2.25%") }}>-</Text>
                         </TouchableOpacity>
                         <Text
                           style={{
-                            fontSize: 18,
-                            marginHorizontal: 10,
+                            fontSize: hp("2%"),
+                            marginHorizontal: wp("1%"),
                             fontWeight: "bold",
                           }}>
                           {quantity}
                         </Text>
                         <TouchableOpacity
                           onPress={() => incrementQuantity(item.id)}
-                          style={{ padding: 10 }}>
-                          <Text style={{ fontSize: 18 }}>+</Text>
+                          style={{ paddingHorizontal: wp("2.10%") }}>
+                          <Text style={{ fontSize: hp("2.25%") }}>+</Text>
                         </TouchableOpacity>
                       </View>
                       <TouchableOpacity
                         onPress={() => addItemToCart(item)}
                         style={{
-                          marginLeft: 10,
+                          marginLeft: wp("2.0%"),
+                          marginRight: wp("2.0%"),
                           flexDirection: "row",
                           alignItems: "center",
                           justifyContent: "center",
                           backgroundColor: "#001A44",
-                          padding: 5,
+                          padding: hp("0.625%"),
                           borderRadius: 10,
-                          paddingHorizontal: 10,
+                          paddingHorizontal: wp("2.5%"),
+                          height: hp("4.0%"),
                         }}>
                         <FontAwesome
                           name="cart-shopping"
-                          size={18}
+                          size={hp("1.8%")}
                           color={COLORS.white}
-                          style={{ marginRight: 10 }}
+                          style={{ marginRight: wp("2.5%") }}
                         />
                         <Text
                           style={[
                             FONTS.fontMedium,
-                            { fontSize: 18, color: "white" },
+                            { fontSize: hp("1.9%"), color: "white", position: "relative", top:-2, },
                           ]}>
                           Añadir
                         </Text>

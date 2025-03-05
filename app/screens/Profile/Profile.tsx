@@ -208,7 +208,7 @@ const Profile = ({navigation} : ProfileScreenProps) => {
                             style={{
                                 flexDirection: 'row',
                                 paddingHorizontal:15,
-                                height: 48,
+                                height: 55,
                                 alignItems: 'center',
                                 paddingVertical: 15,
                                 //borderRadius: SIZES.radius,

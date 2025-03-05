@@ -1,37 +1,37 @@
-import { useTheme } from '@react-navigation/native';
-import React from 'react'
-import { View, Text ,ScrollView, Image ,} from 'react-native'
-import Header from '../../layout/Header';
-import { GlobalStyleSheet } from '../../constants/StyleSheet';
-import { IMAGES } from '../../constants/Images';
-import { COLORS, FONTS } from '../../constants/theme';
-import Cardstyle2 from '../../components/Card/Cardstyle2';
-import Button from '../../components/Button/Button';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/RootStackParamList';
-import { useDispatch, useSelector } from 'react-redux';
-import { removeFromCart } from '../../redux/reducer/cartReducer';
-import { Feather } from '@expo/vector-icons';
+import { useTheme } from "@react-navigation/native";
+import React from "react";
+import { View, Text, ScrollView, Image } from "react-native";
+import Header from "../../layout/Header";
+import { GlobalStyleSheet } from "../../constants/StyleSheet";
+import { IMAGES } from "../../constants/Images";
+import { COLORS, FONTS } from "../../constants/theme";
+import Cardstyle2 from "../../components/Card/Cardstyle2";
+import Button from "../../components/Button/Button";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigation/RootStackParamList";
+import { useDispatch, useSelector } from "react-redux";
+import { removeFromCart } from "../../redux/reducer/cartReducer";
+import { Feather } from "@expo/vector-icons";
 
 // Importa las imágenes
-import producto1 from '../../assets/images/producto/item.webp';
-import producto2 from '../../assets/images/producto/item1.webp';
-import producto3 from '../../assets/images/producto/item2.png';
-import producto5 from '../../assets/images/producto/item3.jpg';
-import producto6 from '../../assets/images/producto/item4.webp';
-import producto7 from '../../assets/images/producto/item5.webp';
-import producto8 from '../../assets/images/producto/item6.webp';
-import producto9 from '../../assets/images/producto/item7.webp';
-import producto10 from '../../assets/images/producto/item8.jpg';
-import producto11 from '../../assets/images/producto/item9.webp';
-import producto12 from '../../assets/images/producto/item11.webp';
-import producto13 from '../../assets/images/producto/item12.webp';
-import producto14 from '../../assets/images/producto/item13.jpg';
-import producto15 from '../../assets/images/producto/item14.webp';
-import producto16 from '../../assets/images/producto/item15.png';
-import producto17 from '../../assets/images/producto/item16.webp';
-import producto18 from '../../assets/images/producto/item17.webp';
-import producto19 from '../../assets/images/producto/item18.jpg';
+import producto1 from "../../assets/images/producto/item.webp";
+import producto2 from "../../assets/images/producto/item1.webp";
+import producto3 from "../../assets/images/producto/item2.png";
+import producto5 from "../../assets/images/producto/item3.jpg";
+import producto6 from "../../assets/images/producto/item4.webp";
+import producto7 from "../../assets/images/producto/item5.webp";
+import producto8 from "../../assets/images/producto/item6.webp";
+import producto9 from "../../assets/images/producto/item7.webp";
+import producto10 from "../../assets/images/producto/item8.jpg";
+import producto11 from "../../assets/images/producto/item9.webp";
+import producto12 from "../../assets/images/producto/item11.webp";
+import producto13 from "../../assets/images/producto/item12.webp";
+import producto14 from "../../assets/images/producto/item13.jpg";
+import producto15 from "../../assets/images/producto/item14.webp";
+import producto16 from "../../assets/images/producto/item15.png";
+import producto17 from "../../assets/images/producto/item16.webp";
+import producto18 from "../../assets/images/producto/item17.webp";
+import producto19 from "../../assets/images/producto/item18.jpg";
 
 // Mapea las rutas de las imágenes a las importaciones
 const images = {
@@ -55,46 +55,36 @@ const images = {
   "IMAGES.producto19": producto19,
 };
 
-type MyCartScreenProps = StackScreenProps<RootStackParamList, 'Mi Carrito'>;
+type MyCartScreenProps = StackScreenProps<RootStackParamList, "Mi Carrito">;
 
-const MyCart = ({navigation} : MyCartScreenProps)=> {
+const MyCart = ({ navigation }: MyCartScreenProps) => {
+  const cart = useSelector((state: any) => state.cart.cart);
+  const dispatch = useDispatch();
 
-    const cart = useSelector((state:any) => state.cart.cart);
-    const dispatch = useDispatch();
+  const removeItemFromCart = (data: any) => {
+    dispatch(removeFromCart(data));
+  };
 
-    const removeItemFromCart = (data: any) => {
-        dispatch(removeFromCart(data));
-    }
-
-  
   const theme = useTheme();
-  const { colors } : {colors : any} = theme;
+  const { colors }: { colors: any } = theme;
+
+  // Función para calcular el total
+  const calculateTotal = () => {
+    return cart
+      .reduce((total: number, item: any) => {
+        const price = parseFloat(item.price.replace(/[^0-9.-]+/g, "").replace(",", "."));
+        return total + price;
+      }, 0)
+      .toFixed(2);
+  };
+
 
   return (
-      <View style={{backgroundColor:colors.background,flex:1}}>
-          <Header
-            title='Mi carrito'
-            leftIcon='back'
-            titleLeft
-            righttitle2
-          />
-            {cart.length > 0 ?
-                <View 
-                    style={[GlobalStyleSheet.container,
-                        { paddingHorizontal: 15,
-                            backgroundColor:theme.dark ? 'rgba(255,255,258,.1)':colors.card,
-                            shadowColor: "#000",
-                            shadowOffset: {
-                                width: 0,
-                                height: 4,
-                            },
-                            shadowOpacity: 0.35,
-                            shadowRadius: 6.27,
-                            elevation: 5, 
-                        }
-                    ]}
-                >
-                    {/* <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+    <View style={{ backgroundColor: colors.background, flex: 1 }}>
+      <Header title="Mi carrito" leftIcon="back" titleLeft righttitle2 />
+      {cart.length > 0 ? (
+        <View>
+          {/* <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                         <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
                             <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primary,alignItems:'center',justifyContent:'center'}}>
                                 <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.card}]}>1</Text>
@@ -116,11 +106,9 @@ const MyCart = ({navigation} : MyCartScreenProps)=> {
                             <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.text}]}>payment</Text>
                         </View>
                     </View> */}
-                </View>
-                :
-                null
-            }
-            {/* {cart.length > 0 ?
+        </View>
+      ) : null}
+      {/* {cart.length > 0 ?
                 <View style={[GlobalStyleSheet.container,{padding:0}]}>
                     <View style={{height:45,backgroundColor:'#87E8FF',marginVertical:15,flexDirection:'row',alignItems:'center',width:'100%',justifyContent:'space-between',paddingLeft:15}}>
                         <View>
@@ -141,65 +129,130 @@ const MyCart = ({navigation} : MyCartScreenProps)=> {
                 :
                 null
             } */}
-            <ScrollView contentContainerStyle={{flexGrow:1}} showsVerticalScrollIndicator={false}>
-                <View style={[GlobalStyleSheet.container,{padding:0}]}>
-                    {cart.map((data:any,index:any) => {
-                        return(
-                            <View key={index} style={{marginBottom:10}}>
-                                <Cardstyle2
-                                    title={data.title}
-                                    price={data.price}
-                                    discount={data.discount}
-                                    delevery={data.delevery}
-                                    image={images[data.image]} // Usa el objeto images para obtener la imagen
-                                    offer={data.offer}
-                                    brand={data.brand} 
-                                    onPress={() => navigation.navigate('ProductsDetails')}
-                                    onPress4={() => removeItemFromCart(data)} 
-                                />
-                            </View>
-                        )
-                    })}
-                </View>
-            </ScrollView>
-            {cart.length > 0 ?
-                (
-                    <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card}]}>
-                        <Button
-                            title='Proceder a comprar '
-                            color={COLORS.secondary}
-                            text={COLORS.title}
-                            onPress={() => navigation.navigate('Checkout')}
-                        />
-                    </View>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}>
+        <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
+          {cart.map((data: any, index: any) => {
+            return (
+              <View key={index} style={{ marginBottom: 10 }}>
+                <Cardstyle2
+                  title={data.title}
+                  price={data.price}
+                  discount={data.discount}
+                  delevery={data.delevery}
+                  image={images[data.image]} // Usa el objeto images para obtener la imagen
+                  offer={data.offer}
+                  brand={data.brand}
+                  marca={data.marca}
+                  modelo={data.modelo}
+                  onPress={() =>
+                    navigation.navigate("ProductsDetails", {
+                      productId: data.id,
+                    })
+                  }
+                  onPress4={() => removeItemFromCart(data)}
+                />
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
+      <View
+        style={[
+          GlobalStyleSheet.container,
+          {
+            paddingTop: 10,
+            backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
+            marginTop: 15,
+          },
+        ]}>
+        <View>
+          {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}> Gastos de envío</Text>
+                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color:COLORS.success }}>Delivery Gratis </Text>
+                                    </View> */}
 
-
-                )
-                :
-                (
-                    <View style={[GlobalStyleSheet.container,{padding:0,position:'absolute',left:0,right:0,bottom:0,top:20}]}>
-                        <View
-                            style={{
-                                flex:1,
-                                alignItems:'center',
-                                justifyContent:'center',
-                            }}
-                        >
-                            <View
-                                style={{
-                                    height:60,
-                                    width:60,
-                                    borderRadius:60,
-                                    alignItems:'center',
-                                    justifyContent:'center',
-                                    backgroundColor:COLORS.primaryLight,
-                                    marginBottom:20,
-                                }}
-                            >
-                                <Feather color={COLORS.primary} size={24} name='shopping-cart'/>
-                            </View>
-                            <Text style={{...FONTS.h5,color:colors.title,marginBottom:8}}> ¡Tu carrito de compras está vacío!</Text>    
-                            {/* <Text
+          <View>
+            <View
+              style={{
+                marginHorizontal: -0,
+                paddingHorizontal: 15,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}>
+              <Text
+                style={[
+                  FONTS.fontMedium,
+                  { fontSize: 16, color: colors.title },
+                ]}>
+                TOTAL:
+              </Text>
+              <Text
+                style={[
+                  FONTS.fontMediumItalic,
+                  { fontSize: 16, color: COLORS.success },
+                ]}>
+                {calculateTotal()}$
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      {cart.length > 0 ? (
+        <View
+          style={[
+            GlobalStyleSheet.container,
+            {
+              backgroundColor: theme.dark
+                ? "rgba(255,255,255,.1)"
+                : colors.card,
+            },
+          ]}>
+          <Button
+            title="REALIZAR PEDIDO"
+            color={COLORS.primary}
+            text={COLORS.white}
+            onPress={() => navigation.navigate("Checkout")}
+          />
+        </View>
+      ) : (
+        <View
+          style={[
+            GlobalStyleSheet.container,
+            {
+              padding: 0,
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 20,
+            },
+          ]}>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+            <View
+              style={{
+                height: 60,
+                width: 60,
+                borderRadius: 60,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: COLORS.primaryLight,
+                marginBottom: 20,
+              }}>
+              <Feather color={COLORS.primary} size={24} name="shopping-cart" />
+            </View>
+            <Text style={{ ...FONTS.h5, color: colors.title, marginBottom: 8 }}>
+              {" "}
+              ¡Tu carrito de compras está vacío!
+            </Text>
+            {/* <Text
                                 style={{
                                     ...FONTS.fontSm,
                                     color:colors.text,
@@ -208,12 +261,11 @@ const MyCart = ({navigation} : MyCartScreenProps)=> {
                                     //marginBottom:30,
                                 }}
                             >Add Product to you favourite and shop now.</Text> */}
-                        </View>
-                    </View>
-                )
-            }
-      </View>
-  )
-}
+          </View>
+        </View>
+      )}
+    </View>
+  );
+};
 
-export default MyCart
+export default MyCart;
