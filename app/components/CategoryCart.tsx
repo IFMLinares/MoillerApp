@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { useEffect, useState  }  from "react";
 import { IMAGES } from "../constants/Images";
 import { FONTS, COLORS } from "../constants/theme";
 import { useNavigation, useTheme } from "@react-navigation/native";
@@ -8,6 +8,7 @@ import { ScrollView } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { Image } from "react-native";
 import data from "../data/data.json";
+import { fetchCategories, fetchSubcategories } from "../api/categoryApi";
 
 const brandData = [
   {
@@ -202,15 +203,38 @@ const CategoryCart = ({ category }) => {
   const { colors }: { colors: any } = theme;
   const navigation = useNavigation<any>();
 
-  let categoryData = [];
-  if (category === "Compresores") {
-    categoryData = brandData;
-  } else if (category === "Filtros Secadores") {
-    categoryData = filterData;
-  } else if (category === "Herramientas") {
-    categoryData = toolData;
-  }
+  const [categoryData, setCategoryData] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
 
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categories = await fetchCategories();
+        setCategoryData(categories);
+      } catch (error) {
+        console.error('Error al cargar las categorías:', error);
+      }
+    };
+
+    const loadSubcategories = async () => {
+      try {
+        const subcategories = await fetchSubcategories();
+        setSubcategories(subcategories);
+      } catch (error) {
+        console.error('Error al cargar las subcategorías:', error);
+      }
+    };
+
+    loadCategories();
+    loadSubcategories();
+  }, []);
+
+  const getSubcategories = (categoryId) => {
+    return subcategories.filter(subcategory => subcategory.categoryId === categoryId);
+  };
+
+
+ 
   return (
     <View>
       <View
@@ -235,7 +259,7 @@ const CategoryCart = ({ category }) => {
                 onPress={() =>
                   navigation.navigate("Products", {
                     categoryId: item.id,
-                    categoryName: item.title,
+                    categoryName: item.name,
                   })
                 }>
                 <View
@@ -250,7 +274,7 @@ const CategoryCart = ({ category }) => {
                   }}>
                   <Image
                     style={{ height: 40, width: 45, resizeMode: "contain" }}
-                    source={item.image}
+                    source={IMAGES.producto1} // Puedes cambiar esto para que sea dinámico
                   />
                 </View>
                 <Text
@@ -258,8 +282,15 @@ const CategoryCart = ({ category }) => {
                     FONTS.fontRegular,
                     { fontSize: 13, color: colors.title, marginTop: 10 },
                   ]}>
-                  {item.title}
+                  {item.name}
                 </Text>
+                <View>
+                  {getSubcategories(item.id).map((subitem, subindex) => (
+                    <Text key={subindex} style={{ fontSize: 12, color: colors.text }}>
+                      {subitem.name}
+                    </Text>
+                  ))}
+                </View>
               </TouchableOpacity>
             ))}
           </ScrollView>

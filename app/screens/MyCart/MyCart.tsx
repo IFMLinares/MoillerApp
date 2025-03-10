@@ -120,7 +120,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
                   price={data.price}
                   discount={data.discount}
                   delevery={data.delevery}
-                  image={images[data.image]} // Usa el objeto images para obtener la imagen
+                  image={{ uri: `http://10.0.2.2:8000${data.highImage}` }} // Usa la URL de la imagen de baja calidad
                   offer={data.offer}
                   brand={data.brand}
                   marca={data.code}

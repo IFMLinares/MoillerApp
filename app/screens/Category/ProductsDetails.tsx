@@ -189,21 +189,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   // api
 
   const { product } = route.params;
-  // const [product, setProduct] = useState(null);
-
-  // useEffect(() => {
-  //   const getProductDetails = async () => {
-  //     try {
-  //       const articles = await fetchArticles();
-  //       const selectedProduct = articles.find((item) => item.id === productId);
-  //       setProduct(selectedProduct);
-  //     } catch (error) {
-  //       console.error('Error al obtener los detalles del producto:', error);
-  //     }
-  //   };
-
-  //   getProductDetails();
-  // }, [productId]);
+ 
   // api
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -371,19 +357,18 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
               width: 8,
               backgroundColor: COLORS.primary,
             }}>
-            {ItemImages.map((data: any, index: any) => (
-              <TouchableOpacity key={index} onPress={() => openModal(index)}>
+            {product.highImage && (
+              <TouchableOpacity onPress={() => openModal(0)}>
                 <Image
                   style={{
                     height: 300,
                     width: "100%",
                     resizeMode: "contain",
-                    // marginTop: 50,
                   }}
-                  source={images[product.image]}
+                  source={{ uri: `http://10.0.2.2:8000${product.highImage}` }} // Mostrar imagen de alta calidad
                 />
               </TouchableOpacity>
-            ))}
+            )}
           </Swiper>
           <View
             style={{
@@ -778,10 +763,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       <Toast ref={(ref) => Toast.setRef(ref)} />
       <Modal visible={isModalVisible} transparent={true}>
         <ImageViewer
-          imageUrls={ItemImages.map((img) => ({
-            url: "",
-            props: { source: images[product.image] },
-          }))}
+          imageUrls={[{ url: `http://10.0.2.2:8000${product.highImage}` }]}
           index={selectedImageIndex}
           onSwipeDown={closeModal}
           enableSwipeDown={true}
@@ -793,7 +775,8 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
             right: 20,
             zIndex: 1,
           }}
-          onPress={closeModal}>
+          onPress={closeModal}
+        >
           <Feather name="x" size={30} color="#fff" />
         </TouchableOpacity>
       </Modal>

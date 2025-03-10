@@ -21,6 +21,8 @@ export const fetchArticles = async () => {
         location: article.co_ubicacion.des_ubicacion.trim(),
         stock: article.sa_stock_almacen[0].stock,
         detailUrl: article.detail_url,
+        lowImage: article.low_images[0]?.image || '', // Añadir imagen de baja calidad
+        highImage: article.high_images[0]?.image || '', // Añadir imagen de alta calidad
     }));
   } catch (error) {
     if (error.response) {

@@ -1074,6 +1074,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     modelo={article.code}
                     price={article.price}
                     hascolor={true}
+                    image={{ uri: `http://10.0.2.2:8000${article.highImage}` }} // Mostrar imagen de baja calidad
                     onPress={() => navigateToProductDetails(article)}
                     onPress3={() => addItemToWishList(article)}
                   />
