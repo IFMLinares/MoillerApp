@@ -1,5 +1,4 @@
-import React, { useRef, useState } from "react";
-//import { Ionicons } from '@expo/vector-icons';
+import React, { useRef, useState, useEffect } from "react";
 import { useTheme } from "@react-navigation/native";
 import {
   View,
@@ -10,6 +9,7 @@ import {
   StyleSheet,
   TextInput,
   Platform,
+  FlatList,
 } from "react-native";
 import { COLORS, FONTS } from "../../constants/theme";
 import { IMAGES } from "../../constants/Images";
@@ -31,7 +31,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-
+import { fetchArticles } from "../../api/listSubCategoryApi";
 // Importa las imágenes
 import producto1 from "../../assets/images/producto/item.webp";
 import producto2 from "../../assets/images/producto/item1.webp";
@@ -403,27 +403,27 @@ const Cardlist3Data = [
 type ProductsScreenProps = StackScreenProps<RootStackParamList, "Products">;
 
 const Products = ({ navigation, route }: ProductsScreenProps) => {
-  const { categoryId, categoryName } = route.params;
+  const { subcategoryId, subcategoryName } = route.params;
   const dispatch = useDispatch();
   const theme = useTheme();
-  const { colors }: { colors: any } = theme;
+  const { colors } = theme;
   const [show, setShow] = useState(true);
+  const [articles, setArticles] = useState([]);
+  const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
-  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
-  // Filtrar los datos según el categoryId
-  let filteredData = [];
-  if (categoryId === "1") {
-    filteredData = data.filter((item) => item.category === "compresor");
-  } else if (categoryId === "2") {
-    filteredData = data.filter(
-      (item) =>
-        item.category === "refrigeracion" &&
-        item.subCategory === "Filtros Secadores"
-    );
-  } else if (categoryId === "3") {
-    filteredData = data.filter((item) => item.category === "Herramientas");
-  }
+  useEffect(() => {
+    const loadArticles = async () => {
+      try {
+        const fetchedArticles = await fetchArticles(subcategoryName);
+        setArticles(fetchedArticles);
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      }
+    };
+
+    loadArticles();
+  }, [subcategoryName]);
 
   const addItemToWishList = (data: any) => {
     dispatch(addTowishList(data));
@@ -451,11 +451,216 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
       [id]: prevQuantities[id] > 1 ? prevQuantities[id] - 1 : 1,
     }));
   };
+  // flatlist card1
+  const renderItem = ({ item }) => (
+    <View
+      style={[
+        GlobalStyleSheet.col50,
+        {
+          marginBottom: 10,
+          paddingHorizontal: 0,
+          backgroundColor: colors.card,
+        },
+      ]}>
+      <Cardstyle1
+        id={item.id}
+        title={item.name}
+        image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
+        price={item.price}
+        modelo={item.code}
+        borderTop
+        onPress={() =>
+          navigation.navigate("ProductsDetails", {
+            productId: item.id,
+          })
+        }
+        onPress3={() => addItemToWishList(item)}
+      />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          marginBottom: hp("0.4%"),
+          paddingRight: wp("2.5%"),
+          borderRightWidth: 1,
+          borderRightColor: COLORS.primaryLight,
+          width: "100%",
+        }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: COLORS.light,
+            borderRadius: 10,
+            height: hp("4.0%"),
+          }}>
+          <TouchableOpacity
+            onPress={() => decrementQuantity(item.id)}
+            style={{ paddingHorizontal: wp("2.10%") }}>
+            <Text style={{ fontSize: hp("2.25%") }}>-</Text>
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: hp("2%"),
+              marginHorizontal: wp("1%"),
+              fontWeight: "bold",
+            }}>
+            {quantities[item.id] || 1}
+          </Text>
+          <TouchableOpacity
+            onPress={() => incrementQuantity(item.id)}
+            style={{ paddingHorizontal: wp("2.10%") }}>
+            <Text style={{ fontSize: hp("2.25%") }}>+</Text>
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+          <TouchableOpacity
+            onPress={() => addItemToCart(item)}
+            style={{
+              marginLeft: wp("2.0%"),
+              marginRight: wp("2.0%"),
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#001A44",
+              padding: hp("0.625%"),
+              borderRadius: 10,
+              paddingHorizontal: wp("2.5%"),
+              height: hp("4.0%"),
+            }}>
+            <FontAwesome
+              name="cart-shopping"
+              size={hp("1.8%")}
+              color={COLORS.white}
+              style={{ marginRight: wp("2.5%") }}
+            />
+            <Text
+              style={[
+                FONTS.fontMedium,
+                {
+                  fontSize: hp("1.9%"),
+                  color: "white",
+                  position: "relative",
+                  top: -2,
+                },
+              ]}>
+              Añadir
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+  // flatlist card1
+  // flatlist card2
+  const renderItem2 = ({ item, index }) => (
+    <View key={index} style={{ marginBottom: 10 }}>
+      <Cardstyle2
+        title={item.name}
+        price={item.price}
+        marca={item.code}
+        image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
+        removebottom
+        onPress={() => navigation.navigate("ProductsDetails")}
+      />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          paddingRight: wp("2.5%"),
+          borderRightWidth: 1,
+          borderRightColor: COLORS.primaryLight,
+          width: "100%",
+          backgroundColor: colors.card,
+          position: "relative",
+          top: -10,
+        }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: COLORS.light,
+            borderRadius: 10,
+            height: hp("4.0%"),
+            marginBottom: 10,
+          }}>
+          <TouchableOpacity
+            onPress={() => decrementQuantity(item.id)}
+            style={{ paddingHorizontal: wp("2.10%") }}>
+            <Text style={{ fontSize: hp("2.25%") }}>-</Text>
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: hp("2%"),
+              marginHorizontal: wp("1%"),
+              fontWeight: "bold",
+            }}>
+            {quantities[item.id] || 1}
+          </Text>
+          <TouchableOpacity
+            onPress={() => incrementQuantity(item.id)}
+            style={{ paddingHorizontal: wp("2.10%") }}>
+            <Text style={{ fontSize: hp("2.25%") }}>+</Text>
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+          <TouchableOpacity
+            onPress={() => addItemToCart(item)}
+            style={{
+              marginLeft: wp("2.0%"),
+              marginRight: wp("2.0%"),
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#001A44",
+              padding: hp("0.625%"),
+              borderRadius: 10,
+              paddingHorizontal: wp("2.5%"),
+              height: hp("4.0%"),
+              marginBottom: 10,
+            }}>
+            <FontAwesome
+              name="cart-shopping"
+              size={hp("1.8%")}
+              color={COLORS.white}
+              style={{ marginRight: wp("2.5%") }}
+            />
+            <Text
+              style={[
+                FONTS.fontMedium,
+                {
+                  fontSize: hp("1.9%"),
+                  color: "white",
+                  position: "relative",
+                  top: -2,
+                },
+              ]}>
+              Añadir
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+
+  // fatlist card2
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
-        title={categoryName} // Usa el nombre de la categoría aquí
+        title={subcategoryName} // Usa el nombre de la categoría aquí
         leftIcon="back"
         titleLeft
         rightIcon1={"search"}
@@ -589,369 +794,32 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}>
-        {/* <View
-          style={[
-            GlobalStyleSheet.container,
-            { paddingHorizontal: 0, paddingTop: 15, paddingBottom: 0 },
-          ]}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-                marginRight: 10,
-              }}>
-              {ArrivalData.map((data: any, index) => {
-                return (
-                  <TouchableOpacity
-                    activeOpacity={0.5}
-                    onPress={() => navigation.navigate("ProductsDetails")}
-                    key={index}
-                    style={{
-                      backgroundColor: colors.card,
-                      height: 35,
-                      alignItems: "center",
-                      gap: 5,
-                      //justifyContent: 'center',
-                      flexDirection: "row",
-                      borderRadius: 34,
-                      borderWidth: 1,
-                      borderColor: colors.text,
-                      //marginTop: 10,
-                      paddingHorizontal: 5,
-                      paddingVertical: 5,
-                      overflow: "hidden",
-                    }}>
-                    <Image
-                      style={{ width: 44, height: 45, resizeMode: "contain" }}
-                      source={data.image}
-                    />
-                    <Text
-                      style={{
-                        ...FONTS.fontMedium,
-                        fontSize: 13,
-                        color: colors.title,
-                      }}>
-                      {data.title}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </ScrollView>
-        </View> */}
-        <View
-          style={[
-            GlobalStyleSheet.container,
-            { paddingTop: 15, paddingHorizontal: 0 },
-          ]}>
-          <View>
-            {show ? (
-              <View style={{}}>
-                <View style={[GlobalStyleSheet.row]}>
-                  {filteredData.map((data: any, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        GlobalStyleSheet.col50,
-                        {
-                          marginBottom: 10,
-                          paddingHorizontal: 0,
-                          backgroundColor: colors.card,
-                        },
-                      ]}>
-                      <Cardstyle1
-                        id={data.id}
-                        title={data.title}
-                        image={images[data.image]} // Usa el objeto images para obtener la imagen
-                        modelo={data.modelo}
-                        price={data.price}
-                        color={data.color}
-                        offer={data.offer}
-                        hascolor={data.hascolor}
-                        discount={data.discount}
-                        borderTop
-                        onPress={() =>
-                          navigation.navigate("ProductsDetails", {
-                            productId: data.id,
-                          })
-                        } // Pasa el productId aquí
-                        onPress3={() => addItemToWishList(data)}
-                      />
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "flex-end",
-                          marginBottom: hp("0.4%"),
-                          // marginHorizontal: wp('2.5%'),
-                          paddingRight: wp("2.5%"),
-                          borderRightWidth: 1,
-                          borderRightColor: COLORS.primaryLight,
-                          width: "100%",
-                        }}>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            backgroundColor: COLORS.light,
-                            borderRadius: 10,
-                            height: hp("4.0%"),
-                          }}>
-                          <TouchableOpacity
-                            onPress={() => decrementQuantity(data.id)}
-                            style={{ paddingHorizontal: wp("2.10%") }}>
-                            <Text style={{ fontSize: hp("2.25%") }}>-</Text>
-                          </TouchableOpacity>
-                          <Text
-                            style={{
-                              fontSize: hp("2%"),
-                              marginHorizontal: wp("1%"),
-                              fontWeight: "bold",
-                            }}>
-                            {quantities[data.id] || 1}
-                          </Text>
-                          <TouchableOpacity
-                            onPress={() => incrementQuantity(data.id)}
-                            style={{ paddingHorizontal: wp("2.10%") }}>
-                            <Text style={{ fontSize: hp("2.25%") }}>+</Text>
-                          </TouchableOpacity>
-                        </View>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}>
-                          <TouchableOpacity
-                            onPress={() => addItemToCart(data)}
-                            style={{
-                              marginLeft: wp("2.0%"),
-                              marginRight: wp("2.0%"),
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              backgroundColor: "#001A44",
-                              padding: hp("0.625%"),
-                              borderRadius: 10,
-                              paddingHorizontal: wp("2.5%"),
-                              height: hp("4.0%"),
-                            }}>
-                            <FontAwesome
-                              name="cart-shopping"
-                              size={hp("1.8%")}
-                              color={COLORS.white}
-                              style={{ marginRight: wp("2.5%") }}
-                            />
-                            <Text
-                              style={[
-                                FONTS.fontMedium,
-                                {
-                                  fontSize: hp("1.9%"),
-                                  color: "white",
-                                  position: "relative",
-                                  top: -2,
-                                },
-                              ]}>
-                              Añadir
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-                {/* <View style={{paddingVertical:5}}>
-                                    <Image
-                                        style={{width:'100%',height:undefined,aspectRatio:1/.3,resizeMode:'contain'}}
-                                        source={IMAGES.ads4}
-                                    />
-                                </View> */}
-                {/* <View style={[GlobalStyleSheet.row]}>
-                                    {cardgrid2Data.map((data:any, index) => {
-                                        return (
-                                            <View key={index} style={[GlobalStyleSheet.col50, { paddingHorizontal:0 }]}>
-                                                <Cardstyle1
-                                                    id={data.id}
-                                                    title={data.title}
-                                                    image={data.image}
-                                                    price={data.price}
-                                                    color={data.color}
-                                                    offer={data.offer}
-                                                    hascolor={data.hascolor}
-                                                    discount={data.discount}
-                                                    borderTop
-                                                    onPress={() => navigation.navigate('ProductsDetails')}
-                                                    onPress3={() => addItemToWishList(data)}
-                                                />
-                                            </View>
-                                        )
-                                    })}   
-                                </View> */}
-                {/* <View style={[{ paddingTop:5,paddingBottom:0 ,}]}>
-                                    <View style={{ marginHorizontal: -15, marginBottom: 10,paddingHorizontal:15 }}>
-                                        <ScrollView
-                                            horizontal
-                                            showsHorizontalScrollIndicator={false}
-                                            contentContainerStyle={{ paddingHorizontal: 15}}
-                                        >
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-                                                {sliderData.map((data, index) => {
-                                                    return (
-                                                        <TouchableOpacity
-                                                            onPress={() => navigation.navigate('ProductsDetails')}
-                                                            activeOpacity={0.5}
-                                                            key={index}
-                                                            style={{
-                                                                backgroundColor:theme.dark ? 'rgba(255,255,255,0.10)': colors.card,
-                                                                height: 40,
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                //borderRadius: 8,
-                                                                //borderWidth: 1,
-                                                                //borderColor: theme.dark ? COLORS.white : colors.borderColor,
-                                                                marginTop: 5,
-                                                                paddingHorizontal: 15,
-                                                                paddingVertical: 5
-                                                            }}>
-                                                            <Text style={{ ...FONTS.fontMedium, fontSize: 13, color: colors.title }}>{data.title}</Text>
-                                                        </TouchableOpacity>
-                                                    )
-                                                })}
-                                            </View>
-                                        </ScrollView>
-                                    </View>
-                                </View> */}
-                {/* <View style={[GlobalStyleSheet.row]}>
-                                    {cardgrid3Data.map((data:any, index) => {
-                                        return (
-                                            <View key={index} style={[GlobalStyleSheet.col50, { paddingHorizontal:0 }]}>
-                                                <Cardstyle1
-                                                    id={data.id}
-                                                    title={data.title}
-                                                    image={data.image}
-                                                    price={data.price}
-                                                    color={data.color}
-                                                    offer={data.offer}
-                                                    hascolor={data.hascolor}
-                                                    discount={data.discount}
-                                                    borderTop
-                                                    onPress={() => navigation.navigate('ProductsDetails')}
-                                                    onPress3={() => addItemToWishList(data)}
-                                                />
-                                            </View>
-                                        )
-                                    })}   
-                                </View> */}
-              </View>
-            ) : (
-              <View style={{}}>
-                {/* <View style={[{}]}>
-                                    {CardlistData.map((data:any, index) => {
-                                        return (
-                                            <View key={index} style={{marginBottom:10}}>
-                                                <Cardstyle2
-                                                    title={data.title}
-                                                    price={data.price}
-                                                    delevery={data.delevery}
-                                                    image={data.image}
-                                                    offer={data.offer}
-                                                    removebottom
-                                                    discount={data.discount}
-                                                    brand={data.brand}
-                                                    onPress={() => navigation.navigate('ProductsDetails')}
-                                                />
-                                            </View>
-                                        )
-                                    })}
-                                </View> */}
-                {/* <View style={{paddingVertical:0,marginTop:-10,marginBottom:0}}>
-                                    <Image
-                                        style={{width:'100%',height:undefined,aspectRatio:1/.3,resizeMode:'contain'}}
-                                        source={IMAGES.ads4}
-                                    />
-                                </View> */}
-                {/* <View style={[{}]}>
-                                    {Cardlist2Data.map((data:any, index) => {
-                                        return (
-                                            <View key={index} style={{marginBottom:10}}>
-                                                <Cardstyle2
-                                                    title={data.title}
-                                                    price={data.price}
-                                                    delevery={data.delevery}
-                                                    image={data.image}
-                                                    offer={data.offer}
-                                                    removebottom
-                                                    discount={data.discount}
-                                                    brand={data.brand}
-                                                    onPress={() => navigation.navigate('ProductsDetails')}
-                                                />
-                                            </View>
-                                        )
-                                    })}
-                                </View> */}
-                {/* <View style={[{ paddingTop:0,paddingBottom:0 ,}]}>
-                                    <View style={{ marginHorizontal: -15, marginBottom: 15,paddingHorizontal:15 }}>
-                                        <ScrollView
-                                            horizontal
-                                            showsHorizontalScrollIndicator={false}
-                                            contentContainerStyle={{ paddingHorizontal: 15}}
-                                        >
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-                                                {sliderData.map((data, index) => {
-                                                    return (
-                                                        <TouchableOpacity
-                                                            activeOpacity={0.5}
-                                                            key={index}
-                                                            style={{
-                                                                backgroundColor:theme.dark ? 'rgba(255,255,255,0.10)': colors.card,
-                                                                height: 40,
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                //borderRadius: 8,
-                                                                //borderWidth: 1,
-                                                                //borderColor: theme.dark ? COLORS.white : colors.borderColor,
-                                                                marginTop: 5,
-                                                                paddingHorizontal: 15,
-                                                                paddingVertical: 5
-                                                            }}>
-                                                            <Text style={{ ...FONTS.fontMedium, fontSize: 13, color: colors.title }}>{data.title}</Text>
-                                                        </TouchableOpacity>
-                                                    )
-                                                })}
-                                            </View>
-                                        </ScrollView>
-                                    </View>
-                                </View> */}
-                {/* <View style={[{}]}>
-                                    {Cardlist3Data.map((data:any, index) => {
-                                        return (
-                                            <View key={index} style={{marginBottom:10}}>
-                                                <Cardstyle2
-                                                    title={data.title}
-                                                    price={data.price}
-                                                    delevery={data.delevery}
-                                                    image={data.image}
-                                                    offer={data.offer}
-                                                    removebottom
-                                                    discount={data.discount}
-                                                    brand={data.brand}
-                                                    onPress={() => navigation.navigate('ProductsDetails')}
-                                                />
-                                            </View>
-                                        )
-                                    })}
-                                </View> */}
-              </View>
-            )}
-          </View>
+
+      <View
+        style={[
+          GlobalStyleSheet.container,
+          { paddingTop: 15, paddingHorizontal: 0 },
+        ]}>
+        <View>
+          {show ? (
+            <FlatList
+              data={articles}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              numColumns={2}
+            />
+          ) : (
+            <FlatList
+              data={articles}
+              renderItem={renderItem2}
+              keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              key={show ? "grid" : "list"} // Cambia la clave aquí
+            />
+          )}
         </View>
-      </ScrollView>
+      </View>
       <BottomSheet2 ref={sheetRef} />
       <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>
