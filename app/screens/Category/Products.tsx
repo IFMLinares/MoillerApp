@@ -32,48 +32,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { fetchArticles } from "../../api/listSubCategoryApi";
-// Importa las imágenes
-import producto1 from "../../assets/images/producto/item.webp";
-import producto2 from "../../assets/images/producto/item1.webp";
-import producto3 from "../../assets/images/producto/item2.png";
-import producto5 from "../../assets/images/producto/item3.jpg";
-import producto6 from "../../assets/images/producto/item4.webp";
-import producto7 from "../../assets/images/producto/item5.webp";
-import producto8 from "../../assets/images/producto/item6.webp";
-import producto9 from "../../assets/images/producto/item7.webp";
-import producto10 from "../../assets/images/producto/item8.jpg";
-import producto11 from "../../assets/images/producto/item9.webp";
-import producto12 from "../../assets/images/producto/item11.webp";
-import producto13 from "../../assets/images/producto/item12.webp";
-import producto14 from "../../assets/images/producto/item13.jpg";
-import producto15 from "../../assets/images/producto/item14.webp";
-import producto16 from "../../assets/images/producto/item15.png";
-import producto17 from "../../assets/images/producto/item16.webp";
-import producto18 from "../../assets/images/producto/item17.webp";
-import producto19 from "../../assets/images/producto/item18.jpg";
-
-// Mapea las rutas de las imágenes a las importaciones
-const images = {
-  "IMAGES.producto1": producto1,
-  "IMAGES.producto2": producto2,
-  "IMAGES.producto3": producto3,
-  "IMAGES.producto5": producto5,
-  "IMAGES.producto6": producto6,
-  "IMAGES.producto7": producto7,
-  "IMAGES.producto8": producto8,
-  "IMAGES.producto9": producto9,
-  "IMAGES.producto10": producto10,
-  "IMAGES.producto11": producto11,
-  "IMAGES.producto12": producto12,
-  "IMAGES.producto13": producto13,
-  "IMAGES.producto14": producto14,
-  "IMAGES.producto15": producto15,
-  "IMAGES.producto16": producto16,
-  "IMAGES.producto17": producto17,
-  "IMAGES.producto18": producto18,
-  "IMAGES.producto19": producto19,
-};
-
+ 
 const sliderData = [
   {
     title: "Crazy Deals",
@@ -471,9 +430,9 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         borderTop
         onPress={() =>
           navigation.navigate("ProductsDetails", {
-            productId: item.id,
+            product: item, // Pasa el objeto completo del producto aquí
           })
-        }
+        } 
         onPress3={() => addItemToWishList(item)}
       />
       <View
@@ -567,7 +526,11 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         marca={item.code}
         image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
         removebottom
-        onPress={() => navigation.navigate("ProductsDetails")}
+        onPress={() =>
+          navigation.navigate("ProductsDetails", {
+            product: item, // Pasa el objeto completo del producto aquí
+          })
+        }
       />
       <View
         style={{

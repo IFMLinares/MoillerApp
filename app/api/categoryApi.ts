@@ -38,8 +38,7 @@ export const fetchSubcategories = async (categoryId) => {
     const subcategories = response.data;
     return subcategories.map(subcategory => ({
       id: subcategory.co_subl?.trim() || '',
-      name: subcategory.subl_des?.trim() || '',
-      // image: subcategory.image_url?.trim() || '', // Assuming you have an image URL in your subcategory data
+      name: subcategory.subl_des?.trim() || '', 
     }));
   } catch (error) {
     if (error.response) {
