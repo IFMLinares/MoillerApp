@@ -28,9 +28,9 @@ export const fetchCategories = async () => {
   }
 };
 
-export const fetchSubcategories = async () => {
+export const fetchSubcategories = async (categoryId) => {
   try {
-    const response = await axios.get('http://10.0.2.2:8000/api/core/subl/list', {
+    const response = await axios.get(`http://10.0.2.2:8000/api/core/subl/list?co_lin=${categoryId}`, {
       headers: {
         'Content-Type': 'application/json',
       }
@@ -39,7 +39,7 @@ export const fetchSubcategories = async () => {
     return subcategories.map(subcategory => ({
       id: subcategory.co_subl?.trim() || '',
       name: subcategory.subl_des?.trim() || '',
-      categoryId: subcategory.co_lin?.trim() || '',
+      // image: subcategory.image_url?.trim() || '', // Assuming you have an image URL in your subcategory data
     }));
   } catch (error) {
     if (error.response) {

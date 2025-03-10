@@ -1,38 +1,14 @@
-import { View, Text } from "react-native";
-import React, { useEffect, useState  }  from "react";
+import { View, Text, FlatList, TouchableOpacity, Image} from "react-native";
+import React, { useEffect, useState }  from "react";
 import { IMAGES } from "../constants/Images";
 import { FONTS, COLORS } from "../constants/theme";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { GlobalStyleSheet } from "../constants/StyleSheet";
-import { ScrollView } from "react-native";
-import { TouchableOpacity } from "react-native";
-import { Image } from "react-native";
+import { ScrollView } from "react-native";  
 import data from "../data/data.json";
-import { fetchCategories, fetchSubcategories } from "../api/categoryApi";
+import { fetchSubcategories } from "../api/categoryApi";
 
-const brandData = [
-  {
-    id: "1",
-    title: "Compresores",
-    image: IMAGES.producto1,
-  },
-];
-
-const filterData = [
-  {
-    id: "2",
-    title: "Filtros Secadores",
-    image: IMAGES.producto13,
-  },
-];
-
-const toolData = [
-  {
-    id: "3",
-    title: "Herramientas",
-    image: IMAGES.producto19,
-  },
-];
+ 
 
 const brand2Data = [
   {
@@ -198,43 +174,68 @@ const ArrivalData = [
   },
 ];
 
-const CategoryCart = ({ category }) => {
+const CategoryCart = ({ categoryId }) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
   const navigation = useNavigation<any>();
-
-  const [categoryData, setCategoryData] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
 
   useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const categories = await fetchCategories();
-        setCategoryData(categories);
-      } catch (error) {
-        console.error('Error al cargar las categorías:', error);
-      }
-    };
-
     const loadSubcategories = async () => {
       try {
-        const subcategories = await fetchSubcategories();
-        setSubcategories(subcategories);
+        const subcategories = await fetchSubcategories(categoryId);
+        // Filtrar subcategorías duplicadas por id
+        const uniqueSubcategories = subcategories.filter((subcategory, index, self) =>
+          index === self.findIndex((s) => s.id === subcategory.id)
+        );
+        setSubcategories(uniqueSubcategories);
       } catch (error) {
-        console.error('Error al cargar las subcategorías:', error);
+        console.error('Error fetching subcategories:', error);
       }
     };
 
-    loadCategories();
     loadSubcategories();
-  }, []);
+  }, [categoryId]);
 
-  const getSubcategories = (categoryId) => {
-    return subcategories.filter(subcategory => subcategory.categoryId === categoryId);
-  };
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={{ alignItems: "center", marginRight: 20 }}
+      activeOpacity={0.5}
+      onPress={() =>
+        navigation.navigate("Products", {
+          subcategoryId: item.id,
+          subcategoryName: item.name,
+        })
+      }
+    >
+      <View
+        style={{
+          height: 60,
+          width: 60,
+          borderRadius: 50,
+          borderWidth: 1,
+          borderColor: COLORS.primaryLight,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Image
+          style={{ height: 40, width: 45, resizeMode: "contain" }}
+          source={{ uri: item.image }} // Assuming you have an image URL in your subcategory data
+        />
+      </View>
+      <Text
+        style={[
+          FONTS.fontRegular,
+          { fontSize: 13, color: colors.title, marginTop: 10 },
+        ]}
+      >
+        {item.name}
+      </Text>
+    </TouchableOpacity>
+  );
 
 
- 
   return (
     <View>
       <View
@@ -245,56 +246,16 @@ const CategoryCart = ({ category }) => {
             backgroundColor: theme.dark ? "rgba(255,255,258,.1)" : colors.card,
             marginTop: 10,
           },
-        ]}>
-        <View>
-          <ScrollView
-            horizontal
-            contentContainerStyle={{ paddingHorizontal: 20, flexGrow: 1 }}
-            showsHorizontalScrollIndicator={false}>
-            {categoryData.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={{ alignItems: "center", marginRight: 20 }}
-                activeOpacity={0.5}
-                onPress={() =>
-                  navigation.navigate("Products", {
-                    categoryId: item.id,
-                    categoryName: item.name,
-                  })
-                }>
-                <View
-                  style={{
-                    height: 60,
-                    width: 60,
-                    borderRadius: 50,
-                    borderWidth: 1,
-                    borderColor: COLORS.primaryLight,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}>
-                  <Image
-                    style={{ height: 40, width: 45, resizeMode: "contain" }}
-                    source={IMAGES.producto1} // Puedes cambiar esto para que sea dinámico
-                  />
-                </View>
-                <Text
-                  style={[
-                    FONTS.fontRegular,
-                    { fontSize: 13, color: colors.title, marginTop: 10 },
-                  ]}>
-                  {item.name}
-                </Text>
-                <View>
-                  {getSubcategories(item.id).map((subitem, subindex) => (
-                    <Text key={subindex} style={{ fontSize: 12, color: colors.text }}>
-                      {subitem.name}
-                    </Text>
-                  ))}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+        ]}
+      >
+        <FlatList
+          data={subcategories}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          horizontal
+          contentContainerStyle={{ paddingHorizontal: 20, flexGrow: 1 }}
+          showsHorizontalScrollIndicator={false}
+        />
       </View>
       {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:0,backgroundColor:theme.dark ? 'rgba(255,255,258,.1)':colors.card,marginTop:15}]}>
             <View style={{paddingHorizontal:15,borderBottomWidth:1,borderBottomColor:COLORS.primaryLight,paddingBottom:15}}>

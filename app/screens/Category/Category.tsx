@@ -1,5 +1,5 @@
 import { View, Text,  ScrollView, Image, TouchableOpacity,useWindowDimensions,Dimensions   } from 'react-native'
-import React, { useEffect, useState  } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../../layout/Header'
 import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -9,45 +9,11 @@ import CategoryCart from '../../components/CategoryCart';
 import { COLORS,FONTS } from '../../constants/theme';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
 import { fetchCategories } from '../../api/categoryApi';
-
-const FirstRoute = () => (
-    <ScrollView contentContainerStyle={{paddingBottom:20}} showsVerticalScrollIndicator={false}>
-        <CategoryCart category="Compresores" />
-    </ScrollView>
-);
-  
-const SecondRoute = () => (
-    <ScrollView contentContainerStyle={{paddingBottom:20}} showsVerticalScrollIndicator={false}>
-         <CategoryCart category="Filtros Secadores" />
-    </ScrollView>
-);
-const ThreeRoute = () => (
-    <ScrollView contentContainerStyle={{paddingBottom:20}} showsVerticalScrollIndicator={false}>
-        <CategoryCart category="Herramientas" />
-    </ScrollView>
-);
-// const FourRoute = () => (
-//     <ScrollView contentContainerStyle={{paddingBottom:20}} showsVerticalScrollIndicator={false}>
-//         <CategoryCart/> 
-//     </ScrollView>
-// );
-// const FiveRoute = () => (
-//     <ScrollView contentContainerStyle={{paddingBottom:20}} showsVerticalScrollIndicator={false}>
-//         <CategoryCart/> 
-//     </ScrollView>
-// );
-  
-const renderScene = SceneMap({
-    first: FirstRoute,
-    second: SecondRoute,
-    Three:ThreeRoute,
-    // Four:FourRoute,
-    // Five:FiveRoute,
-});
+ 
 
 type CategoryScreenProps = StackScreenProps<RootStackParamList, 'Category'>;
 
-const Category = ({navigation, route} : CategoryScreenProps) => {
+const Category = ({ navigation, route }: CategoryScreenProps) => {
   const layout = useWindowDimensions();
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -59,12 +25,13 @@ const Category = ({navigation, route} : CategoryScreenProps) => {
     const loadCategories = async () => {
       try {
         const categories = await fetchCategories();
-        setRoutes(categories.map(category => ({
+        const formattedRoutes = categories.map(category => ({
           key: category.id,
           title: category.name.toUpperCase(),
-        })));
+        }));
+        setRoutes(formattedRoutes);
       } catch (error) {
-        console.error('Error al cargar las categorías:', error);
+        console.error('Error fetching categories:', error);
       }
     };
 
@@ -73,13 +40,13 @@ const Category = ({navigation, route} : CategoryScreenProps) => {
 
   const renderScene = ({ route }) => (
     <ScrollView contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
-      <CategoryCart category={route.title} />
+      <CategoryCart categoryId={route.key} />
     </ScrollView>
   );
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
-      <Header title='Categorías' leftIcon='back' titleLeft />
+      <Header title="Categorías" leftIcon="back" titleLeft />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <View style={[GlobalStyleSheet.container, { padding: 0, flex: 1 }]}>
           <TabView
@@ -95,7 +62,7 @@ const Category = ({navigation, route} : CategoryScreenProps) => {
                 style={{
                   backgroundColor: theme.dark ? 'rgba(255,255,258,.1)' : colors.card,
                   elevation: 5,
-                  paddingVertical: 0
+                  paddingVertical: 0,
                 }}
               />
             )}
@@ -108,6 +75,6 @@ const Category = ({navigation, route} : CategoryScreenProps) => {
       </ScrollView>
     </View>
   );
-}
+};
 
-export default Category
+export default Category;
