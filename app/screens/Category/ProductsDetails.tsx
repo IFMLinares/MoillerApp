@@ -1,5 +1,5 @@
 import { useNavigation, useTheme } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -33,6 +33,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+// api articulos
+import { fetchArticles } from '../../api/authApi';
+// api articulos
+
 // Importa las imágenes
 import producto1 from "../../assets/images/producto/item.webp";
 import producto2 from "../../assets/images/producto/item1.webp";
@@ -182,8 +186,25 @@ type ProductsDetailsScreenProps = StackScreenProps<
 >;
 
 const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
-  const { productId } = route.params;
-  const product = data.find((item) => item.id === productId);
+  // api
+
+  const { product } = route.params;
+  // const [product, setProduct] = useState(null);
+
+  // useEffect(() => {
+  //   const getProductDetails = async () => {
+  //     try {
+  //       const articles = await fetchArticles();
+  //       const selectedProduct = articles.find((item) => item.id === productId);
+  //       setProduct(selectedProduct);
+  //     } catch (error) {
+  //       console.error('Error al obtener los detalles del producto:', error);
+  //     }
+  //   };
+
+  //   getProductDetails();
+  // }, [productId]);
+  // api
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -276,19 +297,19 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       data: [
         {
           title: "Marca",
-          text: product.marca,
+          text: product.color,
         },
         {
           title: "Modelo",
-          text: product.modelo,
+          text: product.subcolor,
         },
         {
           title: "Categoría",
-          text: product.category,
+          text: product.line,
         },
         {
           title: "Sub-Categoría",
-          text: product.subCategory,
+          text: product.subline,
         },
       ],
     },
@@ -435,7 +456,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
           <Text
             numberOfLines={0}
             style={[FONTS.fontMedium, { fontSize: 18, color: colors.title }]}>
-            {product.title}
+            {product.name}
           </Text>
           {/* <View style={{flexDirection:'row',alignItems:'center',gap:10,marginTop:2}}>
                         <Image
@@ -467,7 +488,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                 FONTS.fontMediumItalic,
                 { fontSize: 20, color: COLORS.primary, fontWeight: "bold" },
               ]}>
-              {product.price}
+              {product.price} $
             </Text>
           </View>
           {/* <View

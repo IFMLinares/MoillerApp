@@ -221,7 +221,7 @@ const Header = ({
                   fontSize: 10,
                   color: COLORS.title,
                 }}>
-                0
+                {cart.length}
               </Text>
             </View>
           </TouchableOpacity>

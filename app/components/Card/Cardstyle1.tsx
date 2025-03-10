@@ -169,7 +169,7 @@ const Cardstyle1 = ({
                 textAlign: "center",
               },
             ]}>
-            {price}
+            {price} $
           </Text>
           {/* <Text style={[FONTS.fontJostLight,{fontSize:12,color:colors.title,textDecorationLine:'line-through',opacity:.6}]}>{discount}</Text>
                 <Text style={[FONTS.fontRegular,{fontSize:12,color:COLORS.danger,}]}>{offer}</Text>  */}

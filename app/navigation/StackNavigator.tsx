@@ -100,10 +100,10 @@ const StackNavigator = () => {
         }}> 
 		{/* <Stack.Screen name="Demo" component={Demo} /> */}
         {/* <Stack.Screen name="ChooseLanguage" component={ChooseLanguage} /> */}
-		<Stack.Screen name="SplashScreen" component={SplashScreen}   />
-        <Stack.Screen name="SingIn" component={SingIn} />
+		    {/* <Stack.Screen name="SplashScreen" component={SplashScreen}   /> */}
+        {/* <Stack.Screen name="SingIn" component={SingIn} />
         <Stack.Screen name="SignUp" component={SignUp} /> 
-        <Stack.Screen name="OTPAuthentication" component={OTPAuthentication} />
+        <Stack.Screen name="OTPAuthentication" component={OTPAuthentication} /> */}
         <Stack.Screen name="BottomNavigation" component={BottomNavigation} />
         <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
         <Stack.Screen name="Search" component={Search} />

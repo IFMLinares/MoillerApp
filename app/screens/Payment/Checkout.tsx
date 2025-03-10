@@ -82,12 +82,13 @@ type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Checkout">;
 
 const Checkout = ({ navigation }: CheckoutScreenProps) => {
   const cart = useSelector((state: any) => state.cart.cart);
-
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
+  const [isModalVisible, setIsModalVisible] = useState(false); 
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const navigateToProductDetails = (product) => {
+    navigation.navigate('ProductsDetails', { product });
+  };
   const handleConfirmOrder = () => {
     setIsModalVisible(true);
     setTimeout(() => {
@@ -184,7 +185,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
             />
           </View>
         </View>
-        <View style={{ height:340 }}>
+        <View  >
           <ScrollView
             contentContainerStyle={{ flexGrow: 1 }}
             showsVerticalScrollIndicator={true}
@@ -194,20 +195,16 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                 return (
                   <View key={index} style={{ marginBottom: 10 }}>
                     <Cardstyle2
-                      title={data.title}
+                      title={data.name}
                       price={data.price}
                       discount={data.discount}
                       delevery={data.delevery}
                       image={images[data.image]} // Usa el objeto images para obtener la imagen
                       offer={data.offer}
                       brand={data.brand}
-                      marca={data.marca}
-                      modelo={data.modelo}
-                      onPress={() =>
-                        navigation.navigate("ProductsDetails", {
-                          productId: data.id,
-                        })
-                      }
+                      marca={data.code}
+                      modelo={data.line}
+                      onPress={() => navigateToProductDetails(data)}
                       onPress4={() => removeItemFromCart(data)}
                     />
                   </View>

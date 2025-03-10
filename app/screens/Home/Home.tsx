@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
@@ -23,60 +24,45 @@ import BottomSheet2 from "../Components/BottomSheet2";
 import StopWatch from "../../components/StopWatch";
 import StopWatch2 from "../../components/StopWatch2";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
-import Swiper from "react-native-swiper/src";
-import data from "../../data/data.json";
+import Swiper from "react-native-swiper/src"; 
 import Toast from "react-native-toast-message";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Feather from "react-native-vector-icons/Feather";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { addToCart } from "../../redux/reducer/cartReducer";
 import { Dimensions } from "react-native";
+// api articulos
+import { fetchArticles } from '../../api/authApi';
+// api articulos
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 
-// Importa las imágenes
-import producto1 from "../../assets/images/producto/item.webp";
-import producto2 from "../../assets/images/producto/item1.webp";
-import producto3 from "../../assets/images/producto/item2.png";
-import producto5 from "../../assets/images/producto/item3.jpg";
-import producto6 from "../../assets/images/producto/item4.webp";
-import producto7 from "../../assets/images/producto/item5.webp";
-import producto8 from "../../assets/images/producto/item6.webp";
-import producto9 from "../../assets/images/producto/item7.webp";
-import producto10 from "../../assets/images/producto/item8.jpg";
-import producto11 from "../../assets/images/producto/item9.webp";
-import producto12 from "../../assets/images/producto/item11.webp";
-import producto13 from "../../assets/images/producto/item12.webp";
-import producto14 from "../../assets/images/producto/item13.jpg";
-import producto15 from "../../assets/images/producto/item14.webp";
-import producto16 from "../../assets/images/producto/item15.png";
-import producto17 from "../../assets/images/producto/item16.webp";
-import producto18 from "../../assets/images/producto/item17.webp";
-import producto19 from "../../assets/images/producto/item18.jpg";
+ 
 
 // Mapea las rutas de las imágenes a las importaciones
-const images = {
-  "IMAGES.producto1": producto1,
-  "IMAGES.producto2": producto2,
-  "IMAGES.producto3": producto3,
-  "IMAGES.producto5": producto5,
-  "IMAGES.producto6": producto6,
-  "IMAGES.producto7": producto7,
-  "IMAGES.producto8": producto8,
-  "IMAGES.producto9": producto9,
-  "IMAGES.producto10": producto10,
-  "IMAGES.producto11": producto11,
-  "IMAGES.producto12": producto12,
-  "IMAGES.producto13": producto13,
-  "IMAGES.producto14": producto14,
-  "IMAGES.producto15": producto15,
-  "IMAGES.producto16": producto16,
-  "IMAGES.producto17": producto17,
-  "IMAGES.producto18": producto18,
-  "IMAGES.producto19": producto19,
-};
+// const images = {
+//   "IMAGES.producto1": producto1,
+//   "IMAGES.producto2": producto2,
+//   "IMAGES.producto3": producto3,
+//   "IMAGES.producto5": producto5,
+//   "IMAGES.producto6": producto6,
+//   "IMAGES.producto7": producto7,
+//   "IMAGES.producto8": producto8,
+//   "IMAGES.producto9": producto9,
+//   "IMAGES.producto10": producto10,
+//   "IMAGES.producto11": producto11,
+//   "IMAGES.producto12": producto12,
+//   "IMAGES.producto13": producto13,
+//   "IMAGES.producto14": producto14,
+//   "IMAGES.producto15": producto15,
+//   "IMAGES.producto16": producto16,
+//   "IMAGES.producto17": producto17,
+//   "IMAGES.producto18": producto18,
+//   "IMAGES.producto19": producto19,
+// };
 
 const bannerData = [
   {
@@ -391,118 +377,118 @@ const card2Data = [
   },
 ];
 
-const card3Data = [
-  {
-    id: "8",
-    image: IMAGES.producto1,
-    title: "COMPRESOR AMERICOLD ALTA R134a 1/3 1213 WATTS 4142 BTU 115V",
-    price: "  75,12 € ",
-    // discount: "$112",
-    // offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    id: "9",
-    image: IMAGES.producto2,
-    title: "COMPRESOR AMERICOLD BAJA R134a 1/3 348 WATTS 1187 BTU 115V",
-    price: "  71,25 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "10",
-    image: IMAGES.producto3,
-    title:
-      "COMPRESOR AMERICOLD BAJA MEDIA ALTA R134a 1/3 1091BTU/-23.3C 4248BTU/7.2C 115V/127V",
-    price: "  79,61 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "11",
-    image: IMAGES.producto5,
-    title: "COMPRESOR SECOP 1/4 NF10FX 115V 1048BTU LMBP R134a",
-    price: "  0,05 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "12",
-    image: IMAGES.producto6,
-    title: "COMPRESOR SECOP 1/2HP 104G7555 115V/60HZ LMHBP R134a SC15G",
-    price: "  138,88 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "13",
-    image: IMAGES.producto7,
-    title: "COMPRESOR EMBRACO 1/5 EMIS70HHR 115V/60Hz L/M/HBP R134a 700BTU",
-    price: "  88,66 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "14",
-    image: IMAGES.producto8,
-    title: "COMPRESOR EMBRACO 1/4 FFUS70HAK 115V/60Hz L/MBP R134a 750BTU",
-    price: "  104,76 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "15",
-    image: IMAGES.producto9,
-    title: "COMPRESOR EMBRACO 1/4+ FFUS80HAK 115V/60Hz L/MBP R134a 807BTU",
-    price: "  100,21 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "16",
-    image: IMAGES.producto10,
-    title: "COMPRESOR EMBRACO 1/3 EGAS100HLR 115/60Hz LBP R134a 1.050BTU",
-    price: "  104,54 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "17",
-    image: IMAGES.producto11,
-    title:
-      "COMPRESOR EMBRACO 1/3+ FFI12HBX 115V/60Hz L/HBP R134a 1.190/5300BTU",
-    price: "  113,54 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "18",
-    image: IMAGES.producto12,
-    title: "FILTRO SECADOR 1/4 15 GRAMOS C/VALVULA DE GUSANILLO",
-    price: "  1,73 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "19",
-    image: IMAGES.producto13,
-    title: "FILTRO SECADOR 1/4 APPLIPARTS APFD-107 25GR ROSCABLE CON TUERCAS",
-    price: "  2,10 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-];
+// const card3Data = [
+//   {
+//     id: "8",
+//     image: IMAGES.producto1,
+//     title: "COMPRESOR AMERICOLD ALTA R134a 1/3 1213 WATTS 4142 BTU 115V",
+//     price: "  75,12 € ",
+//     // discount: "$112",
+//     // offer: "70% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "9",
+//     image: IMAGES.producto2,
+//     title: "COMPRESOR AMERICOLD BAJA R134a 1/3 348 WATTS 1187 BTU 115V",
+//     price: "  71,25 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "10",
+//     image: IMAGES.producto3,
+//     title:
+//       "COMPRESOR AMERICOLD BAJA MEDIA ALTA R134a 1/3 1091BTU/-23.3C 4248BTU/7.2C 115V/127V",
+//     price: "  79,61 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "11",
+//     image: IMAGES.producto5,
+//     title: "COMPRESOR SECOP 1/4 NF10FX 115V 1048BTU LMBP R134a",
+//     price: "  0,05 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "12",
+//     image: IMAGES.producto6,
+//     title: "COMPRESOR SECOP 1/2HP 104G7555 115V/60HZ LMHBP R134a SC15G",
+//     price: "  138,88 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "13",
+//     image: IMAGES.producto7,
+//     title: "COMPRESOR EMBRACO 1/5 EMIS70HHR 115V/60Hz L/M/HBP R134a 700BTU",
+//     price: "  88,66 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "14",
+//     image: IMAGES.producto8,
+//     title: "COMPRESOR EMBRACO 1/4 FFUS70HAK 115V/60Hz L/MBP R134a 750BTU",
+//     price: "  104,76 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "15",
+//     image: IMAGES.producto9,
+//     title: "COMPRESOR EMBRACO 1/4+ FFUS80HAK 115V/60Hz L/MBP R134a 807BTU",
+//     price: "  100,21 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "16",
+//     image: IMAGES.producto10,
+//     title: "COMPRESOR EMBRACO 1/3 EGAS100HLR 115/60Hz LBP R134a 1.050BTU",
+//     price: "  104,54 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "17",
+//     image: IMAGES.producto11,
+//     title:
+//       "COMPRESOR EMBRACO 1/3+ FFI12HBX 115V/60Hz L/HBP R134a 1.190/5300BTU",
+//     price: "  113,54 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "18",
+//     image: IMAGES.producto12,
+//     title: "FILTRO SECADOR 1/4 15 GRAMOS C/VALVULA DE GUSANILLO",
+//     price: "  1,73 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+//   {
+//     id: "19",
+//     image: IMAGES.producto13,
+//     title: "FILTRO SECADOR 1/4 APPLIPARTS APFD-107 25GR ROSCABLE CON TUERCAS",
+//     price: "  2,10 € ",
+//     // discount: "$114",
+//     // offer: "50% OFF",
+//     hascolor: true,
+//   },
+// ];
 
 const swiperimageData = [
   {
@@ -526,6 +512,38 @@ const swiperimageData = [
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
 const Home = ({ navigation }: HomeScreenProps) => {
+
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+// api
+  useEffect(() => {
+    const getArticles = async () => {
+      try {
+        const data = await fetchArticles(page);
+        setArticles((prevArticles) => [...prevArticles, ...data]);
+        setHasMore(data.length > 0);
+      } catch (error) {
+        console.error('Error al obtener los artículos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getArticles();
+  }, [page]);
+
+  const loadMoreArticles = () => {
+    if (hasMore) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const navigateToProductDetails = (product ) => {
+    navigation.navigate('ProductsDetails', { product  });
+  }; 
+  // api
   const dispatch = useDispatch();
 
   const theme = useTheme();
@@ -1027,482 +1045,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
               </View>
             </View>
           </View>
-          {/* <View
-            style={[
-              GlobalStyleSheet.container,
-              {
-                paddingHorizontal: 0,
-                backgroundColor: colors.card,
-                marginTop: 10,
-              },
-            ]}>
-            <View>
-              <ScrollView
-                horizontal
-                contentContainerStyle={{ paddingHorizontal: 20, flexGrow: 1 }}
-                showsHorizontalScrollIndicator={false}>
-                {brandData.map((data: any, index) => {
-                  return (
-                    <TouchableOpacity
-                      activeOpacity={0.5}
-                      key={index}
-                      style={{ alignItems: "center", marginRight: 20 }}
-                      onPress={() => navigation.navigate("Products")}>
-                      <View
-                        style={{
-                          height: 60,
-                          width: 60,
-                          borderRadius: 50,
-                          borderWidth: 1,
-                          borderColor: COLORS.primaryLight,
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}>
-                        <Image
-                          style={{
-                            height: 40,
-                            width: 45,
-                            resizeMode: "contain",
-                          }}
-                          source={data.image}
-                        />
-                      </View>
-                      <Text
-                        style={[
-                          FONTS.fontRegular,
-                          { fontSize: 13, color: colors.title, marginTop: 10 },
-                        ]}>
-                        {data.title}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
-            </View>
-          </View> */}
-
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:20,backgroundColor:colors.card}]}>
-                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <View>
-                        <Text style={[FONTS.fontMedium,{fontSize:18,color:colors.title,marginBottom:5}]}>Top Deals Of The Day</Text>
-                        <View style={{flexDirection:'row',alignItems:'center',gap:10}}>
-                            <Text style={[FONTS.fontMedium,{fontSize:14,color:'#BF0A30'}]}>Offer Ends in</Text>
-                            <View>
-                                <StopWatch/>
-                            </View>
-                        </View>
-                    </View>
-                    <View>
-                        <Image
-                            style={{resizeMode:'contain',height:65,width:115}}
-                            source={IMAGES.ads1}
-                        />
-                    </View>
-                </View>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{padding:0}]}>
-                <ScrollView 
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                >
-                    <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
-                        {cardData.map((data:any, index:any) => {
-                            return (
-                                <View style={[{ marginBottom: 0, width: SIZES.width > SIZES.container ? SIZES.container / 3 : SIZES.width / 2.3 }]} key={index}>
-                                    <Cardstyle1
-                                        id={data.id}
-                                        title={data.title}
-                                        image={data.image}
-                                        price={data.price}
-                                        offer={data.offer}
-                                        color={data.color}
-                                        brand={data.brand}
-                                        hascolor={data.hascolor}
-                                        discount={data.discount}
-                                        onPress={() => navigation.navigate('ProductsDetails')}
-                                        onPress3={() => addItemToWishList(data)}
-                                        // onPress2={() => moresheet2.current.openSheet('SkipLoginSheet')} 
-                                    />
-                                </View>
-                            )
-                        })}
-                    </View>
-                </ScrollView>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:-15,paddingVertical:20,paddingBottom:15}]}> 
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{paddingHorizontal:20}}
-                >
-                    <View style={{flexDirection:'row',alignItems:'center',gap:15}}>
-                        {offerData.map((data:any,index) => {
-                            return(
-                                <TouchableOpacity
-                                    key={index} 
-                                    style={[{
-                                        padding:10,
-                                        backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,
-                                        borderRadius:4
-                                    },Select === data && {
-                                        backgroundColor:COLORS.primary
-                                    }]}
-                                    onPress={() => {setSelect(data); navigation.navigate('Products')}}
-                                >
-                                    <View style={{flexDirection:'row',alignItems:'center',gap:10}}>
-                                        <Image
-                                            style={{height:45,width:45,tintColor:Select === data ? COLORS.white :COLORS.primary}}
-                                            source={data.image}
-                                        />
-                                        <View>
-                                            <Text style={[FONTS.fontMedium,{fontSize:15,color:Select === data ? COLORS.white : colors.title}]}>{data.title}</Text>
-                                            <Text style={[FONTS.fontRegular,{fontSize:12,color:Select === data ? COLORS.white : colors.title,opacity:.7}]}>{data.text}</Text>
-                                        </View>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </View>
-                </ScrollView>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{padding:0}]}>
-                <Image
-                    style={{width:'100%',height:undefined,aspectRatio:1/.3,resizeMode:'contain'}}
-                    source={IMAGES.ads4}
-                />
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:0,paddingTop:10}]}>
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 20 }}
-                >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginRight: 10 }}>
-                        {ArrivalData.map((data:any, index) => {
-                            return (
-                                <TouchableOpacity
-                                    onPress={() => navigation.navigate('Products')}
-                                    key={index}
-                                    style={{
-                                        backgroundColor:colors.card,
-                                        height: 35,
-                                        alignItems: 'center',
-                                        gap:5,
-                                        //justifyContent: 'center',
-                                        flexDirection:'row',
-                                        borderRadius: 34,
-                                        borderWidth:1,
-                                        borderColor:colors.text,
-                                        //marginTop: 10,
-                                        paddingHorizontal: 5,
-                                        paddingVertical: 5,
-                                        overflow:'hidden'
-                                    }}>
-                                    <Image
-                                        style={{width:44,height:45,resizeMode:'contain'}}
-                                        source={data.image}
-                                    />
-                                    <Text style={{ ...FONTS.fontMedium, fontSize: 13, color:colors.title }}>{data.title}</Text>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </View>
-                </ScrollView>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:20,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,paddingVertical:5}]}>
-                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text style={[FONTS.fontMedium,{fontSize:18,color:colors.title}]}>Home & Kitchen Essentials</Text>
-                    <View style={{marginTop:-10,marginRight:-25}}>
-                        <Image
-                            style={{resizeMode:'contain',height:60,width:145}}
-                            source={IMAGES.ads5}
-                        />
-                    </View>
-                </View>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{padding:0}]}>
-                <ScrollView 
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                >
-                    <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
-                        {card2Data.map((data:any, index:any) => {
-                            return (
-                                <View style={[{ marginBottom: 0, width: SIZES.width > SIZES.container ? SIZES.container / 3 : SIZES.width / 2.3 }]} key={index}>
-                                    <Cardstyle1
-                                        id={data.id}
-                                        title={data.title}
-                                        image={data.image}
-                                        price={data.price}
-                                        offer={data.offer}
-                                        color={data.color}
-                                        brand={data.brand}
-                                        hascolor={data.hascolor}
-                                        discount={data.discount}
-                                        onPress={() => navigation.navigate('ProductsDetails')}
-                                        onPress3={() => addItemToWishList(data)}
-                                    />
-                                </View>
-                            )
-                        })}
-                    </View>
-                </ScrollView>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container, { paddingVertical: 5 }]}>
-            <View style={{ marginHorizontal: -15, marginVertical: 10 }}>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{}}>
-                {abs2Data.map((data, index) => {
-                  return (
-                    <View key={index} style={{ marginRight: 10 }}>
-                      <Image
-                        style={{ width: 201, height: 110 }}
-                        source={data.image}
-                      />
-                    </View>
-                  );
-                })}
-              </ScrollView>
-            </View>
-          </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:20,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,borderBottomWidth:1,borderBottomColor:COLORS.primaryLight,paddingVertical:10}]}>
-                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text style={[FONTS.fontMedium,{fontSize:18,color:colors.title}]}>Blockbuster deals</Text>
-                    <View style={{}}>
-                        <Text style={[FONTS.fontRegular,{fontSize:12,color:colors.text,textAlign:'right'}]}>Offer Ends in </Text>
-                        <StopWatch2/>
-                    </View>
-                </View>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{padding:0,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card}]}>
-                <View style={{flexDirection:'row',justifyContent:'space-around'}}>
-                    <View style={{width:'65%',padding:20,borderRightWidth:1,borderRightColor:COLORS.primaryLight}}>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() => navigation.navigate('ProductsDetails')} 
-                        >
-                            <Text style={[FONTS.fontMedium,{fontSize:13,color:COLORS.primary}]}>Headphone</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                              activeOpacity={0.5}
-                              onPress={() => navigation.navigate('ProductsDetails')} 
-                        >
-                            <Text numberOfLines={1} style={[FONTS.fontRegular,{fontSize:15,color:colors.title,paddingRight:45}]}>OnePlus Bullets Wireless Z2</Text>
-                        </TouchableOpacity>
-                        <Text style={[FONTS.fontMedium,{fontSize:18,color:colors.title}]}>$105 <Text style={[FONTS.fontJostLight,{fontSize:11,color:colors.title,opacity:.6,textDecorationLine:'line-through'}]}>$112</Text></Text>
-                        <View style={{alignItems:'center'}}>
-                            <TouchableOpacity
-                                  activeOpacity={0.5}
-                                  onPress={() => navigation.navigate('ProductsDetails')} 
-                            >
-                                <Image
-                                    style={{height:Platform.OS === "web" ? SIZES.width / 2 : undefined,width:'100%',aspectRatio:1/.8,resizeMode:'contain'}}
-                                    source={swiperimageData[currentSlide].image}
-                                />
-                            </TouchableOpacity>
-                            <ScrollView
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={{ paddingHorizontal: 15,marginTop:10 }}
-                            >
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                                    {swiperimageData.map((data:any, index) => {
-                                        return (
-                                            <TouchableOpacity
-                                                onPress={() => setCurrentSlide(index)}
-                                                key={index}
-                                                style={[{
-                                                    borderWidth: 1,
-                                                    borderColor: theme.dark ? COLORS.card : '#DDDDDD',
-                                                    height: 35,
-                                                    width: 35,
-                                                    borderRadius: 4,
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }]}
-                                            >
-                                                <Image
-                                                    style={{
-                                                        height: 28,
-                                                        width: 28,
-                                                        resizeMode:'contain'
-                                                    }}
-                                                    source={data.smallImage}
-                                                />
-                                            </TouchableOpacity>
-                                        )
-                                    })}
-                                </View>
-                            </ScrollView>
-                        </View>
-                    </View>
-                    <View style={{width:'35%',}}>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() => navigation.navigate('ProductsDetails')}  
-                            style={{alignItems:'center',borderBottomWidth:1,borderBottomColor:COLORS.primaryLight,marginHorizontal:0,paddingBottom:10}}
-                        >
-                            <Image
-                                style={{resizeMode:'contain',height:undefined,width:'100%',aspectRatio:1/1}}
-                                source={IMAGES.product10}
-                            />
-                            <Text style={[FONTS.fontMedium,{fontSize:12,color:colors.title,paddingHorizontal:15,marginTop:-15,textAlign:'center'}]}>Braun Series 9 Electric Shaver</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                              activeOpacity={0.5}
-                              onPress={() => navigation.navigate('ProductsDetails')}   
-                            style={{alignItems:'center',paddingBottom:10}}
-                        >
-                            <Image
-                                style={{resizeMode:'contain',height:undefined,width:'100%',aspectRatio:1/1}}
-                                source={IMAGES.product11}
-                            />
-                            <Text style={[FONTS.fontMedium,{fontSize:12,color:colors.title,paddingHorizontal:15,marginTop:-10,textAlign:'center'}]}>Hooded zip-up hoodie</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingVertical:5,padding:0}]}>
-                <Image
-                    style={{width:'100%',height:undefined,aspectRatio:1/.3,resizeMode:'contain'}}
-                    source={IMAGES.ads8}
-                />
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:20,backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,borderBottomWidth:1,borderBottomColor:COLORS.primaryLight}]}>
-                <Text style={[FONTS.fontMedium,{fontSize:18,color:colors.title}]}>Home Decor & Furnishings</Text>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{padding:0,backgroundColor:colors.card,marginBottom:10}]}>
-                <View style={{flexDirection:'row'}}>
-                    <View style={{width:'35%',borderRightWidth:1,borderRightColor:COLORS.primaryLight}}>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() => navigation.navigate('ProductsDetails')}  
-                            style={{alignItems:'center',borderBottomWidth:1,borderBottomColor:COLORS.primaryLight,padding:10,paddingBottom:23}}
-                        >
-                            <Image
-                                style={{resizeMode:'contain',height:undefined,width:'100%',aspectRatio:1/1.1}}
-                                source={IMAGES.item7}
-                            />
-                        </TouchableOpacity>          
-                        <TouchableOpacity
-                              activeOpacity={0.5}
-                              onPress={() => navigation.navigate('ProductsDetails')}  
-                            style={{alignItems:'center',padding:10,paddingBottom:10}}
-                        >
-                            <Image
-                                style={{resizeMode:'contain',height:undefined,width:'100%',aspectRatio:1/1.1}}
-                                source={IMAGES.item8}
-                            />
-                        </TouchableOpacity>          
-                    </View>
-                    <View style={{width:'65%'}}>
-                        <TouchableOpacity
-                              activeOpacity={0.5}
-                              onPress={() => navigation.navigate('ProductsDetails')}   
-                            style={{alignItems:'center',padding:10,paddingBottom:10,borderBottomWidth:1,borderBottomColor:COLORS.primaryLight}}
-                        >
-                            <Image
-                                style={{resizeMode:'contain',height:undefined,width:'100%',aspectRatio:1/.6}}
-                                source={IMAGES.item6}
-                            />
-                        </TouchableOpacity>
-                        <View style={{flexDirection:'row',alignItems:'center'}}>
-                            <TouchableOpacity
-                                  activeOpacity={0.5}
-                                  onPress={() => navigation.navigate('ProductsDetails')}   
-                                style={{alignItems:'center',padding:10,paddingBottom:10,width:'50%',borderRightWidth:1,borderRightColor:COLORS.primaryLight}}
-                            >
-                                <Image
-                                    style={{resizeMode:'contain',height:undefined,width:'100%',aspectRatio:1/1.2}}
-                                    source={IMAGES.item18}
-                                />
-                            </TouchableOpacity> 
-                            <TouchableOpacity
-                                  activeOpacity={0.5}
-                                  onPress={() => navigation.navigate('ProductsDetails')}   
-                                style={{alignItems:'center',padding:10,paddingBottom:10,width:'50%'}}
-                            >
-                                <Image
-                                    style={{resizeMode:'contain',height:undefined,width:'100%',aspectRatio:1/1.2}}
-                                    source={IMAGES.item19}
-                                />
-                            </TouchableOpacity> 
-                        </View> 
-                    </View>
-                </View>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:20,backgroundColor:colors.card,borderBottomWidth:1,borderBottomColor:COLORS.primaryLight}]}>
-                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text style={[FONTS.fontMedium,{fontSize:18,color:colors.title}]}>Sponsored</Text>
-                    <Text style={[FONTS.fontRegular,{fontSize:13,color:COLORS.success}]}>Min. 30% Off</Text>
-                </View>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:20,backgroundColor:colors.card}]}>
-                <View style={{ marginHorizontal: -20, marginVertical:10,}}>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{paddingHorizontal:15}}
-                    >
-                        {abs3Data.map((data, index) => {
-                            return (
-                                <TouchableOpacity
-                                    activeOpacity={0.5}
-                                    onPress={() => navigation.navigate('Products')}   
-                                    key={index} 
-                                    style={{ marginHorizontal:5 }}
-                                >
-                                    <Image
-                                        style={{ width: 170, height: 114,borderRadius:4}}
-                                        source={data.image}
-                                    />
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </ScrollView>
-                </View>
-            </View> */}
-          {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:0,paddingTop:15}]}>
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 20 }}
-                >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginRight: 10 }}>
-                        {ArrivalData.map((data:any, index) => {
-                            return (
-                                <TouchableOpacity
-                                    activeOpacity={0.5}
-                                    onPress={() => navigation.navigate('Products')}
-                                    key={index}
-                                    style={{
-                                        backgroundColor:colors.card,
-                                        height: 35,
-                                        alignItems: 'center',
-                                        gap:5,
-                                        //justifyContent: 'center',
-                                        flexDirection:'row',
-                                        borderRadius: 34,
-                                        borderWidth:1,
-                                        borderColor:colors.text,
-                                        //marginTop: 10,
-                                        paddingHorizontal: 5,
-                                        paddingVertical: 5,
-                                        overflow:'hidden'
-                                    }}>
-                                    <Image
-                                        style={{width:44,height:45,resizeMode:'contain'}}
-                                        source={data.image}
-                                    />
-                                    <Text style={{ ...FONTS.fontMedium, fontSize: 13, color:colors.title }}>{data.title}</Text>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </View>
-                </ScrollView>
-            </View> */}
+ 
           <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
             <View
               style={[
@@ -1514,105 +1057,98 @@ const Home = ({ navigation }: HomeScreenProps) => {
                   marginBottom: 15,
                 },
               ]}>
-              {data.map((item, index) => {
-                const quantity = quantities[item.id] || 1;
-                return (
+              {articles.map((article) => (
+                <View
+                  style={[
+                    GlobalStyleSheet.col50,
+                    {
+                      marginBottom: 10,
+                      paddingHorizontal: 0,
+                      backgroundColor: colors.card,
+                    },
+                  ]}
+                  key={article.id}>
+                  <Cardstyle1
+                    id={article.id}
+                    title={article.name}
+                    modelo={article.code}
+                    price={article.price}
+                    hascolor={true}
+                    onPress={() => navigateToProductDetails(article)}
+                    onPress3={() => addItemToWishList(article)}
+                  />
                   <View
-                    style={[
-                      GlobalStyleSheet.col50,
-                      {
-                        marginBottom: 10,
-                        paddingHorizontal: 0,
-                        backgroundColor: colors.card,
-                      },
-                    ]}
-                    key={index}>
-                    <Cardstyle1
-                      id={item.id}
-                      title={item.title}
-                      image={images[item.image]}
-                      modelo={item.modelo}
-                      price={item.price}
-                      hascolor={item.hascolor}
-                      onPress={() =>
-                        navigation.navigate("ProductsDetails", {
-                          productId: item.id,
-                        })
-                      }
-                      onPress3={() => addItemToWishList(item)}
-                    />
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      marginBottom: hp('0.4%'),
+                      paddingRight: wp('2.5%'),
+                      width: '100%',
+                      borderRightWidth: 1,
+                      borderRightColor: COLORS.primaryLight,
+                    }}>
                     <View
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "flex-end",
-                        marginBottom: hp("0.4%"),
-                        paddingRight: wp("2.5%"),
-                        width: "100%",
-                        // marginHorizontal: wp('2.5%'),
-                        borderRightWidth: 1,
-                        borderRightColor: COLORS.primaryLight,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: COLORS.light,
+                        borderRadius: 10,
+                        height: hp('4.0%'),
                       }}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          backgroundColor: COLORS.light,
-                          borderRadius: 10,
-                          height: hp("4.0%"),
-                        }}>
-                        <TouchableOpacity
-                          onPress={() => decrementQuantity(item.id)}
-                          style={{ paddingHorizontal: wp("2.10%") }}>
-                          <Text style={{ fontSize: hp("2.25%") }}>-</Text>
-                        </TouchableOpacity>
-                        <Text
-                          style={{
-                            fontSize: hp("2%"),
-                            marginHorizontal: wp("1%"),
-                            fontWeight: "bold",
-                          }}>
-                          {quantity}
-                        </Text>
-                        <TouchableOpacity
-                          onPress={() => incrementQuantity(item.id)}
-                          style={{ paddingHorizontal: wp("2.10%") }}>
-                          <Text style={{ fontSize: hp("2.25%") }}>+</Text>
-                        </TouchableOpacity>
-                      </View>
                       <TouchableOpacity
-                        onPress={() => addItemToCart(item)}
+                        onPress={() => decrementQuantity(article.id)}
+                        style={{ paddingHorizontal: wp('2.10%') }}>
+                        <Text style={{ fontSize: hp('2.25%') }}>-</Text>
+                      </TouchableOpacity>
+                      <Text
                         style={{
-                          marginLeft: wp("2.0%"),
-                          marginRight: wp("2.0%"),
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          backgroundColor: "#001A44",
-                          padding: hp("0.625%"),
-                          borderRadius: 10,
-                          paddingHorizontal: wp("2.5%"),
-                          height: hp("4.0%"),
+                          fontSize: hp('2%'),
+                          marginHorizontal: wp('1%'),
+                          fontWeight: 'bold',
                         }}>
-                        <FontAwesome
-                          name="cart-shopping"
-                          size={hp("1.8%")}
-                          color={COLORS.white}
-                          style={{ marginRight: wp("2.5%") }}
-                        />
-                        <Text
-                          style={[
-                            FONTS.fontMedium,
-                            { fontSize: hp("1.9%"), color: "white", position: "relative", top:-2, },
-                          ]}>
-                          Añadir
-                        </Text>
+                        {quantities[article.id] || 1}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => incrementQuantity(article.id)}
+                        style={{ paddingHorizontal: wp('2.10%') }}>
+                        <Text style={{ fontSize: hp('2.25%') }}>+</Text>
                       </TouchableOpacity>
                     </View>
+                    <TouchableOpacity
+                      onPress={() => addItemToCart(article)}
+                      style={{
+                        marginLeft: wp('2.0%'),
+                        marginRight: wp('2.0%'),
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: '#001A44',
+                        padding: hp('0.625%'),
+                        borderRadius: 10,
+                        paddingHorizontal: wp('2.5%'),
+                        height: hp('4.0%'),
+                      }}>
+                      <FontAwesome
+                        name="cart-shopping"
+                        size={hp('1.8%')}
+                        color={COLORS.white}
+                        style={{ marginRight: wp('2.5%') }}
+                      />
+                      <Text
+                        style={[
+                          FONTS.fontMedium,
+                          { fontSize: hp('1.9%'), color: 'white', position: 'relative', top: -2 },
+                        ]}>
+                        Añadir
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                );
-              })}
+                </View>
+              ))}
             </View>
+            {loading && <ActivityIndicator size="large" color={COLORS.primary} />}
+             
           </View>
         </ScrollView>
         <BottomSheet2 ref={moresheet2} />

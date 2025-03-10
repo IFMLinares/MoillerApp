@@ -1,5 +1,5 @@
 import { View, Text,  ScrollView, Image, TouchableOpacity,useWindowDimensions,Dimensions   } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState  } from 'react'
 import Header from '../../layout/Header'
 import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -8,7 +8,7 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import CategoryCart from '../../components/CategoryCart';
 import { COLORS,FONTS } from '../../constants/theme';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
-
+import { fetchCategories } from '../../api/categoryApi';
 
 const FirstRoute = () => (
     <ScrollView contentContainerStyle={{paddingBottom:20}} showsVerticalScrollIndicator={false}>
@@ -48,30 +48,38 @@ const renderScene = SceneMap({
 type CategoryScreenProps = StackScreenProps<RootStackParamList, 'Category'>;
 
 const Category = ({navigation, route} : CategoryScreenProps) => {
-
-    const layout = useWindowDimensions();
-
-    const { initialIndex = 0 } = route.params || {}; // Obtén el índice inicial de los parámetros de navegación
-
-    const [index, setIndex] = React.useState(initialIndex);
-
-    const [routes] = React.useState([ 
-        { key: 'first', title: 'LÍNEA BLANCA' },
-        { key: 'second', title: 'REFRIGERACIÓN' }, 
-        { key: 'Three', title: 'HERRAMIENTAS' }, 
-    ]);
-
+  const layout = useWindowDimensions();
   const theme = useTheme();
-  const { colors } : {colors : any} = theme;
+  const { colors }: { colors: any } = theme;
+
+  const [index, setIndex] = useState(0);
+  const [routes, setRoutes] = useState([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categories = await fetchCategories();
+        setRoutes(categories.map(category => ({
+          key: category.id,
+          title: category.name.toUpperCase(),
+        })));
+      } catch (error) {
+        console.error('Error al cargar las categorías:', error);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
+  const renderScene = ({ route }) => (
+    <ScrollView contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
+      <CategoryCart category={route.title} />
+    </ScrollView>
+  );
 
   return (
-    <View style={{backgroundColor:colors.background,flex:1}}>
-        <Header
-          title='Categorías'
-          leftIcon='back'
-          titleLeft
-          // rightIcon1={'search'}
-        />
+    <View style={{ backgroundColor: colors.background, flex: 1 }}>
+      <Header title='Categorías' leftIcon='back' titleLeft />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <View style={[GlobalStyleSheet.container, { padding: 0, flex: 1 }]}>
           <TabView
@@ -99,7 +107,7 @@ const Category = ({navigation, route} : CategoryScreenProps) => {
         </View>
       </ScrollView>
     </View>
-  )
+  );
 }
 
 export default Category

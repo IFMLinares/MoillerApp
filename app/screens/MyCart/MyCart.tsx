@@ -60,13 +60,17 @@ type MyCartScreenProps = StackScreenProps<RootStackParamList, "Mi Carrito">;
 const MyCart = ({ navigation }: MyCartScreenProps) => {
   const cart = useSelector((state: any) => state.cart.cart);
   const dispatch = useDispatch();
+  const theme = useTheme();
+  const { colors }: { colors: any } = theme; 
 
-  const removeItemFromCart = (data: any) => {
-    dispatch(removeFromCart(data));
+  const navigateToProductDetails = (product) => {
+    navigation.navigate('ProductsDetails', { product });
   };
 
-  const theme = useTheme();
-  const { colors }: { colors: any } = theme;
+  const removeItemFromCart = (product) => {
+    dispatch(removeFromCart(product));
+  };
+
 
   // Función para calcular el total
   const calculateTotal = () => {
@@ -82,32 +86,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header title="Mi carrito" leftIcon="back" titleLeft righttitle2 />
-      {cart.length > 0 ? (
-        <View>
-          {/* <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                        <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
-                            <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primary,alignItems:'center',justifyContent:'center'}}>
-                                <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.card}]}>1</Text>
-                            </View>
-                            <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.title}]}>Carro</Text>
-                        </View>
-                        <View style={{height:2,flex:1,backgroundColor:colors.title,opacity:.1,marginHorizontal:10}}/>
-                        <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
-                            <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primaryLight,alignItems:'center',justifyContent:'center'}}>
-                                <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.title}]}>2</Text>
-                            </View>
-                            <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.text}]}>Address</Text>
-                        </View>
-                        <View style={{height:2,flex:1,backgroundColor:colors.title,opacity:.1,marginHorizontal:10}}/>
-                        <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
-                            <View style={{height:18,width:18,borderRadius:30,backgroundColor:COLORS.primaryLight,alignItems:'center',justifyContent:'center'}}>
-                                <Text style={[FONTS.fontMedium,{fontSize:10,color:COLORS.title}]}>3</Text>
-                            </View>
-                            <Text style={[FONTS.fontMedium,{fontSize:13,color:colors.text}]}>payment</Text>
-                        </View>
-                    </View> */}
-        </View>
-      ) : null}
+ 
       {/* {cart.length > 0 ?
                 <View style={[GlobalStyleSheet.container,{padding:0}]}>
                     <View style={{height:45,backgroundColor:'#87E8FF',marginVertical:15,flexDirection:'row',alignItems:'center',width:'100%',justifyContent:'space-between',paddingLeft:15}}>
@@ -137,20 +116,16 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
             return (
               <View key={index} style={{ marginBottom: 10 }}>
                 <Cardstyle2
-                  title={data.title}
+                  title={data.name}
                   price={data.price}
                   discount={data.discount}
                   delevery={data.delevery}
                   image={images[data.image]} // Usa el objeto images para obtener la imagen
                   offer={data.offer}
                   brand={data.brand}
-                  marca={data.marca}
-                  modelo={data.modelo}
-                  onPress={() =>
-                    navigation.navigate("ProductsDetails", {
-                      productId: data.id,
-                    })
-                  }
+                  marca={data.code}
+                  modelo={data.line}
+                  onPress={() => navigateToProductDetails(data)}
                   onPress4={() => removeItemFromCart(data)}
                 />
               </View>

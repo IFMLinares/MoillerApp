@@ -164,7 +164,7 @@ const Cardstyle2 = ({
                   fontWeight: "bold",
                 },
               ]}>
-              {price}
+              {price} $
             </Text>
             <Text
               style={[
