@@ -283,11 +283,11 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       data: [
         {
           title: "Marca",
-          text: product.color,
+          text: product.subcolor,
         },
         {
           title: "Modelo",
-          text: product.subcolor,
+          text: product.color,
         },
         {
           title: "Categoría",
@@ -585,7 +585,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
           <Text
             style={[
               FONTS.fontRegular,
-              { fontSize: 16, color: colors.title, marginTop: 10 },
+              { fontSize: 16, color: colors.title  },
             ]}>
             Todas las especificaciones
           </Text>

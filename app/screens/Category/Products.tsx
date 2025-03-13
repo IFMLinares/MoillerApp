@@ -384,6 +384,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
     loadArticles();
   }, [subcategoryName]);
 
+
   const addItemToWishList = (data: any) => {
     dispatch(addTowishList(data));
   };
@@ -686,7 +687,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
           />
           <TouchableOpacity
             activeOpacity={0.5}
-            // onPress={() => sheetRef.current.openSheet("filter")}
+            onPress={() => sheetRef.current.openSheet("filter")}
             style={{
               flexDirection: "row",
               alignItems: "center",

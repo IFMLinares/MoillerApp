@@ -22,7 +22,7 @@ export const fetchArticles = async (subCategory: string) => {
         stock: article.sa_stock_almacen[0].stock,
         detailUrl: article.detail_url,
         lowImage: article.low_images[0]?.image || '',
-        highImage: article.high_images[0]?.image || '',
+        highImage: article.high_images[0]?.image || '', 
     }));
   } catch (error) {
     if (error.response) {

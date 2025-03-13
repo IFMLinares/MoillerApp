@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useRef} from "react";
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import { IMAGES } from "../constants/Images";
 import { useSelector } from "react-redux";
 // import Feather from "react-native-vector-icons/Feather";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import Toast from "react-native-toast-message";
+import BottomSheet2 from "../screens/Components/BottomSheet2";
 
 type Props = {
   title: string;
@@ -32,10 +34,28 @@ type Props = {
   rightIcon1?: any;
   rightIcon2?: any;
   rightIcon3?: any;
+  rightIcon4?: any;
   righttitle?: any;
   righttitle2?: any;
 };
-
+const brand5Data = [
+  {
+    id: "1",
+    image: IMAGES.marca,
+  },
+  {
+    id: "2",
+    image: IMAGES.marca1,
+  },
+  {
+    id: "3",
+    image: IMAGES.marca2,
+  },
+  {
+    id: "4",
+    image: IMAGES.marca3,
+  },
+];
 const Header = ({
   title,
   leftIcon,
@@ -48,6 +68,7 @@ const Header = ({
   rightIcon1,
   rightIcon2,
   rightIcon3,
+  rightIcon4,
   righttitle,
   righttitle2,
 }: Props) => {
@@ -59,7 +80,7 @@ const Header = ({
   const { colors }: { colors: any } = theme;
 
   const navigation = useNavigation<any>();
-
+  const sheetRef = useRef<any>(null);
   return (
     <View
       style={[
@@ -136,7 +157,6 @@ const Header = ({
                 backgroundColor: COLORS.card,
                 borderRadius: 18,
                 // paddingHorizontal: 10,
-                
               }}>
               <View
                 style={{
@@ -177,7 +197,7 @@ const Header = ({
                   }}
                 />
               </View> */}
-            </View> 
+            </View>
           </View>
         )}
         {righttitle && (
@@ -253,6 +273,29 @@ const Header = ({
                 0
               </Text>
             </View> */}
+          </TouchableOpacity>
+        )}
+        {rightIcon4 == "filter" && (
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => sheetRef.current.openSheet("filter")}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 5,
+              width: "35%",
+              justifyContent: "center",
+            }}>
+            <Image
+              style={{ height: 16, width: 16, resizeMode: "contain" }}
+              source={IMAGES.filter3}
+            />
+            <Text
+              style={[FONTS.fontMedium, { fontSize: 15, color: COLORS.card  }]}>
+              Filtros
+            </Text>
+            <BottomSheet2 ref={sheetRef} />
+            <Toast ref={(ref) => Toast.setRef(ref)} />
           </TouchableOpacity>
         )}
       </View>

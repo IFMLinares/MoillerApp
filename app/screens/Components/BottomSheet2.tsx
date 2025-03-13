@@ -15,17 +15,11 @@ type Props = {
 }
 
 const BottomSheet2 = forwardRef((props, ref) => {
-
-
     const {colors} : {colors : any} = useTheme();
-
     const rbsheetRef = useRef<any>();
-
     const [sheetType, setSheetType ] = useState<any>('');
-    
 
     useImperativeHandle(ref, () => ({
-
         openSheet : async (value:string) => {
             await setSheetType(value);
             await rbsheetRef.current.open();
@@ -33,62 +27,58 @@ const BottomSheet2 = forwardRef((props, ref) => {
         closeSheet() {
             rbsheetRef.current.close();
         }
-    
     }));
 
-
     return(
-
         <>
-            <RBSheet
-                ref={rbsheetRef}
-                closeOnDragDown={true}
-                height={sheetType === "gender" ? 150 :
-                        sheetType === "short" ? 330 :
-                        sheetType === "filter" ? 550 :
-                        sheetType === "notification" ? 350 :
-                        sheetType === "SkipLoginSheet" ? 480 :
-                        sheetType === "Language" ? 300 : 200}
-                openDuration={100}
-                customStyles={{
-                    
-                    container:{
-                        backgroundColor: colors.cardBg,
-                    },
-                    draggableIcon: {
-                        marginTop:10,
-                        marginBottom:0,
-                        height:5,
-                        width:80,
-                        backgroundColor: colors.border,
-                    }
-                }}
-            >
-                {(sheetType === "gender") &&
-                    <GenderSheet genderRef={rbsheetRef}/>
+        <RBSheet
+            ref={rbsheetRef}
+            closeOnDragDown={true}
+            height={sheetType === "gender" ? 150 :
+                    sheetType === "short" ? 330 :
+                    sheetType === "filter" ? 550 :
+                    sheetType === "notification" ? 350 :
+                    sheetType === "SkipLoginSheet" ? 480 :
+                    sheetType === "Language" ? 300 : 200}
+            openDuration={100}
+            customStyles={{
+                container:{
+                    backgroundColor: colors.cardBg,
+                },
+                draggableIcon: {
+                    marginTop:10,
+                    marginBottom:0,
+                    height:5,
+                    width:80,
+                    backgroundColor: colors.border,
                 }
-                {(sheetType === "short") &&
-                    <ShortSheet ShortRef={rbsheetRef}/>
-                }
-                {(sheetType === "notification") &&
-                    <NotificationSheet2 moresheet2={rbsheetRef}/>
-                }
-                {(sheetType === "SkipLoginSheet") &&
-                    <SkipLoginSheet2 moresheet3={rbsheetRef}/>
-                }
-                {(sheetType === "filter") &&
-                    <FilterSheet  sheetRef={rbsheetRef}/>
-                }
-                {(sheetType === "Language") &&
-                    <LanguageSheet setLanguage={props.setLanguage}/>
-                }
-            </RBSheet>
-        </>
-    )
+            }}
+        >
+            {(sheetType === "gender") &&
+                <GenderSheet genderRef={rbsheetRef}/>
+            }
+            {(sheetType === "short") &&
+                <ShortSheet ShortRef={rbsheetRef}/>
+            }
+            {(sheetType === "notification") &&
+                <NotificationSheet2 moresheet2={rbsheetRef}/>
+            }
+            {(sheetType === "SkipLoginSheet") &&
+                <SkipLoginSheet2 moresheet3={rbsheetRef}/>
+            }
+            {(sheetType === "filter") &&
+                <FilterSheet  sheetRef={rbsheetRef}/>
+            }
+            {(sheetType === "Language") &&
+                <LanguageSheet setLanguage={props.setLanguage}/>
+            }
+        </RBSheet>
+    </>
+)
 });
 
 
-const ShortSheet = ({ ShortRef } : { ShortRef : any}) => {
+const ShortSheet = forwardRef(({ ShortRef } : { ShortRef : any}, ref) => {
     return(
         <View>
             <ShortSheet2
@@ -96,9 +86,9 @@ const ShortSheet = ({ ShortRef } : { ShortRef : any}) => {
             />
         </View>
     )
-}
+});
 
-const GenderSheet = ({ genderRef } : { genderRef : any}) => {
+const GenderSheet = forwardRef(({ genderRef } : { genderRef : any}, ref) => {
     return(
         <View>
             <GenderSheet2
@@ -106,9 +96,9 @@ const GenderSheet = ({ genderRef } : { genderRef : any}) => {
             />
     </View>
     )
-}
+});
 
-const FilterSheet = ({ sheetRef } : { sheetRef : any}) => {
+const FilterSheet = forwardRef(({ sheetRef } : { sheetRef : any}, ref) => {
     return(
         <View>
             <FilterSheet2
@@ -116,9 +106,9 @@ const FilterSheet = ({ sheetRef } : { sheetRef : any}) => {
             />
         </View>
     )
-}
+});
 
-const LanguageSheet = ({ moresheet, setLanguage } : { moresheet : any}) => {
+const LanguageSheet = forwardRef(({ moresheet, setLanguage } : { moresheet : any}, ref) => {
     return(
         <View>
             <LanguageoptionSheet
@@ -127,9 +117,9 @@ const LanguageSheet = ({ moresheet, setLanguage } : { moresheet : any}) => {
             />
         </View>
     )
-}
+});
 
-const NotificationSheet2 = ({ moresheet2 } : { moresheet2 : any}) => {
+const NotificationSheet2 = forwardRef(({ moresheet2 } : { moresheet2 : any}, ref) => {
     return(
         <View>
             <NotificationSheet
@@ -137,9 +127,9 @@ const NotificationSheet2 = ({ moresheet2 } : { moresheet2 : any}) => {
             />
         </View>
     )
-}
+});
 
-const SkipLoginSheet2 = ({ moresheet3 } : { moresheet3 : any}) => {
+const SkipLoginSheet2 = forwardRef(({ moresheet3 } : { moresheet3 : any}, ref) => {
     return(
         <View>
             <SkipLoginSheet
@@ -147,6 +137,6 @@ const SkipLoginSheet2 = ({ moresheet3 } : { moresheet3 : any}) => {
             />
         </View>
     )
-}
+});
 
 export default BottomSheet2
