@@ -266,7 +266,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                   color: colors.title,
                   fontWeight: "bold",
                 }}>
-                {calculateTotal()}$
+                {calculateTotal()}€
               </Text>
             </View>
             <View
@@ -322,7 +322,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                   FONTS.fontMediumItalic,
                   { fontSize: 16, color: COLORS.success, fontWeight: "bold", },
                 ]}>
-                {calculateTotal()}$
+                {calculateTotal()}€
               </Text>
             </View>
             {/* <View
@@ -374,7 +374,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                   FONTS.fontMediumItalic,
                   { fontSize: 16, color: COLORS.success, fontWeight: "bold", },
                 ]}>
-                {calculateTotal()}$
+                {calculateTotal()}€
               </Text>
             </View>
           </View>

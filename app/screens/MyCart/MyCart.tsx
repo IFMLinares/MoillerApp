@@ -12,48 +12,7 @@ import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
 import { Feather } from "@expo/vector-icons";
-
-// Importa las imágenes
-import producto1 from "../../assets/images/producto/item.webp";
-import producto2 from "../../assets/images/producto/item1.webp";
-import producto3 from "../../assets/images/producto/item2.png";
-import producto5 from "../../assets/images/producto/item3.jpg";
-import producto6 from "../../assets/images/producto/item4.webp";
-import producto7 from "../../assets/images/producto/item5.webp";
-import producto8 from "../../assets/images/producto/item6.webp";
-import producto9 from "../../assets/images/producto/item7.webp";
-import producto10 from "../../assets/images/producto/item8.jpg";
-import producto11 from "../../assets/images/producto/item9.webp";
-import producto12 from "../../assets/images/producto/item11.webp";
-import producto13 from "../../assets/images/producto/item12.webp";
-import producto14 from "../../assets/images/producto/item13.jpg";
-import producto15 from "../../assets/images/producto/item14.webp";
-import producto16 from "../../assets/images/producto/item15.png";
-import producto17 from "../../assets/images/producto/item16.webp";
-import producto18 from "../../assets/images/producto/item17.webp";
-import producto19 from "../../assets/images/producto/item18.jpg";
-
-// Mapea las rutas de las imágenes a las importaciones
-const images = {
-  "IMAGES.producto1": producto1,
-  "IMAGES.producto2": producto2,
-  "IMAGES.producto3": producto3,
-  "IMAGES.producto5": producto5,
-  "IMAGES.producto6": producto6,
-  "IMAGES.producto7": producto7,
-  "IMAGES.producto8": producto8,
-  "IMAGES.producto9": producto9,
-  "IMAGES.producto10": producto10,
-  "IMAGES.producto11": producto11,
-  "IMAGES.producto12": producto12,
-  "IMAGES.producto13": producto13,
-  "IMAGES.producto14": producto14,
-  "IMAGES.producto15": producto15,
-  "IMAGES.producto16": producto16,
-  "IMAGES.producto17": producto17,
-  "IMAGES.producto18": producto18,
-  "IMAGES.producto19": producto19,
-};
+import QuantityButton from "../Components/QuantityButton";
 
 type MyCartScreenProps = StackScreenProps<RootStackParamList, "Mi Carrito">;
 
@@ -143,10 +102,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
           },
         ]}>
         <View>
-          {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
-                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}> Gastos de envío</Text>
-                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color:COLORS.success }}>Delivery Gratis </Text>
-                                    </View> */}
+ 
 
           <View>
             <View
@@ -169,7 +125,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
                   FONTS.fontMediumItalic,
                   { fontSize: 16, color: COLORS.success },
                 ]}>
-                {calculateTotal()}$
+                {calculateTotal()}€
               </Text>
             </View>
           </View>

@@ -473,7 +473,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                 FONTS.fontMediumItalic,
                 { fontSize: 20, color: COLORS.primary, fontWeight: "bold" },
               ]}>
-              {product.price} $
+              {product.price} €
             </Text>
           </View>
           {/* <View
@@ -579,8 +579,8 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
             },
           ]}>
           <Text
-            style={[FONTS.fontRegular, { fontSize: 16, color: colors.title }]}>
-            {product.title}
+            style={[FONTS.fontRegular, { fontSize: 16, color: COLORS.success }]}>
+           Código del artículo: {product.code}
           </Text>
           <Text
             style={[

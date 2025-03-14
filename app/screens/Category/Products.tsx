@@ -32,7 +32,9 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { fetchArticles } from "../../api/listSubCategoryApi";
- 
+import QuantityButton from "../Components/QuantityButton";
+import QuantityButton2 from "../Components/QuantityButton2";
+
 const sliderData = [
   {
     title: "Crazy Deals",
@@ -384,33 +386,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
     loadArticles();
   }, [subcategoryName]);
 
-
-  const addItemToWishList = (data: any) => {
-    dispatch(addTowishList(data));
-  };
-
-  const addItemToCart = (item: any) => {
-    const quantity = quantities[item.id] || 1;
-    dispatch(addToCart({ ...item, quantity }));
-    Toast.show({
-      type: "success",
-      text1: "¡Producto/s añadido a su carrito exitosamente!",
-    });
-  };
-
-  const incrementQuantity = (id: string) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [id]: (prevQuantities[id] || 1) + 1,
-    }));
-  };
-
-  const decrementQuantity = (id: string) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [id]: prevQuantities[id] > 1 ? prevQuantities[id] - 1 : 1,
-    }));
-  };
+ 
   // flatlist card1
   const renderItem = ({ item }) => (
     <View
@@ -433,88 +409,14 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
           navigation.navigate("ProductsDetails", {
             product: item, // Pasa el objeto completo del producto aquí
           })
-        } 
+        }
         onPress3={() => addItemToWishList(item)}
       />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          marginBottom: hp("0.4%"),
-          paddingRight: wp("2.5%"),
-          borderRightWidth: 1,
-          borderRightColor: COLORS.primaryLight,
-          width: "100%",
-        }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: COLORS.light,
-            borderRadius: 10,
-            height: hp("4.0%"),
-          }}>
-          <TouchableOpacity
-            onPress={() => decrementQuantity(item.id)}
-            style={{ paddingHorizontal: wp("2.10%") }}>
-            <Text style={{ fontSize: hp("2.25%") }}>-</Text>
-          </TouchableOpacity>
-          <Text
-            style={{
-              fontSize: hp("2%"),
-              marginHorizontal: wp("1%"),
-              fontWeight: "bold",
-            }}>
-            {quantities[item.id] || 1}
-          </Text>
-          <TouchableOpacity
-            onPress={() => incrementQuantity(item.id)}
-            style={{ paddingHorizontal: wp("2.10%") }}>
-            <Text style={{ fontSize: hp("2.25%") }}>+</Text>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}>
-          <TouchableOpacity
-            onPress={() => addItemToCart(item)}
-            style={{
-              marginLeft: wp("2.0%"),
-              marginRight: wp("2.0%"),
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "#001A44",
-              padding: hp("0.625%"),
-              borderRadius: 10,
-              paddingHorizontal: wp("2.5%"),
-              height: hp("4.0%"),
-            }}>
-            <FontAwesome
-              name="cart-shopping"
-              size={hp("1.8%")}
-              color={COLORS.white}
-              style={{ marginRight: wp("2.5%") }}
-            />
-            <Text
-              style={[
-                FONTS.fontMedium,
-                {
-                  fontSize: hp("1.9%"),
-                  color: "white",
-                  position: "relative",
-                  top: -2,
-                },
-              ]}>
-              Añadir
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <QuantityButton
+        item={item}
+        quantities={quantities}
+        setQuantities={setQuantities}
+      />
     </View>
   );
   // flatlist card1
@@ -533,89 +435,13 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
           })
         }
       />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          paddingRight: wp("2.5%"),
-          borderRightWidth: 1,
-          borderRightColor: COLORS.primaryLight,
-          width: "100%",
-          backgroundColor: colors.card,
-          position: "relative",
-          top: -10,
-        }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: COLORS.light,
-            borderRadius: 10,
-            height: hp("4.0%"),
-            marginBottom: 10,
-          }}>
-          <TouchableOpacity
-            onPress={() => decrementQuantity(item.id)}
-            style={{ paddingHorizontal: wp("2.10%") }}>
-            <Text style={{ fontSize: hp("2.25%") }}>-</Text>
-          </TouchableOpacity>
-          <Text
-            style={{
-              fontSize: hp("2%"),
-              marginHorizontal: wp("1%"),
-              fontWeight: "bold",
-            }}>
-            {quantities[item.id] || 1}
-          </Text>
-          <TouchableOpacity
-            onPress={() => incrementQuantity(item.id)}
-            style={{ paddingHorizontal: wp("2.10%") }}>
-            <Text style={{ fontSize: hp("2.25%") }}>+</Text>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}>
-          <TouchableOpacity
-            onPress={() => addItemToCart(item)}
-            style={{
-              marginLeft: wp("2.0%"),
-              marginRight: wp("2.0%"),
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "#001A44",
-              padding: hp("0.625%"),
-              borderRadius: 10,
-              paddingHorizontal: wp("2.5%"),
-              height: hp("4.0%"),
-              marginBottom: 10,
-            }}>
-            <FontAwesome
-              name="cart-shopping"
-              size={hp("1.8%")}
-              color={COLORS.white}
-              style={{ marginRight: wp("2.5%") }}
-            />
-            <Text
-              style={[
-                FONTS.fontMedium,
-                {
-                  fontSize: hp("1.9%"),
-                  color: "white",
-                  position: "relative",
-                  top: -2,
-                },
-              ]}>
-              Añadir
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      
+      <QuantityButton2
+        item={item}
+        quantities={quantities}
+        setQuantities={setQuantities}
+      />
+
     </View>
   );
 
