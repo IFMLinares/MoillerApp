@@ -181,15 +181,23 @@ const absData = [
 const marcas = [
   {
     image: IMAGES.marca,
+    subcolor: "STEINMANN", // Identificador único para la marca
+    name: "STEINMANN", // Nombre de la marca
   },
   {
     image: IMAGES.marca1,
+    subcolor: "MASLEX",
+    name: "Maslex",
   },
   {
     image: IMAGES.marca2,
+    subcolor: "SECOP",
+    name: "Secop",
   },
   {
     image: IMAGES.marca3,
+    subcolor: "AMERICOLD",
+    name: "Americold",
   },
 ];
 const abs2Data = [
@@ -981,15 +989,21 @@ const Home = ({ navigation }: HomeScreenProps) => {
                   contentContainerStyle={{}}>
                   {marcas.map((data, index) => (
                     <View
-                      key={index} // Usa el índice como clave si no hay un identificador único
+                      key={index}
                       style={{ marginRight: 10, marginVertical: 15 }}>
-                      <TouchableOpacity>
-                        <Image
-                          style={{ width: 95, height: 20 }}
-                          source={data.image}
-                          resizeMode="stretch"
-                        />
-                      </TouchableOpacity>
+<TouchableOpacity
+  onPress={() =>
+    navigation.navigate("ProductsMarcas", {
+      subcolor: data.subcolor.trim(), // Pasa el identificador de la marca
+      subcategoryName: data.name, // Pasa el nombre de la marca
+    })
+  }>
+  <Image
+    style={{ width: 95, height: 20 }}
+    source={data.image}
+    resizeMode="stretch"
+  />
+</TouchableOpacity>
                     </View>
                   ))}
                 </ScrollView>

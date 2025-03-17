@@ -527,7 +527,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
             />
             <Text
               style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}>
-              FILTRO
+              FILTROS
             </Text>
           </TouchableOpacity>
           <View

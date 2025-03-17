@@ -10,6 +10,7 @@ import {
   TextInput,
   Platform,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { COLORS, FONTS } from "../../constants/theme";
 import { IMAGES } from "../../constants/Images";
@@ -31,9 +32,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { fetchArticles } from "../../api/listSubCategoryApi";
+import { fetchArticles } from "../../api/listMarcasApi";
 import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const sliderData = [
   {
@@ -361,7 +363,10 @@ const Cardlist3Data = [
   },
 ];
 
-type ProductsScreenProps = StackScreenProps<RootStackParamList, "ProductsMarcas">;
+type ProductsScreenProps = StackScreenProps<
+  RootStackParamList,
+  "ProductsMarcas"
+>;
 
 const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   const { subcategoryId, subcategoryName } = route.params;
@@ -372,37 +377,57 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   const [articles, setArticles] = useState([]);
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
-
-  useEffect(() => {
-    const loadArticles = async () => {
-      try { 
-        const fetchedArticles = await fetchArticles(subcategoryName);
-        setArticles(fetchedArticles);
-      } catch (error) {
-        console.error("Error fetching articles:", error);
-      }
-    };
-
-    loadArticles();
-  }, [subcategoryName]);
-
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  
   useEffect(() => {
     const loadArticles = async () => {
       try {
-        const fetchedArticles = await fetchArticles(subcategoryName); // Llama a la API 
+        setLoading(true);
+
+        // Intenta cargar los datos desde AsyncStorage
+        const cachedArticles = await AsyncStorage.getItem(`articles_${route.params.subcolor}`);
+        if (cachedArticles) {
+          setArticles(JSON.parse(cachedArticles));
+          setLoading(false);
+          return;
+        }
+
+        // Si no hay datos en caché, carga desde la API
+        const fetchedArticles = await fetchArticles();
         const filteredArticles = fetchedArticles.filter(
-          (article) => article.subcolor.toLowerCase() === subcategoryName.toLowerCase()
-        ); 
+          (article) => article.subcolor.trim() === route.params.subcolor.trim()
+        );
+
+        // Guarda los datos en AsyncStorage
+        await AsyncStorage.setItem(`articles_${route.params.subcolor}`, JSON.stringify(filteredArticles));
+
         setArticles(filteredArticles);
       } catch (error) {
         console.error("Error fetching articles:", error);
+      } finally {
+        setLoading(false);
       }
     };
-  
-    loadArticles();
-  }, [subcategoryName]);
 
- 
+    loadArticles();
+  }, [route.params.subcolor]);
+
+  const loadMoreArticles = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const newArticles = await fetchArticles(page, 6); // Carga 20 artículos por página
+      setArticles((prevArticles) => [...prevArticles, ...newArticles]);
+      setPage(page + 1);
+    } catch (error) {
+      console.error("Error loading more articles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   // flatlist card1
   const renderItem = ({ item }) => (
     <View
@@ -451,13 +476,12 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
           })
         }
       />
-      
+
       <QuantityButton2
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
       />
-
     </View>
   );
 
@@ -466,7 +490,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
-        title={subcategoryName} // Usa el nombre de la categoría aquí
+        title={route.params.subcategoryName} // Usa el nombre de la marca
         leftIcon="back"
         titleLeft
         rightIcon1={"search"}
@@ -543,7 +567,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
             />
             <Text
               style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}>
-              FILTRO
+              FILTROS
             </Text>
           </TouchableOpacity>
           <View
@@ -611,9 +635,12 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
             <FlatList
               data={articles}
               renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id.toString()} // Usa un identificador único
               contentContainerStyle={{ paddingBottom: 20 }}
               numColumns={2}
+              onEndReached={loadMoreArticles}
+              onEndReachedThreshold={0.5} // Carga más artículos cuando el usuario está al 50% del final
+              ListFooterComponent={loading && <ActivityIndicator size="large" color={COLORS.primary} />}
             />
           ) : (
             <FlatList
@@ -622,6 +649,9 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
               keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={{ paddingBottom: 20 }}
               key={show ? "grid" : "list"} // Cambia la clave aquí
+              onEndReached={loadMoreArticles}
+              onEndReachedThreshold={0.5} // Carga más artículos cuando el usuario está al 50% del final
+              ListFooterComponent={loading && <ActivityIndicator size="large" color={COLORS.primary} />}
             />
           )}
         </View>
