@@ -55,12 +55,16 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
     const loadCategories = async () => {
       try {
         const categories = await fetchCategories();
-        setCategories(categories);
+        // Filtrar las categorías para excluir "Consumo" y "Servicios"
+        const filteredCategories = categories.filter(
+          (category) => category.name !== "CONSUMO" && category.name !== "SERVICIOS"
+        );
+        setCategories(filteredCategories);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-
+  
     loadCategories();
   }, []);
 
@@ -85,8 +89,15 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
       <Text
         style={[
           FONTS.fontRegular,
-          { fontSize: 13, color: colors.title, marginTop: 5,  width: '95%', textAlign: 'center' },
-        ]}numberOfLines={2}>
+          {
+            fontSize: 13,
+            color: colors.title,
+            marginTop: 5,
+            width: "100%",
+            textAlign: "center",
+          },
+        ]}
+        numberOfLines={2}>
         {capitalizeFirstLetter(item.name)}
       </Text>
     </TouchableOpacity>
@@ -94,12 +105,15 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
-      <Header title="Categorías" leftIcon="back" titleLeft rightIcon4="filter" />
+      <Header
+        title="Categorías"
+        leftIcon="back"
+        titleLeft
+        rightIcon4="filter"
+      />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}>
- 
-
         <View style={{ padding: 10 }}>
           <FlatList
             data={categories}
@@ -109,9 +123,7 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
             contentContainerStyle={{ alignItems: "center" }}
           />
         </View>
-        {selectedCategory && (
-          <CategoryCart categoryId={selectedCategory} />
-        )}
+        {selectedCategory && <CategoryCart categoryId={selectedCategory} />}
         <View
           style={[
             GlobalStyleSheet.container,

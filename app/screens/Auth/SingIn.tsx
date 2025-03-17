@@ -24,6 +24,8 @@ import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios'; // Asegúrate de tener axios instalado
+import { authLogin } from '../../api/authLogin'; // Importa la función de autenticación
 
 type SingInScreenProps = StackScreenProps<RootStackParamList, "SingIn">;
 
@@ -40,16 +42,23 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
   const handleLogin = async () => {
     setLoading(true);
     setErrorMessage("");
-    setTimeout(async () => {
+    try {
+      const data = await authLogin(username, password);
       setLoading(false);
-      if (username === "admin" && password === "admin") {
+      if (data.access) {
         await AsyncStorage.setItem('username', username);
+        await AsyncStorage.setItem('access_token', data.access); // Cambiado a 'access_token'
+        await AsyncStorage.setItem('refreshToken', data.refresh);
         navigation.navigate("DrawerNavigation", { screen: "Home" });
       } else {
         setErrorMessage("Usuario o contraseña incorrectos");
       }
-    }, 3000);
+    } catch (error) {
+      setLoading(false);
+      setErrorMessage(error.message);
+    }
   };
+  
 
   const [inputValue, setInputValue] = useState("");
 

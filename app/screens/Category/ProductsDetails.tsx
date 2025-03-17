@@ -10,6 +10,7 @@ import {
   Platform,
   Modal,
   Dimensions,
+  TextInput,
 } from "react-native";
 import Header from "../../layout/Header";
 import { IMAGES } from "../../constants/Images";
@@ -34,50 +35,8 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 // api articulos
-import { fetchArticles } from '../../api/authApi';
+import { fetchArticles } from "../../api/authApi";
 // api articulos
-
-// Importa las imágenes
-import producto1 from "../../assets/images/producto/item.webp";
-import producto2 from "../../assets/images/producto/item1.webp";
-import producto3 from "../../assets/images/producto/item2.png";
-import producto5 from "../../assets/images/producto/item3.jpg";
-import producto6 from "../../assets/images/producto/item4.webp";
-import producto7 from "../../assets/images/producto/item5.webp";
-import producto8 from "../../assets/images/producto/item6.webp";
-import producto9 from "../../assets/images/producto/item7.webp";
-import producto10 from "../../assets/images/producto/item8.jpg";
-import producto11 from "../../assets/images/producto/item9.webp";
-import producto12 from "../../assets/images/producto/item11.webp";
-import producto13 from "../../assets/images/producto/item12.webp";
-import producto14 from "../../assets/images/producto/item13.jpg";
-import producto15 from "../../assets/images/producto/item14.webp";
-import producto16 from "../../assets/images/producto/item15.png";
-import producto17 from "../../assets/images/producto/item16.webp";
-import producto18 from "../../assets/images/producto/item17.webp";
-import producto19 from "../../assets/images/producto/item18.jpg";
-
-// Mapea las rutas de las imágenes a las importaciones
-const images = {
-  "IMAGES.producto1": producto1,
-  "IMAGES.producto2": producto2,
-  "IMAGES.producto3": producto3,
-  "IMAGES.producto5": producto5,
-  "IMAGES.producto6": producto6,
-  "IMAGES.producto7": producto7,
-  "IMAGES.producto8": producto8,
-  "IMAGES.producto9": producto9,
-  "IMAGES.producto10": producto10,
-  "IMAGES.producto11": producto11,
-  "IMAGES.producto12": producto12,
-  "IMAGES.producto13": producto13,
-  "IMAGES.producto14": producto14,
-  "IMAGES.producto15": producto15,
-  "IMAGES.producto16": producto16,
-  "IMAGES.producto17": producto17,
-  "IMAGES.producto18": producto18,
-  "IMAGES.producto19": producto19,
-};
 
 const SelectData = [
   {
@@ -189,7 +148,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   // api
 
   const { product } = route.params;
- 
+
   // api
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -411,23 +370,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
             </View>
           </View>
         </View>
-        {/* <View style={[GlobalStyleSheet.container,{padding:0}]}>
-                    <View style={{height:45,backgroundColor:'#87E8FF',marginVertical:10,flexDirection:'row',alignItems:'center',width:'100%',justifyContent:'space-between',paddingLeft:15}}>
-                        <View>
-                            <Text style={[FONTS.fontRegular,{fontSize:15,color:COLORS.title}]} >You're saving<Text style={[FONTS.fontSemiBold,{color:'#07A3C5'}]}> $5,565 </Text>on this time</Text>
-                        </View>
-                        <View>
-                            <Image
-                                style={{height:45,resizeMode:'contain',marginRight:Platform.OS === 'android' ? -35 : 0}}
-                                source={IMAGES.background}
-                            />
-                            <Image
-                                style={{position:'absolute',height:28,width:28,top:10,right:15}}
-                                source={IMAGES.gift}
-                            />
-                        </View>
-                    </View>
-                </View> */}
+
         <View
           style={[
             GlobalStyleSheet.container,
@@ -476,97 +419,8 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
               {product.price} €
             </Text>
           </View>
-          {/* <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 5,
-              marginTop: 10,
-            }}>
-            <FontAwesome name="car" size={20} color="black" />
-            <Text style={[FONTS.fontRegular,{fontSize:15,color:colors.text}]}>Devolución de 14 días disponible</Text>
-            <Text
-              style={[
-                FONTS.fontSemiBold,
-                { fontSize: 15, color: COLORS.success },
-              ]}>
-              {" "}
-              Delivery Gratis
-            </Text>
-          </View> */}
         </View>
-        {/* <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,marginVertical:10,paddingBottom:0,paddingTop:10}]}>
-                    <Text style={[FONTS.fontMedium,{fontSize:16,color:colors.title,paddingBottom:10}]}>Seleccionar variante</Text>
-                    <View style={{flexDirection:'row',flexWrap:'wrap',marginHorizontal:-15}}>
-                        {SelectData.map((data:any,index) => {
-                            return(
-                                <TouchableOpacity key={index} 
-                                    style={{
-                                        paddingVertical:10,
-                                        width:'100%',
-                                        borderTopWidth:1,
-                                        borderTopColor:COLORS.primaryLight,
-                                        //marginHorizontal:-15,
-                                        paddingHorizontal:15,
-                                        flexDirection:'row',
-                                        alignItems:'center',
-                                        justifyContent:'space-between'
-                                    }}
-                                >
-                                    <Text style={[FONTS.fontMedium,{fontSize:15,color:colors.title}]}>{data.title}:</Text>
-                                    <View style={{flexDirection:'row',gap:5}}>
-                                        <Text style={[FONTS.fontRegular,{fontSize:15,color:colors.text}]}>{data.text}</Text>
-                                        <Feather size={20} color={COLORS.primary} name={'chevron-right'} />
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </View>
-                </View> */}
-        {/* <View style={[GlobalStyleSheet.container,{paddingHorizontal:-15,paddingVertical:0,marginBottom:10}]}> 
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{paddingHorizontal:15}}
-                    >
-                        <View style={{flexDirection:'row',alignItems:'center',gap:15}}>
-                            {offerData.map((data:any,index) => {
-                                return(
-                                    <TouchableOpacity
-                                        key={index} 
-                                        style={[{
-                                            padding:10,
-                                            backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card,
-                                            borderRadius:4
-                                        },Select === data && {
-                                            backgroundColor:COLORS.primary
-                                        }]}
-                                        onPress={() => setSelect(data)}
-                                    >
-                                        <View style={{alignItems:'center'}}>
-                                            <Image
-                                                style={{height:45,width:45,tintColor:Select === data ? COLORS.secondary :COLORS.primary}}
-                                                source={data.image}
-                                            />
-                                            <View>
-                                                <Text style={[FONTS.fontMedium,{fontSize:15,color:Select === data ? COLORS.white : colors.title,textAlign:'center'}]}>{data.title}</Text>
-                                                <Text style={[FONTS.fontRegular,{fontSize:12,color:Select === data ? COLORS.white : colors.title,opacity:.7,textAlign:'center'}]}>{data.text}</Text>
-                                            </View>
-                                        </View>
-                                    </TouchableOpacity>
-                                )
-                            })}
-                        </View>
-                    </ScrollView>
-                </View> */}
-        {/* <View style={[GlobalStyleSheet.container,{backgroundColor:theme.dark ? 'rgba(255,255,255,.1)':colors.card}]}>
-                    <View style={{}}>
-                        <Text  style={[FONTS.fontMedium,{fontSize:16,color:colors.title}]}>Descripción del producto</Text>
-                        <Text style={[FONTS.fontRegular,{fontSize:15,color:colors.text,lineHeight:20,marginTop:10,opacity:.8}]}>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam sapiente tempore excepturi quos suscipit impedit. Iure error soluta accusantium quasi? Consequuntur porro amet sed vero voluptates corrupti incidunt, ducimus quas!
-                        </Text>
-                    </View>
-                </View> */}
+
         <View
           style={[
             GlobalStyleSheet.container,
@@ -579,14 +433,14 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
             },
           ]}>
           <Text
-            style={[FONTS.fontRegular, { fontSize: 16, color: COLORS.success }]}>
-           Código del artículo: {product.code}
-          </Text>
-          <Text
             style={[
               FONTS.fontRegular,
-              { fontSize: 16, color: colors.title  },
+              { fontSize: 16, color: COLORS.success },
             ]}>
+            Código del artículo: {product.code}
+          </Text>
+          <Text
+            style={[FONTS.fontRegular, { fontSize: 16, color: colors.title }]}>
             Todas las especificaciones
           </Text>
         </View>
@@ -712,14 +566,23 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
               style={{ padding: 10 }}>
               <Text style={{ fontSize: 18 }}>-</Text>
             </TouchableOpacity>
-            <Text
+            <TextInput
               style={{
                 fontSize: 18,
                 marginHorizontal: 10,
                 fontWeight: "bold",
-              }}>
-              {quantity}
-            </Text>
+                textAlign: "center",
+                width: 40,
+              }}
+              keyboardType="numeric"
+              value={String(quantity)}
+              onChangeText={(text) => {
+                const num = parseInt(text);
+                if (!isNaN(num) && num > 0) {
+                  setQuantity(num);
+                }
+              }}
+            />
             <TouchableOpacity
               onPress={incrementQuantity}
               style={{ padding: 10 }}>
@@ -734,20 +597,15 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                 backgroundColor: COLORS.primary,
                 borderRadius: 10,
               }}>
-              <Text style={{ fontSize: wp("4%"), color: COLORS.white, textAlign: "center" }}>
+              <Text
+                style={{
+                  fontSize: wp("4%"),
+                  color: COLORS.white,
+                  textAlign: "center",
+                }}>
                 Agregar al carrito
               </Text>
-            </TouchableOpacity>
-            {/* <Button
-              onPress={addItemToCart}
-              title="AGREGAR AL CARRITO"
-              color={COLORS.primary}
-              text={COLORS.white}
-              style={{
-                fontFamily: "RalewayBold", 
-                fontSize: wp("2.3%"),
-              }}
-            /> */}
+            </TouchableOpacity> 
           </View>
           {/* <View style={{width:'50%'}}>
                         <Button
@@ -775,8 +633,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
             right: 20,
             zIndex: 1,
           }}
-          onPress={closeModal}
-        >
+          onPress={closeModal}>
           <Feather name="x" size={30} color="#fff" />
         </TouchableOpacity>
       </Modal>

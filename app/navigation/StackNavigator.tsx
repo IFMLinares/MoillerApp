@@ -25,6 +25,7 @@ import Myorder from "../screens/Myorder/Myorder";
 import Trackorder from "../screens/Myorder/Trackorder";
 import Writereview from "../screens/Myorder/Writereview";
 import Products from "../screens/Category/Products";
+import ProductsMarcas from "../screens/Category/ProductsMarcas";
 import ProductsDetails from "../screens/Category/ProductsDetails";
 import Coupons from "../screens/Profile/Coupons";
 import EditProfile from "../screens/Profile/EditProfile";
@@ -101,9 +102,9 @@ const StackNavigator = () => {
 		{/* <Stack.Screen name="Demo" component={Demo} /> */}
         {/* <Stack.Screen name="ChooseLanguage" component={ChooseLanguage} /> */}
 		    {/* <Stack.Screen name="SplashScreen" component={SplashScreen}   /> */}
-        {/* <Stack.Screen name="SingIn" component={SingIn} />
+        <Stack.Screen name="SingIn" component={SingIn} />
         <Stack.Screen name="SignUp" component={SignUp} /> 
-        <Stack.Screen name="OTPAuthentication" component={OTPAuthentication} /> */}
+        <Stack.Screen name="OTPAuthentication" component={OTPAuthentication} />
         <Stack.Screen name="BottomNavigation" component={BottomNavigation} />
         <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
         <Stack.Screen name="Search" component={Search} />
@@ -121,6 +122,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Trackorder" component={Trackorder} />
         <Stack.Screen name="Writereview" component={Writereview} />
         <Stack.Screen name="Products" component={Products} />
+        <Stack.Screen name="ProductsMarcas" component={ProductsMarcas} />
         <Stack.Screen name="ProductsDetails" component={ProductsDetails} />
         <Stack.Screen name="Coupons" component={Coupons} />
         <Stack.Screen name="EditProfile" component={EditProfile} />

@@ -117,7 +117,7 @@ const Myorder = ({ navigation }: MyorderScreenProps) => {
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
         title="Mis ordenes"
-        // leftIcon="back"
+        leftIcon="back"
         titleLeft
         rightIcon3={"home"}
       />

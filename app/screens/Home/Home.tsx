@@ -24,7 +24,7 @@ import BottomSheet2 from "../Components/BottomSheet2";
 import StopWatch from "../../components/StopWatch";
 import StopWatch2 from "../../components/StopWatch2";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
-import Swiper from "react-native-swiper/src"; 
+import Swiper from "react-native-swiper/src";
 import Toast from "react-native-toast-message";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Feather from "react-native-vector-icons/Feather";
@@ -32,15 +32,14 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { addToCart } from "../../redux/reducer/cartReducer";
 import { Dimensions } from "react-native";
 // api articulos
-import { fetchArticles } from '../../api/authApi';
+import { fetchArticles } from "../../api/authApi";
 // api articulos
+import QuantityButton from "../Components/QuantityButton";
 
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-
- 
 
 // Mapea las rutas de las imágenes a las importaciones
 // const images = {
@@ -512,12 +511,11 @@ const swiperimageData = [
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
 const Home = ({ navigation }: HomeScreenProps) => {
-
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-// api
+  // api
   useEffect(() => {
     const getArticles = async () => {
       try {
@@ -525,7 +523,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
         setArticles((prevArticles) => [...prevArticles, ...data]);
         setHasMore(data.length > 0);
       } catch (error) {
-        console.error('Error al obtener los artículos:', error);
+        console.error("Error al obtener los artículos:", error);
       } finally {
         setLoading(false);
       }
@@ -540,9 +538,9 @@ const Home = ({ navigation }: HomeScreenProps) => {
     }
   };
 
-  const navigateToProductDetails = (product ) => {
-    navigation.navigate('ProductsDetails', { product  });
-  }; 
+  const navigateToProductDetails = (product) => {
+    navigation.navigate("ProductsDetails", { product });
+  };
   // api
   const dispatch = useDispatch();
 
@@ -629,7 +627,11 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     />
                   </TouchableOpacity> */}
                   <Image
-                    style={{ resizeMode: "contain", width: wp('30.5%'), height: hp('5%') }}
+                    style={{
+                      resizeMode: "contain",
+                      width: wp("30.5%"),
+                      height: hp("5%"),
+                    }}
                     source={IMAGES.appname}
                   />
                 </View>
@@ -649,22 +651,25 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     <View
                       style={{
                         transform: [{ rotate: "90deg" }],
-                        marginLeft: wp('5%'),
-                      }}
-                    >
-                      <Feather name="search" size={hp('2.5%')} color={COLORS.title} />
+                        marginLeft: wp("5%"),
+                      }}>
+                      <Feather
+                        name="search"
+                        size={hp("2.5%")}
+                        color={COLORS.title}
+                      />
                     </View>
                     <TextInput
                       placeholder="Buscar"
                       placeholderTextColor={COLORS.title}
                       style={{
                         backgroundColor: COLORS.card,
-                        width: wp('35%'),
-                        height: hp('4%'),
+                        width: wp("35%"),
+                        height: hp("4%"),
                         borderRadius: 18,
-                        paddingLeft: wp('2.5%'),
+                        paddingLeft: wp("2.5%"),
                         color: COLORS.title,
-                        fontSize: hp('2%'),
+                        fontSize: hp("2%"),
                       }}
                     />
                     {/* <View
@@ -918,26 +923,38 @@ const Home = ({ navigation }: HomeScreenProps) => {
                           height: 150,
                         }}>
                         <TouchableOpacity
-                          style={{ width: "40%",height: '100%' , marginRight:10 }}
+                          style={{
+                            width: "40%",
+                            height: "100%",
+                            marginRight: 10,
+                          }}
                           onPress={() =>
                             navigation.navigate("Category", { initialIndex: 1 })
                           } // Cambia el índice según la pestaña deseada
                         >
                           <Image
-                            style={{ width: "100%", height: "100%", borderRadius:20 }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: 20,
+                            }}
                             source={IMAGES.ads12}
                             resizeMode="stretch"
                           />
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={{ width: "60%", height: '100%' }}
+                          style={{ width: "60%", height: "100%" }}
                           onPress={() =>
                             navigation.navigate("Category", { initialIndex: 2 })
                           } // Cambia el índice según la pestaña deseada
                         >
                           <Image
-                            style={{ width: "100%", height: "100%", borderRadius:20, }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: 20,
+                            }}
                             source={IMAGES.ads13}
                             resizeMode="stretch"
                           />
@@ -962,21 +979,19 @@ const Home = ({ navigation }: HomeScreenProps) => {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{}}>
-                  {marcas.map((data, index) => {
-                    return (
-                      <View
-                        key={index}
-                        style={{ marginRight: 10, marginVertical: 15 }}>
-                        <TouchableOpacity>
-                          <Image
-                            style={{ width: 95, height: 20 }}
-                            source={data.image}
-                            resizeMode="stretch"
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    );
-                  })}
+                  {marcas.map((data, index) => (
+                    <View
+                      key={index} // Usa el índice como clave si no hay un identificador único
+                      style={{ marginRight: 10, marginVertical: 15 }}>
+                      <TouchableOpacity>
+                        <Image
+                          style={{ width: 95, height: 20 }}
+                          source={data.image}
+                          resizeMode="stretch"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
                 </ScrollView>
               </View>
             </View>
@@ -1045,7 +1060,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
               </View>
             </View>
           </View>
- 
+
           <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
             <View
               style={[
@@ -1057,7 +1072,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                   marginBottom: 15,
                 },
               ]}>
-              {articles.map((article) => (
+              {articles.map((article, index) => (
                 <View
                   style={[
                     GlobalStyleSheet.col50,
@@ -1067,89 +1082,29 @@ const Home = ({ navigation }: HomeScreenProps) => {
                       backgroundColor: colors.card,
                     },
                   ]}
-                  key={article.id}>
+                  key={article.id || index} // Usa `article.id` o el índice como clave
+                >
                   <Cardstyle1
                     id={article.id}
                     title={article.name}
                     modelo={article.code}
                     price={article.price}
                     hascolor={true}
-                    image={{ uri: `http://10.0.2.2:8000${article.highImage}` }} // Mostrar imagen de baja calidad
+                    image={{ uri: `http://10.0.2.2:8000${article.highImage}` }}
                     onPress={() => navigateToProductDetails(article)}
                     onPress3={() => addItemToWishList(article)}
                   />
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                      marginBottom: hp('0.4%'),
-                      paddingRight: wp('2.5%'),
-                      width: '100%',
-                      borderRightWidth: 1,
-                      borderRightColor: COLORS.primaryLight,
-                    }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: COLORS.light,
-                        borderRadius: 10,
-                        height: hp('4.0%'),
-                      }}>
-                      <TouchableOpacity
-                        onPress={() => decrementQuantity(article.id)}
-                        style={{ paddingHorizontal: wp('2.10%') }}>
-                        <Text style={{ fontSize: hp('2.25%') }}>-</Text>
-                      </TouchableOpacity>
-                      <Text
-                        style={{
-                          fontSize: hp('2%'),
-                          marginHorizontal: wp('1%'),
-                          fontWeight: 'bold',
-                        }}>
-                        {quantities[article.id] || 1}
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => incrementQuantity(article.id)}
-                        style={{ paddingHorizontal: wp('2.10%') }}>
-                        <Text style={{ fontSize: hp('2.25%') }}>+</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => addItemToCart(article)}
-                      style={{
-                        marginLeft: wp('2.0%'),
-                        marginRight: wp('2.0%'),
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: '#001A44',
-                        padding: hp('0.625%'),
-                        borderRadius: 10,
-                        paddingHorizontal: wp('2.5%'),
-                        height: hp('4.0%'),
-                      }}>
-                      <FontAwesome
-                        name="cart-shopping"
-                        size={hp('1.8%')}
-                        color={COLORS.white}
-                        style={{ marginRight: wp('2.5%') }}
-                      />
-                      <Text
-                        style={[
-                          FONTS.fontMedium,
-                          { fontSize: hp('1.9%'), color: 'white', position: 'relative', top: -2 },
-                        ]}>
-                        Añadir
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                  <QuantityButton
+                    item={article}
+                    quantities={quantities}
+                    setQuantities={setQuantities}
+                  />
                 </View>
               ))}
             </View>
-            {loading && <ActivityIndicator size="large" color={COLORS.primary} />}
-             
+            {loading && (
+              <ActivityIndicator size="large" color={COLORS.primary} />
+            )}
           </View>
         </ScrollView>
         <BottomSheet2 ref={moresheet2} />

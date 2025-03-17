@@ -27,6 +27,7 @@ export type RootStackParamList = {
     EditProfile: undefined;
     Trackorder: undefined;
     Products: undefined;
+    ProductsMarcas: undefined;
     Language: undefined;
     MyCart: undefined;
     Category: undefined;
