@@ -10,6 +10,7 @@ import {
   TextInput,
   Platform,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { COLORS, FONTS } from "../../constants/theme";
 import { IMAGES } from "../../constants/Images";
@@ -32,6 +33,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { fetchArticles } from "../../api/listSubCategoryApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
 
@@ -372,19 +374,42 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
   const [articles, setArticles] = useState([]);
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
+  const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
 
   useEffect(() => {
     const loadArticles = async () => {
       try {
-        const fetchedArticles = await fetchArticles(subcategoryName);
-        setArticles(fetchedArticles);
+        setIsLoading(true); // Mostrar el indicador de carga
+
+        // Verificar si los artículos están en AsyncStorage
+        const cachedArticles = await AsyncStorage.getItem(
+          `products_${subcategoryId}`
+        );
+
+        if (cachedArticles) {
+          // Si están en caché, cargarlos desde AsyncStorage
+          setArticles(JSON.parse(cachedArticles));
+        } else {
+          // Si no están en caché, obtenerlos de la API
+          const fetchedArticles = await fetchArticles(subcategoryName);
+
+          // Guardar en AsyncStorage para futuras solicitudes
+          await AsyncStorage.setItem(
+            `products_${subcategoryId}`,
+            JSON.stringify(fetchedArticles)
+          );
+
+          setArticles(fetchedArticles);
+        }
       } catch (error) {
         console.error("Error fetching articles:", error);
+      } finally {
+        setIsLoading(false); // Ocultar el indicador de carga
       }
     };
 
     loadArticles();
-  }, [subcategoryName]);
+  }, [subcategoryId, subcategoryName]);
 
  
   // flatlist card1
@@ -450,7 +475,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
-        title={subcategoryName} // Usa el nombre de la categoría aquí
+        title={subcategoryName} // Usa el nombre de la subcategoría aquí
         leftIcon="back"
         titleLeft
         rightIcon1={"search"}
@@ -461,7 +486,6 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         style={[
           {
             padding: 0,
-            //paddingHorizontal:15,
             backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
             shadowColor: "#000",
             shadowOffset: {
@@ -474,7 +498,8 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
             height: 40,
             width: "100%",
           },
-        ]}>
+        ]}
+      >
         <View
           style={[
             GlobalStyleSheet.container,
@@ -484,7 +509,8 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               flexDirection: "row",
               alignItems: "center",
             },
-          ]}>
+          ]}
+        >
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={() => sheetRef.current.openSheet("short")}
@@ -494,13 +520,15 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               gap: 5,
               width: "35%",
               justifyContent: "center",
-            }}>
+            }}
+          >
             <Image
               style={{ height: 16, width: 16, resizeMode: "contain" }}
               source={IMAGES.list2}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}>
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}
+            >
               ORDENAR POR
             </Text>
           </TouchableOpacity>
@@ -520,13 +548,15 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               gap: 5,
               width: "35%",
               justifyContent: "center",
-            }}>
+            }}
+          >
             <Image
               style={{ height: 16, width: 16, resizeMode: "contain" }}
               source={IMAGES.filter3}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}>
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}
+            >
               FILTROS
             </Text>
           </TouchableOpacity>
@@ -545,7 +575,8 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               width: "15%",
               justifyContent: "center",
               alignItems: "center",
-            }}>
+            }}
+          >
             <Image
               style={{
                 height: 22,
@@ -553,7 +584,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
                 resizeMode: "contain",
                 tintColor: show ? colors.text : COLORS.primary,
               }}
-              source={IMAGES.list}
+              source={IMAGES.grid}
             />
           </TouchableOpacity>
           <View
@@ -571,7 +602,8 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               width: "15%",
               justifyContent: "center",
               alignItems: "center",
-            }}>
+            }}
+          >
             <Image
               style={{
                 height: 22,
@@ -579,7 +611,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
                 resizeMode: "contain",
                 tintColor: show ? COLORS.primary : colors.text,
               }}
-              source={IMAGES.grid}
+              source={IMAGES.list}
             />
           </TouchableOpacity>
         </View>
@@ -589,26 +621,24 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         style={[
           GlobalStyleSheet.container,
           { paddingTop: 15, paddingHorizontal: 0 },
-        ]}>
-        <View>
-          {show ? (
-            <FlatList
-              data={articles}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
-              contentContainerStyle={{ paddingBottom: 20 }}
-              numColumns={2}
-            />
-          ) : (
-            <FlatList
-              data={articles}
-              renderItem={renderItem2}
-              keyExtractor={(item, index) => index.toString()}
-              contentContainerStyle={{ paddingBottom: 20 }}
-              key={show ? "grid" : "list"} // Cambia la clave aquí
-            />
-          )}
-        </View>
+        ]}
+      >
+        {isLoading ? (
+          <ActivityIndicator
+            size="large"
+            color={COLORS.primary}
+            style={{ marginTop: 20 }}
+          />
+        ) : (
+          <FlatList
+            data={articles}
+            renderItem={show ? renderItem : renderItem2}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            numColumns={show ? 2 : 1}
+            key={show ? "grid" : "list"} // Cambia la clave aquí
+          />
+        )}
       </View>
       <BottomSheet2 ref={sheetRef} />
       <Toast ref={(ref) => Toast.setRef(ref)} />

@@ -103,7 +103,7 @@ const Wishlist = ({navigation} : WishlistScreenProps) => {
   return (
      <View style={{backgroundColor:colors.background,flex:1}}>
         <Header
-          title='Mi '
+          title='Marca'
           leftIcon={'back'}
           righttitle
           titleLeft
@@ -153,7 +153,7 @@ const Wishlist = ({navigation} : WishlistScreenProps) => {
                                 <Feather color={COLORS.primary} size={24} name='heart'/>
                             </View>
                             <Text style={{...FONTS.h5,color:colors.title,marginBottom:8}}>
-                            ¡Tu - está vacía!</Text>    
+                            ¡Tu Marca está vacía!</Text>    
                             <Text
                                 style={{
                                     ...FONTS.fontSm,

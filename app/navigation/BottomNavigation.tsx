@@ -41,14 +41,14 @@ const BottomNavigation = () => {
                 name='Categoría'
                 component={CategoryScreen}
             />
+                <Tab.Screen 
+                    name='Marca'
+                    component={WishlistScreen}
+                />
             <Tab.Screen 
                 name='Mi Carrito'
                 component={MyCartScreen}
             />
-            {/* <Tab.Screen 
-                name='Wishlist'
-                component={WishlistScreen}
-            /> */}
             <Tab.Screen 
                 name={username ? username : 'Profile'}
                 component={ProfileScreen}

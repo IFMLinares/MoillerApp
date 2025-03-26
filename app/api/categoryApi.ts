@@ -2,54 +2,58 @@ import axios from 'axios';
 
 export const fetchCategories = async () => {
   try {
-    const response = await axios.get('http://10.0.2.2:8000/api/core/lineas/list', {
+    const response = await axios.get('http://10.0.2.2:8000/api/core/articles/list', {
       headers: {
         'Content-Type': 'application/json',
       }
     });
-    const categories = response.data;
-    return categories
-      .map(category => ({
-        id: category.co_lin?.trim() || '',
-        name: category.lin_des?.trim() || '',
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name)); // Ordenar alfabéticamente por nombre
+
+    // Extraer y mapear las categorías únicas directamente
+    const categories = Array.from(
+      new Map(
+        response.data.map(article => [
+          article.co_lin.co_lin.trim(),
+          {
+            id: article.co_lin.co_lin.trim(),
+            name: article.co_lin.lin_des.trim(),
+          }
+        ])
+      ).values()
+    );
+
+    return categories.sort((a, b) => a.name.localeCompare(b.name)); // Ordenar alfabéticamente
   } catch (error) {
-    if (error.response) {
-      console.error('Error en la respuesta del servidor:', error.response.data);
-      console.error('Código de estado:', error.response.status);
-      console.error('Encabezados:', error.response.headers);
-    } else if (error.request) {
-      console.error('No se recibió respuesta del servidor:', error.request);
-    } else {
-      console.error('Error al configurar la solicitud:', error.message);
-    }
+    console.error('Error al obtener las categorías:', error.message);
     throw error;
   }
 };
 
 export const fetchSubcategories = async (categoryId) => {
   try {
-    const response = await axios.get(`http://10.0.2.2:8000/api/core/subl/list?co_lin=${categoryId}`, {
+    const response = await axios.get('http://10.0.2.2:8000/api/core/articles/list', {
       headers: {
         'Content-Type': 'application/json',
       }
     });
-    const subcategories = response.data;
-    return subcategories.map(subcategory => ({
-      id: subcategory.co_subl?.trim() || '',
-      name: subcategory.subl_des?.trim() || '', 
-    }));
+
+    // Filtrar por categoría y mapear las subcategorías únicas directamente
+    const subcategories = Array.from(
+      new Map(
+        response.data
+          .filter(article => article.co_lin.co_lin.trim() === categoryId)
+          .map(article => [
+            article.co_subl.co_subl.trim(),
+            {
+              id: article.co_subl.co_subl.trim(),
+              name: article.co_subl.subl_des.trim(),
+            }
+          ])
+      ).values()
+    );
+
+    return subcategories;
   } catch (error) {
-    if (error.response) {
-      console.error('Error en la respuesta del servidor:', error.response.data);
-      console.error('Código de estado:', error.response.status);
-      console.error('Encabezados:', error.response.headers);
-    } else if (error.request) {
-      console.error('No se recibió respuesta del servidor:', error.request);
-    } else {
-      console.error('Error al configurar la solicitud:', error.message);
-    }
+    console.error('Error al obtener las subcategorías:', error.message);
     throw error;
   }
 };

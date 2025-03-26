@@ -8,6 +8,7 @@ import {
   TextInput,
   Platform,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
@@ -40,6 +41,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Mapea las rutas de las imágenes a las importaciones
 // const images = {
@@ -527,9 +529,24 @@ const Home = ({ navigation }: HomeScreenProps) => {
   useEffect(() => {
     const getArticles = async () => {
       try {
-        const data = await fetchArticles(page);
-        setArticles((prevArticles) => [...prevArticles, ...data]);
-        setHasMore(data.length > 0);
+        setLoading(true);
+
+        // Verificar si los artículos están en AsyncStorage
+        const cachedArticles = await AsyncStorage.getItem("home_articles");
+
+        if (cachedArticles) {
+          // Si están en caché, cargarlos desde AsyncStorage
+          setArticles(JSON.parse(cachedArticles));
+        } else {
+          // Si no están en caché, obtenerlos de la API
+          const data = await fetchArticles(page);
+
+          // Guardar en AsyncStorage para futuras solicitudes
+          await AsyncStorage.setItem("home_articles", JSON.stringify(data));
+
+          setArticles(data);
+          setHasMore(data.length > 0);
+        }
       } catch (error) {
         console.error("Error al obtener los artículos:", error);
       } finally {
@@ -540,9 +557,29 @@ const Home = ({ navigation }: HomeScreenProps) => {
     getArticles();
   }, [page]);
 
-  const loadMoreArticles = () => {
+  const loadMoreArticles = async () => {
     if (hasMore) {
-      setPage((prevPage) => prevPage + 1);
+      try {
+        setLoading(true);
+
+        // Obtener más artículos de la API
+        const data = await fetchArticles(page + 1);
+
+        // Actualizar los artículos y la página
+        setArticles((prevArticles) => [...prevArticles, ...data]);
+        setPage((prevPage) => prevPage + 1);
+        setHasMore(data.length > 0);
+
+        // Actualizar el caché en AsyncStorage
+        await AsyncStorage.setItem(
+          "home_articles",
+          JSON.stringify([...articles, ...data])
+        );
+      } catch (error) {
+        console.error("Error al cargar más artículos:", error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -680,24 +717,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                         fontSize: hp("2%"),
                       }}
                     />
-                    {/* <View
-                      style={{
-                        transform: [{ rotate: "90deg" }],
-                        position: "relative",
-                        left: wp('1%'),
-                      }}
-                    >
-                      <SimpleLineIcons
-                        name="equalizer"
-                        size={hp('2.25%')}
-                        color={COLORS.white}
-                        style={{
-                          padding: hp('1.75%'),
-                          backgroundColor: COLORS.primary,
-                          borderRadius: 18,
-                        }}
-                      />
-                    </View> */}
+ 
                   </View>
                   {/* <TouchableOpacity
                     //onPress={() => navigation.navigate('Notification')}
@@ -889,7 +909,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
               );
             })} */}
           </Swiper>
-          <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
+          {/* <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
             <View style={{ marginHorizontal: -15, marginVertical: 10 }}>
               <TouchableOpacity
                 onPress={() =>
@@ -902,8 +922,8 @@ const Home = ({ navigation }: HomeScreenProps) => {
                 />
               </TouchableOpacity>
             </View>
-          </View>
-          <View
+          </View> */}
+          {/* <View
             style={[
               {
                 paddingVertical: 0,
@@ -973,7 +993,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                 })}
               </ScrollView>
             </View>
-          </View>
+          </View> */}
           <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
             <View style={{ marginHorizontal: -0, marginVertical: 10 }}>
               <View
@@ -991,19 +1011,19 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     <View
                       key={index}
                       style={{ marginRight: 10, marginVertical: 15 }}>
-<TouchableOpacity
-  onPress={() =>
-    navigation.navigate("ProductsMarcas", {
-      subcolor: data.subcolor.trim(), // Pasa el identificador de la marca
-      subcategoryName: data.name, // Pasa el nombre de la marca
-    })
-  }>
-  <Image
-    style={{ width: 95, height: 20 }}
-    source={data.image}
-    resizeMode="stretch"
-  />
-</TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("ProductsMarcas", {
+                            subcolor: data.subcolor.trim(), // Pasa el identificador de la marca
+                            subcategoryName: data.name, // Pasa el nombre de la marca
+                          })
+                        }>
+                        <Image
+                          style={{ width: 95, height: 20 }}
+                          source={data.image}
+                          resizeMode="stretch"
+                        />
+                      </TouchableOpacity>
                     </View>
                   ))}
                 </ScrollView>
@@ -1018,9 +1038,9 @@ const Home = ({ navigation }: HomeScreenProps) => {
               ]}>
               <View style={{}}>
                 <ScrollView
-                  horizontal
-                  contentContainerStyle={{ paddingHorizontal: 20, flexGrow: 1 }}
-                  showsHorizontalScrollIndicator={false}>
+                  // horizontal
+                  contentContainerStyle={{ paddingHorizontal: 10, flexGrow: 1 }}
+                  showsHorizontalScrollIndicator={true}>
                   <View
                     style={{
                       flexDirection: "row",
@@ -1085,7 +1105,8 @@ const Home = ({ navigation }: HomeScreenProps) => {
                   borderBottomColor: COLORS.primaryLight,
                   marginBottom: 15,
                 },
-              ]}>
+              ]}
+            >
               {articles.map((article, index) => (
                 <View
                   style={[

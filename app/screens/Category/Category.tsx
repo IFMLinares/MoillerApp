@@ -5,6 +5,7 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Header from "../../layout/Header";
@@ -19,24 +20,30 @@ import { fetchCategories } from "../../api/categoryApi";
 import { IMAGES } from "../../constants/Images";
 import BottomSheet2 from "../Components/BottomSheet2";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 type CategoryScreenProps = StackScreenProps<RootStackParamList, "Category">;
 
-const brand5Data = [
+const marcas = [
   {
-    id: "1",
     image: IMAGES.marca,
+    subcolor: "STEINMANN", // Identificador único para la marca
+    name: "STEINMANN", // Nombre de la marca
   },
   {
-    id: "2",
     image: IMAGES.marca1,
+    subcolor: "MASLEX",
+    name: "MASLEX",
   },
   {
-    id: "3",
     image: IMAGES.marca2,
+    subcolor: "SECOP",
+    name: "SECOP",
   },
   {
-    id: "4",
     image: IMAGES.marca3,
+    subcolor: "AMERICOLD",
+    name: "AMERICOLD",
   },
 ];
 const capitalizeFirstLetter = (string) => {
@@ -49,60 +56,80 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [show, setShow] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
   const sheetRef = useRef<any>(null);
 
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const categories = await fetchCategories();
-        // Filtrar las categorías para excluir "Consumo" y "Servicios"
-        const filteredCategories = categories.filter(
-          (category) => category.name !== "CONSUMO" && category.name !== "SERVICIOS"
-        );
-        setCategories(filteredCategories);
+        setIsLoading(true); // Mostrar el indicador de carga
+
+        // Verificar si las categorías están en AsyncStorage
+        const cachedCategories = await AsyncStorage.getItem("categories");
+
+        if (cachedCategories) {
+          // Si están en caché, cargarlas desde AsyncStorage
+          setCategories(JSON.parse(cachedCategories));
+        } else {
+          // Si no están en caché, obtenerlas de la API
+          const categories = await fetchCategories();
+
+          // Guardar en AsyncStorage para futuras solicitudes
+          await AsyncStorage.setItem("categories", JSON.stringify(categories));
+
+          setCategories(categories);
+        }
       } catch (error) {
         console.error("Error fetching categories:", error);
+      } finally {
+        setIsLoading(false); // Ocultar el indicador de carga
       }
     };
-  
+
     loadCategories();
   }, []);
 
-  const renderCategory = ({ item }) => (
-    <TouchableOpacity
-      style={{ alignItems: "center", margin: 10 }}
-      onPress={() => setSelectedCategory(item.id)}>
-      <View
-        style={{
-          height: 70,
-          width: 70,
-          borderRadius: 50,
-          backgroundColor: COLORS.primaryLight,
-          alignItems: "center",
-          justifyContent: "center",
-        }}>
-        <Image
-          source={IMAGES[item.image]}
-          style={{ height: 50, width: 50, borderRadius: 25 }}
-        />
-      </View>
-      <Text
-        style={[
-          FONTS.fontRegular,
-          {
-            fontSize: 13,
-            color: colors.title,
-            marginTop: 5,
-            width: "100%",
-            textAlign: "center",
-          },
-        ]}
-        numberOfLines={2}>
-        {capitalizeFirstLetter(item.name)}
-      </Text>
-    </TouchableOpacity>
-  );
+  const renderCategory = ({ item }) => {
+    // Busca la imagen correspondiente en el objeto IMAGES
+    const imageName = item.name.toLowerCase() ; // Convierte el nombre a minúsculas y elimina espacios
+    const categoryImage = IMAGES[imageName] || IMAGES.default; // Usa una imagen por defecto si no se encuentra
 
+    return (
+      <TouchableOpacity
+        style={{ alignItems: "center", margin: 10 }}
+        onPress={() => setSelectedCategory(item.id)}>
+        <View
+          style={{
+            height: 70,
+            width: 70,
+            borderRadius: 50,
+            backgroundColor: COLORS.primaryLight,
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+          <Image
+            source={categoryImage}
+            style={{ height: 70, width: 70, borderRadius: 25 }}
+          />
+        </View>
+        <Text
+          style={[
+            FONTS.fontRegular,
+            {
+              fontSize: 13,
+              color: colors.title,
+              marginTop: 5,
+              width: "100%",
+              textAlign: "center",
+            },
+          ]}
+          numberOfLines={2}>
+          {capitalizeFirstLetter(item.name)}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+  
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
@@ -110,11 +137,16 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
         leftIcon="back"
         titleLeft
         rightIcon4="filter"
-      />
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}>
+      /> 
         <View style={{ padding: 10 }}>
+        {isLoading ? (
+            // Mostrar el ActivityIndicator mientras se cargan los datos
+            <ActivityIndicator
+              size="large"
+              color={COLORS.primary}
+              style={{ marginTop: 20 }}
+            />
+          ) : (
           <FlatList
             data={categories}
             renderItem={renderCategory}
@@ -122,6 +154,7 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
             numColumns={3}
             contentContainerStyle={{ alignItems: "center" }}
           />
+        )}
         </View>
         {selectedCategory && <CategoryCart categoryId={selectedCategory} />}
         <View
@@ -157,7 +190,7 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
               justifyContent: "center",
               gap: 15,
             }}>
-            {brand5Data.map((data: any, index) => {
+            {marcas.map((data: any, index) => {
               return (
                 <View
                   key={index}
@@ -172,24 +205,31 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
                       justifyContent: "center",
                     },
                   ]}>
-                  <Image
-                    style={[
-                      {
-                        height: 65,
-                        width: 65,
-                        resizeMode: "contain",
-                        borderRadius: 40,
-                        backgroundColor: COLORS.primary,
-                      },
-                    ]}
-                    source={data.image}
-                  />
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("ProductsMarcas", {
+                        subcolor: data.subcolor.trim(), // Pasa el identificador de la marca
+                        subcategoryName: data.name, // Pasa el nombre de la marca
+                      })
+                    }>
+                    <Image
+                      style={[
+                        {
+                          height: 65,
+                          width: 65,
+                          resizeMode: "contain",
+                          borderRadius: 40,
+                          backgroundColor: COLORS.primary,
+                        },
+                      ]}
+                      source={data.image}
+                    />
+                  </TouchableOpacity>
                 </View>
               );
             })}
           </View>
-        </View>
-      </ScrollView>
+        </View> 
       <BottomSheet2 ref={sheetRef} />
       <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>

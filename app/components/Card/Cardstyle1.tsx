@@ -104,16 +104,7 @@ const Cardstyle1 = ({
           }}
           source={image}
         />
-      </View>
-      <TouchableOpacity style={{ position: "absolute", right: 0, top: -5 }}>
-        <LikeBtn
-          id={id}
-          onPress={
-            inWishlist().includes(id) ? removeItemFromWishList : onPress3
-          }
-          inWishlist={inWishlist}
-        />
-      </TouchableOpacity>
+      </View> 
       <View
         style={{
           paddingHorizontal: hascolor ? 20 : 20,

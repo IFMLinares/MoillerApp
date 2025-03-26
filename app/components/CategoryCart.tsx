@@ -1,4 +1,10 @@
-import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { IMAGES } from "../constants/Images";
 import { FONTS, COLORS } from "../constants/theme";
@@ -7,6 +13,7 @@ import { GlobalStyleSheet } from "../constants/StyleSheet";
 import { ScrollView } from "react-native";
 import data from "../data/data.json";
 import { fetchSubcategories } from "../api/categoryApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const brand2Data = [
   {
@@ -173,7 +180,10 @@ const ArrivalData = [
 ];
 
 const capitalizeFirstLetter = (string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  return string
+    .split(" ") // Divide el texto en palabras
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitaliza la primera letra de cada palabra
+    .join(" "); // Une las palabras de nuevo con espacios
 };
 
 const CategoryCart = ({ categoryId, categoryTitle }) => {
@@ -182,18 +192,41 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
   const navigation = useNavigation<any>();
   const [subcategories, setSubcategories] = useState([]);
   const [showAll, setShowAll] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
 
   useEffect(() => {
     const loadSubcategories = async () => {
       try {
-        const subcategories = await fetchSubcategories(categoryId);
-        const uniqueSubcategories = subcategories.filter(
-          (subcategory, index, self) =>
-            index === self.findIndex((s) => s.id === subcategory.id)
+        setIsLoading(true); // Mostrar el indicador de carga
+
+        // Verificar si las subcategorías están en AsyncStorage
+        const cachedSubcategories = await AsyncStorage.getItem(
+          `subcategories_${categoryId}`
         );
-        setSubcategories(uniqueSubcategories);
+
+        if (cachedSubcategories) {
+          // Si están en caché, cargarlas desde AsyncStorage
+          setSubcategories(JSON.parse(cachedSubcategories));
+        } else {
+          // Si no están en caché, obtenerlas de la API
+          const subcategories = await fetchSubcategories(categoryId);
+          const uniqueSubcategories = subcategories.filter(
+            (subcategory, index, self) =>
+              index === self.findIndex((s) => s.id === subcategory.id)
+          );
+
+          // Guardar en AsyncStorage para futuras solicitudes
+          await AsyncStorage.setItem(
+            `subcategories_${categoryId}`,
+            JSON.stringify(uniqueSubcategories)
+          );
+
+          setSubcategories(uniqueSubcategories);
+        }
       } catch (error) {
         console.error("Error fetching subcategories:", error);
+      } finally {
+        setIsLoading(false); // Ocultar el indicador de carga
       }
     };
 
@@ -203,6 +236,7 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
   const displayedSubcategories = showAll
     ? subcategories
     : subcategories.slice(0, 7);
+
   return (
     <View>
       <View
@@ -214,83 +248,85 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
             marginTop: 15,
           },
         ]}>
-        <View
-          style={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            paddingHorizontal: 10,
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 10,
-          }}>
-          {displayedSubcategories.map((subcategory, index) => (
-            <TouchableOpacity
-              key={index}
-              style={{ alignItems: "center" }}
-              activeOpacity={0.5}
-              onPress={() =>
-                navigation.navigate("Products", {
-                  subcategoryId: subcategory.id,
-                  subcategoryName: subcategory.name,
-                })
-              }>
-              <View
-                style={[
-                  {
-                    height: 40,
-                    width: "100%",
-                    paddingHorizontal: 10,
-                    backgroundColor: COLORS.primary,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 5,
-                  },
-                ]}>
-                <Text
+        {isLoading ? (
+          // Mostrar el ActivityIndicator mientras se cargan los datos
+          <ActivityIndicator
+            size="large"
+            color={COLORS.primary}
+            style={{ marginTop: 20 }}
+          />
+        ) : (
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              paddingHorizontal: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+            }}>
+            {displayedSubcategories.map((subcategory, index) => (
+              <TouchableOpacity
+                key={index}
+                style={{ alignItems: "center" }}
+                activeOpacity={0.5}
+                onPress={() =>
+                  navigation.navigate("Products", {
+                    subcategoryId: subcategory.id,
+                    subcategoryName: subcategory.name,
+                  })
+                }>
+                <View
                   style={[
-                    FONTS.fontRegular,
-                    { fontSize: 13, color: COLORS.white },
-                  ]} >
-                  {capitalizeFirstLetter(subcategory.name)}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-          {subcategories.length > 7 && !showAll && (
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              activeOpacity={0.5}
-              onPress={() => setShowAll(true)}>
-              <View
-                style={[
-                  {
-                    height: 40,
-                    width: "100%",
-                    paddingHorizontal: 10,
-                    backgroundColor: COLORS.primary,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  },
-                ]}>
-                <Text
-                  style={[
-                    FONTS.fontRegular,
-                    { fontSize: 13, color: COLORS.white },
+                    {
+                      height: 40,
+                      width: "100%",
+                      paddingHorizontal: 10,
+                      backgroundColor: COLORS.primary,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 5,
+                    },
                   ]}>
-                  Mostrar más
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
+                  <Text
+                    style={[
+                      FONTS.fontRegular,
+                      { fontSize: 13, color: COLORS.white },
+                    ]}>
+                    {capitalizeFirstLetter(subcategory.name)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+            {subcategories.length > 7 && !showAll && (
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                activeOpacity={0.5}
+                onPress={() => setShowAll(true)}>
+                <View
+                  style={[
+                    {
+                      height: 40,
+                      width: "100%",
+                      paddingHorizontal: 10,
+                      backgroundColor: COLORS.primary,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                  ]}>
+                  <Text
+                    style={[
+                      FONTS.fontRegular,
+                      { fontSize: 13, color: COLORS.white },
+                    ]}>
+                    Mostrar más
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
       </View>
-
-      {/* <View style={[GlobalStyleSheet.container,{paddingVertical:5,padding:0,}]}>
-            <Image
-                style={{width:'100%',height:undefined,aspectRatio:1/.3,resizeMode:'contain'}}
-                source={IMAGES.ads4}
-            />
-        </View> */}
     </View>
   );
 };
