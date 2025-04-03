@@ -1,7 +1,7 @@
 export type BottomTabParamList = {
     Home: undefined;
-    Marca: undefined;
+    Marcas: undefined;
     MyCart: undefined;
     Category: undefined;
-    Profile: undefined;
+    Más: undefined;
 };

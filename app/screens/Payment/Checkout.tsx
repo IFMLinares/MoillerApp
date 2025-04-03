@@ -16,12 +16,13 @@ import FeatherIcon from "react-native-vector-icons/Feather";
 //import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS } from "../../constants/theme";
 import Button from "../../components/Button/Button";
-import { removeFromCart } from "../../redux/reducer/cartReducer";
+import { clearCart } from "../../redux/reducer/cartReducer";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { Ionicons } from '@expo/vector-icons';
 import Cardstyle2 from "../../components/Card/Cardstyle2";
 import { useDispatch, useSelector } from "react-redux";
+import { removeFromCart } from "../../redux/reducer/cartReducer";
 
 const checkoutData = [
   {
@@ -46,17 +47,46 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
   const [isModalVisible, setIsModalVisible] = useState(false); 
+  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const dispatch = useDispatch();
 
   const navigateToProductDetails = (product) => {
     navigation.navigate('ProductsDetails', { product });
   };
+  
   const handleConfirmOrder = () => {
+    setIsConfirmationModalVisible(false);
     setIsModalVisible(true);
+  
+    const totalPrice = calculateTotal(); // Precio total
+    const productCount = cart.length; // Cantidad de productos
+  
     setTimeout(() => {
       setIsModalVisible(false);
-      navigation.navigate("Myorder");
+  
+      // Navegar a "Mis Órdenes" con los datos del pedido
+      navigation.navigate("Myorder", {
+        order: {
+          id: `#${Math.floor(Math.random() * 100000)}`, // Generar un ID aleatorio
+          status: "Pendiente",
+          total: totalPrice,
+          paid: 0, // Asumimos que no está pagado aún
+          productCount: productCount,
+          products: cart, // Pasar los productos comprados
+        },
+      });
+  
+      // Vaciar el carrito
+      dispatch(clearCart());
     }, 2000);
+  };
+
+  const handleOpenConfirmationModal = () => {
+    setIsConfirmationModalVisible(true);
+  };
+
+  const handleCancelOrder = () => {
+    setIsConfirmationModalVisible(false);
   };
 
     // Función para calcular el total
@@ -64,7 +94,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
       return cart
         .reduce((total: number, item: any) => {
           const price = parseFloat(item.price.replace(/[^0-9.-]+/g, "").replace(",", "."));
-          return total + price;
+          return total + price * item.quantity; // Multiplica el precio por la cantidad
         }, 0)
         .toFixed(2);
     };
@@ -77,6 +107,37 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header title="Verificar Pedido" leftIcon="back" titleRight />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+
+        <View  >
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            showsVerticalScrollIndicator={true}
+          >
+            <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
+              {cart.map((data: any, index: any) => {
+                return (
+                  <View key={index} style={{ marginBottom: 10 }}>
+                    <Cardstyle2
+                      title={data.name}
+                      price={data.price}
+                      discount={data.discount}
+                      delevery={data.delevery}
+                      image={{ uri: `http://10.0.2.2:8000${data.highImage}` }} // Usa la URL de la imagen de baja calidad
+                      offer={data.offer}
+                      brand={data.brand}
+                      marca={data.code}
+                      modelo={data.line}
+                      quantity={data.quantity} // Pasar la cantidad
+                      productId={data.id} // Pasar el ID del producto
+                      onPress={() => navigateToProductDetails(data)}
+                      onPress4={() => removeItemFromCart(data)}
+                    />
+                  </View>
+                );
+              })}
+            </View>
+          </ScrollView>
+        </View>
         <View
           style={[
             GlobalStyleSheet.container,
@@ -88,40 +149,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
               marginTop: 15,
             },
           ]}>
-          {/* {checkoutData.map((data:any, index) => {
-                        return (
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate(data.navigate)}
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    borderBottomWidth: 1,
-                                    marginHorizontal:-15,
-                                    paddingHorizontal:15,
-                                    borderBottomColor: COLORS.primaryLight,
-                                    paddingBottom: 10,
-                                    marginTop: 10
-                                }}
-                                key={index}
-                            >
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10,flex:1 }}>
-                                    <View style={{ height: 40, width: 40,borderWidth:1,borderColor:COLORS.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
-                                        <Image
-                                            style={{ height: 20, width: 20, tintColor: COLORS.primary , resizeMode: 'contain' }}
-                                            source={data.image}
-                                        />
-                                    </View>
-                                    <View style={{flex:1}}>
-                                        <Text style={{ ...FONTS.fontMedium, fontSize: 16, color: colors.title }}>{data.title}</Text>
-                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.text }}>{data.text}</Text>
-                                    </View>
-                                </View>
-                                <FeatherIcon size={22} color={colors.title} name={'chevron-right'} />
-                                <Ionicons color={colors.title} name='chevron-forward' size={20}/>
-                            </TouchableOpacity>
-                        )
-                    })} */}
+ 
           <View style={{ marginTop: 20 }}>
             <Text
               style={{
@@ -150,35 +178,6 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
             />
           </View>
         </View>
-        <View  >
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            showsVerticalScrollIndicator={true}
-          >
-            <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
-              {cart.map((data: any, index: any) => {
-                return (
-                  <View key={index} style={{ marginBottom: 10 }}>
-                    <Cardstyle2
-                      title={data.name}
-                      price={data.price}
-                      discount={data.discount}
-                      delevery={data.delevery}
-                      image={{ uri: `http://10.0.2.2:8000${data.highImage}` }} // Usa la URL de la imagen de baja calidad
-                      offer={data.offer}
-                      brand={data.brand}
-                      marca={data.code}
-                      modelo={data.line}
-                      onPress={() => navigateToProductDetails(data)}
-                      onPress4={() => removeItemFromCart(data)}
-                    />
-                  </View>
-                );
-              })}
-            </View>
-          </ScrollView>
-        </View>
-        {/* <View style={{ flex: 1 }}></View> */}
         <View
           style={[
             GlobalStyleSheet.container,
@@ -262,31 +261,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                 {calculateTotal()}€
               </Text>
             </View>
-            {/* <View
-              style={{
-                marginHorizontal: -0,
-                paddingHorizontal: 15,
-                paddingTop: 15,
-                paddingBottom: 5,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}>
-              <Text
-                style={[
-                  FONTS.fontMedium,
-                  { fontSize: 16, color: colors.title },
-                ]}>
-                Delivery:
-              </Text>
-              <Text
-                style={[
-                  FONTS.fontMedium,
-                  { fontSize: 16, color: COLORS.success },
-                ]}>
-                0$
-              </Text>
-            </View> */}
+ 
             <View
               style={{
                 borderTopWidth: 1,
@@ -336,11 +311,82 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
             title="CONFIRMAR PEDIDO"
             color={COLORS.primary}
             text={COLORS.white}
-            onPress={handleConfirmOrder}
+            onPress={handleOpenConfirmationModal}
           />
         </View>
       </View>
       
+{/* Modal de confirmación */}
+<Modal
+        visible={isConfirmationModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsConfirmationModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              width: 300,
+              padding: 20,
+              backgroundColor: colors.card,
+              borderRadius: 10,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                ...FONTS.fontMedium,
+                fontSize: 18,
+                color: colors.title,
+                marginBottom: 20,
+              }}
+            >
+              ¿Estás seguro de realizar el pedido?
+            </Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "green",
+                  padding: 10,
+                  borderRadius: 10,
+                  flex: 1,
+                  marginRight: 5,
+                  alignItems: "center",
+                }}
+                onPress={handleConfirmOrder}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 16, ...FONTS.fontMedium }}>
+                  Aceptar
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "red",
+                  padding: 10,
+                  borderRadius: 10,
+                  flex: 1,
+                  marginLeft: 5,
+                  alignItems: "center",
+                }}
+                onPress={handleCancelOrder}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 16, ...FONTS.fontMedium }}>
+                  Cancelar
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de éxito */}
       <Modal
         visible={isModalVisible}
         transparent={true}
@@ -375,29 +421,6 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
             >
               ¡Pedido realizado exitosamente!
             </Text>
-            {/* <TouchableOpacity
-              style={{
-                backgroundColor: "green",
-                padding: 10,
-                borderRadius: 10,
-                width: "100%",
-                alignItems: "center",
-              }}
-              onPress={() => {
-                setIsModalVisible(false);
-                navigation.navigate("Myorder");
-              }}
-            >
-              <Text
-                style={{
-                  color: COLORS.white,
-                  fontSize: 16,
-                  ...FONTS.fontMedium,
-                }}
-              >
-                Siguiente
-              </Text>
-            </TouchableOpacity> */}
           </View>
         </View>
       </Modal>

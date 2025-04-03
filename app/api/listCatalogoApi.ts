@@ -10,7 +10,9 @@ export const fetchArticles = async () => {
         },
       }
     );
-    const articles = response.data.map((article) => ({
+
+    // Mapea los artículos sin filtrar
+    return response.data.map((article) => ({
       id: article.id,
       code: article.co_art.trim(),
       name: article.art_des.trim(),
@@ -30,13 +32,8 @@ export const fetchArticles = async () => {
       volume: article.volumen?.trim() || "",
       weight: article.peso?.trim() || "",
       warranty: article.garantia?.trim() || "",
-      brand: article.co_cat.cat_des?.trim() || "", // Mapea "cat_des" como "brand"
+      category: article.co_cat.cat_des?.trim() || "",
     }));
-
-    // Mezclar los artículos al azar
-    const shuffledArticles = articles.sort(() => Math.random() - 0.5);
-
-    return shuffledArticles.slice(0, 12); // Retorna solo los primeros 12 productos mezclados
   } catch (error) {
     if (error.response) {
       console.error("Error en la respuesta del servidor:", error.response.data);
@@ -50,4 +47,3 @@ export const fetchArticles = async () => {
     throw error;
   }
 };
-

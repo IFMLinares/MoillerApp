@@ -32,21 +32,21 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { fetchArticles } from "../../api/listSubCategoryApi";
+import { fetchArticles } from "../../api/listCatalogoApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
 
  
 
-type ProductsScreenProps = StackScreenProps<RootStackParamList, "Products">;
+type ProductsScreenProps = StackScreenProps<RootStackParamList, "Catalogo">;
 
-const Products = ({ navigation, route }: ProductsScreenProps) => {
-  const { subcategoryId, subcategoryName } = route.params;
+const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
+  const { subcategoryName } = route.params;
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors } = theme;
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [articles, setArticles] = useState([]);
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
@@ -55,38 +55,42 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
   useEffect(() => {
     const loadArticles = async () => {
       try {
-        setIsLoading(true); // Mostrar el indicador de carga
+        setIsLoading(true);
 
-        // Verificar si los artículos están en AsyncStorage
-        const cachedArticles = await AsyncStorage.getItem(
-          `products_${subcategoryId}`
-        );
+        // Intentar cargar los productos desde AsyncStorage
+        const cachedArticles = await AsyncStorage.getItem("cachedArticles");
 
         if (cachedArticles) {
-          // Si están en caché, cargarlos desde AsyncStorage
+          // Si hay datos en AsyncStorage, cargarlos
           setArticles(JSON.parse(cachedArticles));
-        } else {
-          // Si no están en caché, obtenerlos de la API
-          const fetchedArticles = await fetchArticles(subcategoryName);
-
-          // Guardar en AsyncStorage para futuras solicitudes
-          await AsyncStorage.setItem(
-            `products_${subcategoryId}`,
-            JSON.stringify(fetchedArticles)
-          );
-
-          setArticles(fetchedArticles);
+          setIsLoading(false);
         }
+
+        // Realizar la solicitud a la API para obtener los productos más recientes
+        const fetchedArticles = await fetchArticles();
+
+        // Ordenar los artículos alfabéticamente por nombre
+        fetchedArticles.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Guardar los productos en el estado y en AsyncStorage
+        setArticles(fetchedArticles);
+        await AsyncStorage.setItem(
+          "cachedArticles",
+          JSON.stringify(fetchedArticles)
+        );
       } catch (error) {
         console.error("Error fetching articles:", error);
+        Toast.show({
+          type: "error",
+          text1: "Error al cargar los productos",
+        });
       } finally {
-        setIsLoading(false); // Ocultar el indicador de carga
+        setIsLoading(false);
       }
     };
 
     loadArticles();
-  }, [subcategoryId, subcategoryName]);
-
+  }, []);
  
   // flatlist card1
   const renderItem = ({ item }) => (
@@ -132,7 +136,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         removebottom
         onPress={() =>
           navigation.navigate("ProductsDetails", {
-            product: item, // Pasa el objeto completo del producto aquí 
+            product: item, // Pasa el objeto completo del producto aquí
           })
         }
       />
@@ -345,4 +349,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Products;
+export default Catalogo;

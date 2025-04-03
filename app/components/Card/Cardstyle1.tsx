@@ -98,7 +98,7 @@ const Cardstyle1 = ({
         <Image
           style={{
             height: undefined,
-            width: "100%",
+            width: "90%",
             aspectRatio: 1 / 1,
             resizeMode: "contain",
           }}

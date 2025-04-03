@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,100 +17,91 @@ import { Feather } from "@expo/vector-icons";
 import Cardstyle2 from "../../components/Card/Cardstyle2";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
-
-const MyorderData = [
-  // {
-  //     image:IMAGES.item9,
-  //     title:'Echo Vibe Urban Runners',
-  //     price:"$179",
-  //     delevery:"FREE Delivery",
-  //     offer:"40% OFF",
-  //     btntitle:'Track Order',
-  //     brand:"Apple",
-  //     trackorder:true,
-  //     status : "ongoing",
-  // },
-  // {
-  //     image:IMAGES.item05,
-  //     title:"Polka dot wrap blouse dress",
-  //     price:"$99",
-  //     discount:"$118",
-  //     offer:"70% OFF",
-  //     hascolor:true,
-  //     completed:true,
-  //     status : "completed",
-  // },
-  // {
-  //     image:IMAGES.item10,
-  //     title:'Swift Glide Sprinter Soles',
-  //     price:"$199",
-  //     delevery:"FREE Delivery",
-  //     offer:"40% OFF",
-  //     btntitle:'Track Order',
-  //     brand:"OLG",
-  //     EditReview:true,
-  //     completed:true,
-  //     status : "completed",
-  // },
-  // {
-  //     image:IMAGES.item11,
-  //     title:'Sky Burst Skyline Burst Shoes',
-  //     price:"$149",
-  //     delevery:"FREE Delivery",
-  //     offer:"40% OFF",
-  //     btntitle:'Track Order',
-  //     brand:"Sony",
-  //     completed:true,
-  //     status : "completed",
-  // },
-  // {
-  //     image:IMAGES.item12,
-  //     title:'Zen Dash Active Flex Shoes',
-  //     price:"$299",
-  //     delevery:"FREE Delivery",
-  //     offer:"40% OFF",
-  //     btntitle:'Track Order',
-  //     brand:"Deslar",
-  //     trackorder:true,
-  //     status : "ongoing",
-  // },
-  // {
-  //     image:IMAGES.item13,
-  //     title:'Nova Stride Street Stompers',
-  //     price:"$99",
-  //     delevery:"FREE Delivery",
-  //     offer:"40% OFF",
-  //     btntitle:'Track Order',
-  //     brand:"Apple",
-  //     trackorder:true,
-  //     status : "ongoing",
-  // },
-];
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type MyorderScreenProps = StackScreenProps<RootStackParamList, "Myorder">;
 
-const Myorder = ({ navigation }: MyorderScreenProps) => {
+const Myorder = ({ navigation, route }: MyorderScreenProps) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
 
-  const [orderData, setOrderData] = useState(MyorderData);
   const [activeFilter, setActiveFilter] = useState("all"); // Track active filter
+  const [orders, setOrders] = useState([]); // Estado inicial vacío
+  const [filteredOrders, setFilteredOrders] = useState(orders);
 
-  const filterData = (val: any) => {
-    setActiveFilter(val); // Update active filter when a filter is selected
-    if (val === "all") {
-      setOrderData(MyorderData);
-    } else {
-      const newArry = MyorderData.filter((e) => e.status === val);
-      //console.log(newArry)
-      setOrderData(newArry);
+  // Cargar pedidos al iniciar
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        const storedOrders = await AsyncStorage.getItem("orders");
+        if (storedOrders) {
+          const parsedOrders = JSON.parse(storedOrders);
+          setOrders(parsedOrders);
+          setFilteredOrders(parsedOrders);
+        }
+      } catch (error) {
+        console.error("Error al cargar los pedidos:", error);
+      }
+    };
+
+    loadOrders();
+  }, []);
+
+  const saveOrders = async (newOrders) => {
+    try {
+      await AsyncStorage.setItem("orders", JSON.stringify(newOrders));
+    } catch (error) {
+      console.error("Error al guardar los pedidos:", error);
     }
   };
 
-  const removeItem = (indexToRemove: number) => {
-    setOrderData((prevItems) =>
-      prevItems.filter((item, index) => index !== indexToRemove)
-    );
+  // Manejar nuevos pedidos o actualizaciones
+  useEffect(() => {
+    const addOrUpdateOrder = async () => {
+      try {
+        const storedOrders = await AsyncStorage.getItem("orders");
+        const existingOrders = storedOrders ? JSON.parse(storedOrders) : [];
+
+        if (route.params?.order) {
+          // Agregar una nueva orden al estado existente
+          const newOrders = [...existingOrders, route.params.order];
+          setOrders(newOrders);
+          setFilteredOrders(newOrders);
+          saveOrders(newOrders); // Guardar en AsyncStorage
+        } else if (route.params?.updatedOrder) {
+          // Actualizar una orden existente
+          const updatedOrders = existingOrders.map((order) =>
+            order.id === route.params.updatedOrder.id
+              ? {
+                  ...order,
+                  paid: route.params.updatedOrder.paid,
+                  status:
+                    route.params.updatedOrder.paid >=
+                    route.params.updatedOrder.total
+                      ? "Completado"
+                      : "Pendiente",
+                }
+              : order
+          );
+          setOrders(updatedOrders);
+          setFilteredOrders(updatedOrders);
+          saveOrders(updatedOrders); // Guardar en AsyncStorage
+        }
+      } catch (error) {
+        console.error("Error al manejar los pedidos:", error);
+      }
+    };
+
+    addOrUpdateOrder();
+  }, [route.params?.order, route.params?.updatedOrder]);
+
+  const filterData = (filter: string) => {
+    setActiveFilter(filter);
+    if (filter === "all") {
+      setFilteredOrders(orders);
+    } else {
+      setFilteredOrders(orders.filter((order) => order.status === filter));
+    }
   };
 
   return (
@@ -145,24 +136,6 @@ const Myorder = ({ navigation }: MyorderScreenProps) => {
             alignItems: "center",
             justifyContent: "space-between",
           }}>
-          <TouchableOpacity
-            onPress={() => filterData("all")}
-            style={{
-              width: "20%",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
-            <Text
-              style={[
-                FONTS.fontMedium,
-                {
-                  fontSize: 15,
-                  color: activeFilter === "all" ? COLORS.primary : colors.title,
-                },
-              ]}>
-              Todo
-            </Text>
-          </TouchableOpacity>
           <View
             style={{
               width: 1,
@@ -171,7 +144,7 @@ const Myorder = ({ navigation }: MyorderScreenProps) => {
             }}
           />
           <TouchableOpacity
-            onPress={() => filterData("ongoing")}
+            onPress={() => filterData("Pendiente")}
             activeOpacity={0.5}
             style={styles.TopbarCenterLine}>
             <Image
@@ -180,20 +153,22 @@ const Myorder = ({ navigation }: MyorderScreenProps) => {
                 width: 16,
                 resizeMode: "contain",
                 tintColor:
-                  activeFilter === "ongoing" ? COLORS.primary : colors.title,
+                  activeFilter === "Pendiente" ? COLORS.primary : colors.title,
               }}
-              source={IMAGES.deliverytruck2}
+              source={IMAGES.budget}
             />
             <Text
               style={[
-                FONTS.fontMedium,
+                FONTS.fontRegular,
                 {
                   fontSize: 15,
                   color:
-                    activeFilter === "ongoing" ? COLORS.primary : colors.title,
+                    activeFilter === "Pendiente"
+                      ? COLORS.primary
+                      : colors.title,
                 },
               ]}>
-              En camino
+              Pendiente
             </Text>
           </TouchableOpacity>
           <View
@@ -204,7 +179,7 @@ const Myorder = ({ navigation }: MyorderScreenProps) => {
             }}
           />
           <TouchableOpacity
-            onPress={() => filterData("completed")}
+            onPress={() => filterData("Completado")}
             activeOpacity={0.5}
             style={styles.TopbarCenterLine}>
             <Image
@@ -213,17 +188,17 @@ const Myorder = ({ navigation }: MyorderScreenProps) => {
                 width: 16,
                 resizeMode: "contain",
                 tintColor:
-                  activeFilter === "completed" ? COLORS.primary : colors.title,
+                  activeFilter === "Completado" ? COLORS.primary : colors.title,
               }}
               source={IMAGES.savecheck}
             />
             <Text
               style={[
-                FONTS.fontMedium,
+                FONTS.fontRegular,
                 {
                   fontSize: 15,
                   color:
-                    activeFilter === "completed"
+                    activeFilter === "Completado"
                       ? COLORS.primary
                       : colors.title,
                 },
@@ -233,92 +208,111 @@ const Myorder = ({ navigation }: MyorderScreenProps) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: orderData.length === 0 ? "center" : "flex-start",
+      <View
+        style={{
+          marginTop: 10,
+          padding: 15,
+          backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
         }}>
-        <View style={[GlobalStyleSheet.container, { paddingTop: 15 }]}>
-          <View style={{ marginHorizontal: -15 }}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View>
-                {orderData.map((data: any, index) => {
-                  return (
-                    <View key={index} style={{ marginBottom: 10 }}>
-                      <Cardstyle2
-                        title={data.title}
-                        price={data.price}
-                        delevery={data.delevery}
-                        image={data.image}
-                        offer={data.offer}
-                        brand={data.brand}
-                        btntitle={data.btntitle}
-                        trackorder={data.trackorder}
-                        completed={data.completed}
-                        EditReview={data.EditReview}
-                        onPress={() => navigation.navigate("ProductsDetails")}
-                        onPress2={() => navigation.navigate("Trackorder")}
-                        onPress3={() => navigation.navigate("Writereview")}
-                        onPress4={() => removeItem(index)}
-                        closebtn
-                      />
-                    </View>
-                  );
-                })}
-              </View>
-            </ScrollView>
-            {orderData.length === 0 && (
+        {/* Cuadro blanco con detalles del pedido */}
+        {filteredOrders.map((order, index) => (
+          <View
+            key={index}
+            style={{
+              backgroundColor: COLORS.white,
+              borderRadius: 10,
+              padding: 15,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: 5,
+              marginBottom: 15,
+              borderWidth: 1,
+              borderColor:
+                order.status === "Completado" ? COLORS.success : COLORS.warning,
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Pedido", { order })}>
               <View
-                style={[
-                  GlobalStyleSheet.container,
-                  { padding: 0, left: 0, right: 0, bottom: 0, top: 0 },
-                ]}>
-                <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}>
+                <Text
                   style={{
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
+                    ...FONTS.fontRegular,
+                    fontSize: 16,
+                    color: colors.title,
                   }}>
-                  <View
-                    style={{
-                      height: 60,
-                      width: 60,
-                      borderRadius: 60,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: COLORS.primaryLight,
-                      marginBottom: 20,
-                    }}>
-                    <Feather
-                      color={COLORS.primary}
-                      size={24}
-                      name="shopping-cart"
-                    />
-                  </View>
-                  <Text
-                    style={{
-                      ...FONTS.h5,
-                      color: colors.title,
-                      marginBottom: 8,
-                    }}>
-                    No tienes ordenes disponibles
-                  </Text>
-                  <Text
-                    style={{
-                      ...FONTS.fontSm,
-                      color: colors.text,
-                      textAlign: "center",
-                      paddingHorizontal: 40,
-                      //marginBottom:30,
-                    }}>
-                    Agregue el producto a su carrito de compras y compre ahora.
-                  </Text>
-                </View>
+                  Nro° de orden:{" "}
+                  <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.id}</Text>
+                </Text>
+                <Text
+                  style={{
+                    ...FONTS.fontRegular,
+                    fontSize: 16,
+                    color:
+                      order.status === "Completado"
+                        ? COLORS.success
+                        : COLORS.warning,
+                  }}>
+                  Status:{" "}
+                  <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.status}</Text>
+                </Text>
               </View>
-            )}
+              <Text
+                style={{
+                  ...FONTS.fontRegular,
+                  fontSize: 16,
+                  color: colors.title,
+                  marginBottom: 10,
+                }}>
+                Cantidad de productos:{" "}
+                <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.productCount}</Text>
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}>
+                <Text
+                  style={{
+                    ...FONTS.fontRegular,
+                    fontSize: 16,
+                    color: colors.title,
+                  }}>
+                  Total:{" "}
+                  <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.total}€</Text>
+                </Text>
+                {/* <Text
+                  style={{
+                    ...FONTS.fontRegular,
+                    fontSize: 16,
+                    color: COLORS.success,
+                  }}>
+                  Abonado:{" "}
+                  <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.paid}€</Text>
+                </Text>
+              <Text
+                style={{
+                  ...FONTS.fontRegular,
+                  fontSize: 16,
+                  color: COLORS.warning,
+                }}>
+                Restante:{" "}
+                <Text style={{ fontWeight: "bold" ,...FONTS.fontRegular,}}>
+                  {(order.total - order.paid).toFixed(2)}€
+                </Text>
+              </Text> */}
+              </View>
+            </TouchableOpacity>
           </View>
-        </View>
-      </ScrollView>
+        ))}
+      </View>
     </View>
   );
 };

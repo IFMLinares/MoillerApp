@@ -309,7 +309,7 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
                       height: 40,
                       width: "100%",
                       paddingHorizontal: 10,
-                      backgroundColor: COLORS.primary,
+                      backgroundColor: COLORS.blue,
                       alignItems: "center",
                       justifyContent: "center",
                     },

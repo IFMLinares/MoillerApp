@@ -31,6 +31,7 @@ export type RootStackParamList = {
     Language: undefined;
     MyCart: undefined;
     Category: undefined;
+    Marcas: undefined;
     Notifications: undefined;
     Questions: undefined;
     ProductsDetails: undefined;
@@ -38,16 +39,19 @@ export type RootStackParamList = {
     Profile: undefined;
     Wishlist: undefined;
     Search: undefined;
+    SearchArticles: undefined;
     Components: undefined;
     Coupons: undefined;
     DeliveryAddress: undefined;
     Checkout: undefined;
+    Pedido: undefined;
     Addcard: undefined;
     Payment: undefined;
     AddDeliveryAddress: undefined;
     Myorder: undefined;
     Notification: undefined;
     Home: undefined;
+    Catalogo: undefined;
     Accordion: undefined;
     BottomSheet: undefined;
     ModalBox: undefined;

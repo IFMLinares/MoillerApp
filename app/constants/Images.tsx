@@ -7,6 +7,9 @@ export const IMAGES = {
     headerlogo : require('../assets/images/logo/logoblanco.png'),
     google2 : require('../assets/images/icons/google2.png'),
     facebook : require('../assets/images/icons/facebook.png'),
+    instagram: require('../assets/images/icons/instagram.png'),
+    whatsapp: require('../assets/images/icons/whatsapp.png'),
+    ubicacion: require('../assets/images/icons/ubicacion.png'),
     Home: require('../assets/images/icons/home.png'),
     Home4: require('../assets/images/icons/home4.png'),
     heart: require('../assets/images/icons/heart.png'),
@@ -86,7 +89,8 @@ export const IMAGES = {
     savecheck: require('../assets/images/icons/save-check.png'), 
     translation: require('../assets/images/icons/translation.png'), 
     transfer: require('../assets/images/icons/transfer.png'), 
-
+    gmail: require('../assets/images/icons/gmail.png'),
+    budget: require('../assets/images/icons/budget.png'),
     banner1 : require('../assets/images/banner/pic1.png'),
     banner2 : require('../assets/images/banner/pic2.png'),
     banner3 : require('../assets/images/banner/pic3.png'),
@@ -135,7 +139,7 @@ export const IMAGES = {
     item18: require('../assets/images/item/pic9.png'),
     item19: require('../assets/images/item/pic10.png'),
 
-
+    brand: require('../assets/images/icons/brand.png'),
     brand1: require('../assets/images/brand/pic1.png'),
     brand2: require('../assets/images/brand/pic2.png'),
     brand3: require('../assets/images/brand/pic3.png'),

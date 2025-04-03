@@ -6,7 +6,8 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux'
 import store from './app/redux/store';
-
+import React, { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function App() {
   
 
@@ -28,6 +29,18 @@ export default function App() {
   if(!loaded){
     return null;
   }
+  // useEffect(() => {
+  //   const clearStorage = async () => {
+  //     try {
+  //       await AsyncStorage.clear();
+  //       console.log("AsyncStorage limpiado correctamente.");
+  //     } catch (error) {
+  //       console.error("Error al limpiar AsyncStorage:", error);
+  //     }
+  //   };
+
+  //   clearStorage();
+  // }, []);
   return (
     <SafeAreaProvider>
         <SafeAreaView

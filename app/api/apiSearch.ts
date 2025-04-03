@@ -1,19 +1,13 @@
 import axios from "axios";
 
-export const fetchArticles = async (subCategory: string) => {
+export const fetchArticles = async () => {
   try {
-    const response = await axios.get(
-      "http://10.0.2.2:8000/api/core/articles/list",
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const articles = response.data.filter(
-      (article) => article.co_subl.subl_des.trim() === subCategory
-    );
-    return articles.map((article) => ({
+    const response = await axios.get("http://10.0.2.2:8000/api/core/articles/list", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data.map((article) => ({
       id: article.id,
       code: article.co_art.trim(),
       name: article.art_des.trim(),
@@ -36,15 +30,7 @@ export const fetchArticles = async (subCategory: string) => {
       brand: article.co_cat.cat_des?.trim() || "",
     }));
   } catch (error) {
-    if (error.response) {
-      console.error("Error en la respuesta del servidor:", error.response.data);
-      console.error("Código de estado:", error.response.status);
-      console.error("Encabezados:", error.response.headers);
-    } else if (error.request) {
-      console.error("No se recibió respuesta del servidor:", error.request);
-    } else {
-      console.error("Error al configurar la solicitud:", error.message);
-    }
-    throw error;
+    console.error("Error al buscar artículos:", error);
+    return [];
   }
 };

@@ -14,19 +14,17 @@ import { addTowishList } from "../../redux/reducer/wishListReducer";
 const QuantityButton = ({ item, quantities, setQuantities }) => {
     const dispatch = useDispatch();
 
-    const addItemToWishList = useCallback((data) => {
-        dispatch(addTowishList(data));
-    }, [dispatch]);
-
+    // Añadir producto al carrito con la cantidad seleccionada
     const addItemToCart = useCallback((item) => {
-        const quantity = quantities[item.id] || 1;
-        dispatch(addToCart({ ...item, quantity }));
+        const quantity = quantities[item.id] || 1; // Obtener la cantidad seleccionada
+        dispatch(addToCart({ ...item, quantity })); // Pasar la cantidad al carrito
         Toast.show({
             type: "success",
             text1: "¡Producto/s añadido a su carrito exitosamente!",
         });
     }, [dispatch, quantities]);
 
+    // Incrementar la cantidad del producto
     const incrementQuantity = useCallback((id) => {
         setQuantities((prevQuantities) => ({
             ...prevQuantities,
@@ -34,6 +32,7 @@ const QuantityButton = ({ item, quantities, setQuantities }) => {
         }));
     }, [setQuantities]);
 
+    // Decrementar la cantidad del producto
     const decrementQuantity = useCallback((id) => {
         setQuantities((prevQuantities) => ({
             ...prevQuantities,
@@ -41,6 +40,7 @@ const QuantityButton = ({ item, quantities, setQuantities }) => {
         }));
     }, [setQuantities]);
 
+    // Cambiar la cantidad manualmente desde el TextInput
     const handleQuantityChange = useCallback((id, value) => {
         const numericValue = parseInt(value, 10);
         if (!isNaN(numericValue) && numericValue > 0) {
@@ -62,8 +62,8 @@ const QuantityButton = ({ item, quantities, setQuantities }) => {
                 borderRightWidth: 1,
                 borderRightColor: COLORS.primaryLight,
                 width: "100%",
-           
             }}>
+            {/* Controles de cantidad */}
             <View
                 style={{
                     flexDirection: "row",
@@ -81,7 +81,7 @@ const QuantityButton = ({ item, quantities, setQuantities }) => {
                     style={{
                         fontSize: hp("1.5%"),
                         marginHorizontal: wp("1%"),
-                        fontWeight: "bold", 
+                        fontWeight: "bold",
                         textAlign: "center",
                         width: wp("4.0%"),
                     }}
@@ -95,6 +95,8 @@ const QuantityButton = ({ item, quantities, setQuantities }) => {
                     <Text style={{ fontSize: hp("2.25%") }}>+</Text>
                 </TouchableOpacity>
             </View>
+
+            {/* Botón para añadir al carrito */}
             <View
                 style={{
                     flexDirection: "row",

@@ -20,32 +20,30 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   const cart = useSelector((state: any) => state.cart.cart);
   const dispatch = useDispatch();
   const theme = useTheme();
-  const { colors }: { colors: any } = theme; 
+  const { colors }: { colors: any } = theme;
 
   const navigateToProductDetails = (product) => {
-    navigation.navigate('ProductsDetails', { product });
+    navigation.navigate("ProductsDetails", { product });
   };
 
   const removeItemFromCart = (product) => {
     dispatch(removeFromCart(product));
   };
 
-
   // Función para calcular el total
   const calculateTotal = () => {
     return cart
       .reduce((total: number, item: any) => {
         const price = parseFloat(item.price.replace(/[^0-9.-]+/g, "").replace(",", "."));
-        return total + price;
+        return total + price * item.quantity; // Multiplica el precio por la cantidad
       }, 0)
       .toFixed(2);
   };
 
-
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header title="Mi carrito" leftIcon="back" titleLeft righttitle2 />
- 
+
       {/* {cart.length > 0 ?
                 <View style={[GlobalStyleSheet.container,{padding:0}]}>
                     <View style={{height:45,backgroundColor:'#87E8FF',marginVertical:15,flexDirection:'row',alignItems:'center',width:'100%',justifyContent:'space-between',paddingLeft:15}}>
@@ -72,6 +70,11 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
         showsVerticalScrollIndicator={false}>
         <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
           {cart.map((data: any, index: any) => {
+            const totalPricePerProduct =
+              parseFloat(
+                data.price.replace(/[^0-9.-]+/g, "").replace(",", ".")
+              ) * data.quantity;
+
             return (
               <View key={index} style={{ marginBottom: 10 }}>
                 <Cardstyle2
@@ -84,6 +87,8 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
                   brand={data.brand}
                   marca={data.code}
                   modelo={data.line}
+                  quantity={data.quantity} // Pasar la cantidad
+                  productId={data.id} // Pasar el ID del producto
                   onPress={() => navigateToProductDetails(data)}
                   onPress4={() => removeItemFromCart(data)}
                 />
@@ -102,8 +107,6 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
           },
         ]}>
         <View>
- 
-
           <View>
             <View
               style={{
@@ -183,15 +186,6 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
               {" "}
               ¡Tu carrito de compras está vacío!
             </Text>
-            {/* <Text
-                                style={{
-                                    ...FONTS.fontSm,
-                                    color:colors.text,
-                                    textAlign:'center',
-                                    paddingHorizontal:40,
-                                    //marginBottom:30,
-                                }}
-                            >Add Product to you favourite and shop now.</Text> */}
           </View>
         </View>
       )}

@@ -26,7 +26,6 @@ import Cardstyle1 from "../../components/Card/Cardstyle1";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/reducer/cartReducer";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
-import data from "../../data/data.json";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
 import ImageViewer from "react-native-image-zoom-viewer";
@@ -147,7 +146,7 @@ type ProductsDetailsScreenProps = StackScreenProps<
 const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   // api
 
-  const { product } = route.params;
+  const { product, productId  } = route.params;
 
   // api
 
@@ -181,7 +180,12 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   const dispatch = useDispatch();
 
   const addItemToCart = () => {
-    dispatch(addToCart(product));
+    const productWithQuantity = {
+      ...product,
+      quantity, // Incluye la cantidad seleccionada
+    };
+  
+    dispatch(addToCart(productWithQuantity));
     Toast.show({
       type: "success",
       text1: "¡Producto/s añadido a su carrito exitosamente!",
@@ -211,7 +215,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   const incrementQuantity = () => {
     setQuantity(quantity + 1);
   };
-
+  
   const decrementQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
@@ -242,11 +246,11 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       data: [
         {
           title: "Marca",
-          text: product.subcolor,
+          text: product.brand, // Mostrar el campo `brand` (cat_des)
         },
         {
           title: "Modelo",
-          text: product.color,
+          text: product.model,
         },
         {
           title: "Categoría",
@@ -255,23 +259,6 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
         {
           title: "Sub-Categoría",
           text: product.subline,
-        },
-      ],
-    },
-    {
-      title: "DISEÑO",
-      data: [
-        {
-          title: "Dimensiones",
-          // text: '71.5 x 146.7 x 7.8 mm'
-        },
-        {
-          title: "Peso",
-          // text: '172 g'
-        },
-        {
-          title: "Color",
-          // text: 'Negro, blanco,'
         },
       ],
     },
@@ -605,7 +592,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                 }}>
                 Agregar al carrito
               </Text>
-            </TouchableOpacity> 
+            </TouchableOpacity>
           </View>
           {/* <View style={{width:'50%'}}>
                         <Button
@@ -618,6 +605,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                     </View> */}
         </View>
       </View>
+
       <Toast ref={(ref) => Toast.setRef(ref)} />
       <Modal visible={isModalVisible} transparent={true}>
         <ImageViewer

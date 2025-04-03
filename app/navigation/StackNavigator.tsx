@@ -59,6 +59,10 @@ import Toggles from "../screens/Components/Toggles";
 import Demo from "../screens/Home/Demo";
 import Inputs from "../screens/Components/Inputs";
 import Category from "../screens/Category/Category"; // Importa la pantalla Category
+import SearchArticles from "../screens/Components/SearchArticles";
+import ProductDetail from "../screens/Components/ProductDetail";
+import CatalogoScreen from "../screens/Category/Catalogo";
+import PedidoScreen from "../screens/Payment/Pedido";
 const Stack = createStackNavigator<RootStackParamList>();
 
 const StackNavigator = () => {
@@ -102,10 +106,10 @@ const StackNavigator = () => {
 		{/* <Stack.Screen name="Demo" component={Demo} /> */}
         {/* <Stack.Screen name="ChooseLanguage" component={ChooseLanguage} /> */}
 		    {/* <Stack.Screen name="SplashScreen" component={SplashScreen}   /> */}
-        {/* <Stack.Screen name="SingIn" component={SingIn} />
+        <Stack.Screen name="SingIn" component={SingIn} />
         <Stack.Screen name="SignUp" component={SignUp} /> 
         <Stack.Screen name="OTPAuthentication" component={OTPAuthentication} />
-        <Stack.Screen name="BottomNavigation" component={BottomNavigation} /> */}
+        <Stack.Screen name="BottomNavigation" component={BottomNavigation} />
         <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
         <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name="Notification" component={Notification} />
@@ -122,6 +126,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Trackorder" component={Trackorder} />
         <Stack.Screen name="Writereview" component={Writereview} />
         <Stack.Screen name="Products" component={Products} />
+        <Stack.Screen name="Pedido" component={PedidoScreen} />
         <Stack.Screen name="ProductsMarcas" component={ProductsMarcas} />
         <Stack.Screen name="ProductsDetails" component={ProductsDetails} />
         <Stack.Screen name="Coupons" component={Coupons} />
@@ -131,7 +136,9 @@ const StackNavigator = () => {
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="Singlechat" component={Singlechat} />
         <Stack.Screen name="Call" component={Call} />
-
+        <Stack.Screen name="Catalogo" component={CatalogoScreen} />
+        <Stack.Screen name="SearchArticles" component={SearchArticles} />
+        <Stack.Screen name="ProductDetail" component={ProductDetail} />
         <Stack.Screen name="Components" component={Components} />
         <Stack.Screen name="Accordion" component={AccordionScreen} />
         <Stack.Screen name="BottomSheet" component={BottomSheet} />

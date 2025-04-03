@@ -37,12 +37,10 @@ type Props = {
   onPress3?: (e: any) => void;
   onPress4?: (e: any) => void;
   hideActions?: boolean; // Nueva propiedad para ocultar botones
-  quantity: number; // Nueva propiedad
-  productId: string; // Nueva propiedad
   //hascolor:any
 };
 
-const Cardstyle2 = ({
+const Cardstyle3 = ({
   title,
   price,
   image,
@@ -64,8 +62,6 @@ const Cardstyle2 = ({
   onPress3,
   onPress4,
   hideActions = false, // Valor predeterminado: no ocultar botones
-  quantity, // Recibe la cantidad
-  productId, // Recibe el ID del producto
 }: Props) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -219,7 +215,7 @@ const Cardstyle2 = ({
           }}
         >
           <View>
-          <CheckoutItems quantity={quantity} productId={productId} />
+            <CheckoutItems />
           </View>
           <View
             style={{
@@ -258,4 +254,4 @@ const Cardstyle2 = ({
   );
 };
 
-export default Cardstyle2;
+export default Cardstyle3;

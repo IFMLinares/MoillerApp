@@ -43,18 +43,8 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
         setWidth(val.window.width);
     });
 
-    const [username, setUsername] = useState('');
+ 
 
-    useEffect(() => {
-      const getUsername = async () => {
-        const storedUsername = await AsyncStorage.getItem('username');
-        if (storedUsername) {
-          setUsername(storedUsername);
-        }
-      };
-  
-      getUsername();
-    }, []);
     useEffect(() => {
         Animated.spring(circlePosition, {
             toValue: state.index * tabWD,
@@ -196,10 +186,10 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                                 }}
                                                 source={
                                                     label === 'Inicio'    ?  IMAGES.Home:
-                                                    label === 'Categoría' ?  IMAGES.grid:
-                                                    label === 'Marca'   ?  IMAGES.heart2:
+                                                    label === 'Categorías' ?  IMAGES.grid:
+                                                    label === 'Marcas'   ?  IMAGES.brand:
                                                     label === 'Mi Carrito'     ?  IMAGES.mycart:
-                                                    label === username ? IMAGES.write1 : IMAGES.Home
+                                                    label === 'Más' ? IMAGES.grid5 : IMAGES.Home
                                                 }
                                             />
                                         {/* </Animated.View> */}

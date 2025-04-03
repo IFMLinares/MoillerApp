@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomTabParamList } from './BottomTabParamList';
 import WishlistScreen from '../screens/Wishlist/Wishlist';
+import MarcasScreen from '../screens/Marcas/Marcas';
 import MyCartScreen from '../screens/MyCart/MyCart';
 import HomeScreen from '../screens/Home/Home';
 import CategoryScreen from '../screens/Category/Category';
@@ -38,19 +39,19 @@ const BottomNavigation = () => {
                 component={HomeScreen}
             />
             <Tab.Screen 
-                name='Categoría'
+                name='Categorías'
                 component={CategoryScreen}
             />
                 <Tab.Screen 
-                    name='Marca'
-                    component={WishlistScreen}
+                    name='Marcas'
+                    component={MarcasScreen}
                 />
             <Tab.Screen 
                 name='Mi Carrito'
                 component={MyCartScreen}
             />
             <Tab.Screen 
-                name={username ? username : 'Profile'}
+                name='Más'
                 component={ProfileScreen}
             />
         </Tab.Navigator>

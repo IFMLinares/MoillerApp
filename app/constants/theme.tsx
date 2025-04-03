@@ -26,7 +26,7 @@ export const COLORS = {
 	title : "#000000",
 	borderColor : "rgba(0,0,0,.1)",
 	input : "rgba(0,0,0,.03)",
-	
+	blue:"rgb(10, 79, 153)",
 	//dark theme
 	darkCard : "rgba(255,255,255,.05)",
 	darkBackground : "rgba(0,3,3,.9)",

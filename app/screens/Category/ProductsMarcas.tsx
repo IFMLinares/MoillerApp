@@ -37,331 +37,7 @@ import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const sliderData = [
-  {
-    title: "Crazy Deals",
-  },
-  {
-    title: "Budget Buys",
-  },
-  {
-    title: "Best Offer",
-  },
-  {
-    title: "Woman",
-  },
-  {
-    title: "Dress",
-  },
-  {
-    title: "unisex",
-  },
-];
-
-const ArrivalData = [
-  {
-    image: IMAGES.item15,
-    title: "Fashion",
-  },
-  {
-    image: IMAGES.item16,
-    title: "Beauty",
-  },
-  {
-    image: IMAGES.item17,
-    title: "Home",
-  },
-  {
-    image: IMAGES.item20,
-    title: "phone",
-  },
-  {
-    image: IMAGES.item15,
-    title: "Fashion",
-  },
-  {
-    image: IMAGES.item16,
-    title: "Beauty",
-  },
-  {
-    image: IMAGES.item17,
-    title: "Home",
-  },
-  {
-    image: IMAGES.item20,
-    title: "phone",
-  },
-];
-
-const cardgridData = [
-  {
-    id: "8",
-    image: IMAGES.producto1,
-    title: "COMPRESOR AMERICOLD ALTA R134a 1/3 1213 WATTS 4142 BTU 115V",
-    price: "  75,12 € ",
-    // discount: "$112",
-    // offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    id: "9",
-    image: IMAGES.producto2,
-    title: "COMPRESOR AMERICOLD BAJA R134a 1/3 348 WATTS 1187 BTU 115V",
-    price: "  71,25 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "10",
-    image: IMAGES.producto3,
-    title:
-      "COMPRESOR AMERICOLD BAJA MEDIA ALTA R134a 1/3 1091BTU/-23.3C 4248BTU/7.2C 115V/127V",
-    price: "  79,61 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "11",
-    image: IMAGES.producto5,
-    title: "COMPRESOR SECOP 1/4 NF10FX 115V 1048BTU LMBP R134a",
-    price: "  0,05 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "12",
-    image: IMAGES.producto6,
-    title: "COMPRESOR SECOP 1/2HP 104G7555 115V/60HZ LMHBP R134a SC15G",
-    price: "  138,88 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "13",
-    image: IMAGES.producto7,
-    title: "COMPRESOR EMBRACO 1/5 EMIS70HHR 115V/60Hz L/M/HBP R134a 700BTU",
-    price: "  88,66 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "14",
-    image: IMAGES.producto8,
-    title: "COMPRESOR EMBRACO 1/4 FFUS70HAK 115V/60Hz L/MBP R134a 750BTU",
-    price: "  104,76 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "15",
-    image: IMAGES.producto9,
-    title: "COMPRESOR EMBRACO 1/4+ FFUS80HAK 115V/60Hz L/MBP R134a 807BTU",
-    price: "  100,21 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "16",
-    image: IMAGES.producto10,
-    title: "COMPRESOR EMBRACO 1/3 EGAS100HLR 115/60Hz LBP R134a 1.050BTU",
-    price: "  104,54 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "17",
-    image: IMAGES.producto11,
-    title:
-      "COMPRESOR EMBRACO 1/3+ FFI12HBX 115V/60Hz L/HBP R134a 1.190/5300BTU",
-    price: "  113,54 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "18",
-    image: IMAGES.producto12,
-    title: "FILTRO SECADOR 1/4 15 GRAMOS C/VALVULA DE GUSANILLO",
-    price: "  1,73 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-  {
-    id: "19",
-    image: IMAGES.producto13,
-    title: "FILTRO SECADOR 1/4 APPLIPARTS APFD-107 25GR ROSCABLE CON TUERCAS",
-    price: "  2,10 € ",
-    // discount: "$114",
-    // offer: "50% OFF",
-    hascolor: true,
-  },
-];
-
-const cardgrid2Data = [
-  {
-    id: "34",
-    image: IMAGES.item05,
-    title: "Polka dot wrap blouse dress",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    id: "35",
-    image: IMAGES.item06,
-    title: "Pleated high-waisted is",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    id: "36",
-    image: IMAGES.item07,
-    title: "LG TurboWash Washing for",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    id: "37",
-    image: IMAGES.item08,
-    title: "Ergonomic Office Chair",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-];
-const cardgrid3Data = [
-  {
-    id: "38",
-    image: IMAGES.item09,
-    title: "APPLE iPhone 14 (Bluetooth)",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    id: "39",
-    image: IMAGES.item010,
-    title: "KitchenAid 9-Cup Food and",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    id: "40",
-    image: IMAGES.item011,
-    title: "Engraved Metal Money is",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    id: "41",
-    image: IMAGES.item012,
-    title: "OnePlus Bullets EyeBuds",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-];
-
-const CardlistData = [
-  {
-    image: IMAGES.item9,
-    title: "Echo Vibe Urban Runners",
-    price: "$179",
-    delevery: "FREE Delivery",
-    discount: "$112",
-    offer: "40% OFF",
-    brand: "Apple",
-  },
-  {
-    image: IMAGES.item10,
-    title: "Swift Glide Sprinter Soles",
-    price: "$199",
-    delevery: "FREE Delivery",
-    discount: "$110",
-    offer: "40% OFF",
-    brand: "OLG",
-  },
-];
-
-const Cardlist2Data = [
-  {
-    image: IMAGES.item06,
-    brand: "SKY",
-    title: "Pleated high-waisted is",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    image: IMAGES.item07,
-    title: "LG TurboWash Washing for",
-    brand: "OLG",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-];
-const Cardlist3Data = [
-  {
-    image: IMAGES.item09,
-    brand: "Apple",
-    title: "APPLE iPhone 14 (Bluetooth)",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    image: IMAGES.item010,
-    brand: "Apple",
-    title: "KitchenAid 9-Cup Food and",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    image: IMAGES.item011,
-    brand: "Whp",
-    title: "Engraved Metal Money is",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-  {
-    image: IMAGES.item012,
-    brand: "Vivo",
-    title: "OnePlus Bullets EyeBuds",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    hascolor: true,
-  },
-];
+ 
 
 type ProductsScreenProps = StackScreenProps<
   RootStackParamList,
@@ -369,63 +45,89 @@ type ProductsScreenProps = StackScreenProps<
 >;
 
 const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
-  const { subcategoryId, subcategoryName } = route.params;
+  const { brandId, brandName } = route.params; // Recibe los parámetros de la marca
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors } = theme;
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(true); // Alternar entre las dos listas
   const [articles, setArticles] = useState([]);
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  
-  useEffect(() => {
-    const loadArticles = async () => {
-      try {
-        setLoading(true);
+  const [page, setPage] = useState(1); // Página actual para la paginación
+  const [initialLoading, setInitialLoading] = useState(false); // Estado para la carga inicial
+  const [loadingMoreGrid, setLoadingMoreGrid] = useState(false); // Estado para cargar más artículos en la vista de cuadrícula
+  const [loadingMoreList, setLoadingMoreList] = useState(false); // Estado para cargar más artículos en la vista de lista
+  const [hasMore, setHasMore] = useState(true); // Indica si hay más productos para cargar
 
-        // Intenta cargar los datos desde AsyncStorage
-        const cachedArticles = await AsyncStorage.getItem(`articles_${route.params.subcolor}`);
-        if (cachedArticles) {
-          setArticles(JSON.parse(cachedArticles));
-          setLoading(false);
-          return;
-        }
-
-        // Si no hay datos en caché, carga desde la API
-        const fetchedArticles = await fetchArticles();
-        const filteredArticles = fetchedArticles.filter(
-          (article) => article.subcolor.trim() === route.params.subcolor.trim()
-        );
-
-        // Guarda los datos en AsyncStorage
-        await AsyncStorage.setItem(`articles_${route.params.subcolor}`, JSON.stringify(filteredArticles));
-
-        setArticles(filteredArticles);
-      } catch (error) {
-        console.error("Error fetching articles:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadArticles();
-  }, [route.params.subcolor]);
-
-  const loadMoreArticles = async () => {
-    if (loading) return;
-    setLoading(true);
+ // Cargar productos al montar el componente
+ useEffect(() => {
+  const loadArticles = async () => {
     try {
-      const newArticles = await fetchArticles(page, 6); // Carga 20 artículos por página
-      setArticles((prevArticles) => [...prevArticles, ...newArticles]);
-      setPage(page + 1);
+      setInitialLoading(true); // Inicia el indicador de carga inicial
+
+      // Verificar si los productos ya están en AsyncStorage
+      const cachedArticles = await AsyncStorage.getItem(`articles_${brandId}`);
+      if (cachedArticles) {
+        console.log("Cargando artículos desde AsyncStorage");
+        setArticles(JSON.parse(cachedArticles));
+        setHasMore(false); // No hay más productos para cargar
+        return; // Salir si los datos están en caché
+      }
+
+      // Si no hay datos en caché, cargar desde la API
+      console.log("Cargando artículos desde la API");
+      const fetchedArticles = await fetchArticles(brandName, page); // Filtra por marca y página
+      if (fetchedArticles.length === 0) {
+        setHasMore(false); // No hay más productos para cargar
+      } else {
+        setArticles(fetchedArticles);
+
+        // Guardar los productos en AsyncStorage
+        await AsyncStorage.setItem(
+          `articles_${brandId}`,
+          JSON.stringify(fetchedArticles)
+        );
+      }
     } catch (error) {
-      console.error("Error loading more articles:", error);
+      console.error("Error al cargar los artículos:", error);
     } finally {
-      setLoading(false);
+      setInitialLoading(false); // Detén el indicador de carga inicial
     }
   };
+
+  loadArticles();
+}, [brandId, brandName, page]); // Escucha cambios en los parámetros y la página
+
+const loadMoreArticles = async (listType: "grid" | "list") => {
+  if (!hasMore) return; // No cargar más si no hay más productos
+  if (listType === "grid" && loadingMoreGrid) return; // Evitar múltiples solicitudes simultáneas para la cuadrícula
+  if (listType === "list" && loadingMoreList) return; // Evitar múltiples solicitudes simultáneas para la lista
+
+  if (listType === "grid") setLoadingMoreGrid(true);
+  if (listType === "list") setLoadingMoreList(true);
+
+  try {
+    const newArticles = await fetchArticles(brandName, page + 1); // Filtra por marca y página
+    if (newArticles.length === 0) {
+      setHasMore(false); // No hay más productos para cargar
+    } else {
+      const updatedArticles = [...articles, ...newArticles];
+      setArticles(updatedArticles);
+      setPage((prevPage) => prevPage + 1); // Incrementa la página
+
+      // Actualizar los productos en AsyncStorage
+      await AsyncStorage.setItem(
+        `articles_${brandId}`,
+        JSON.stringify(updatedArticles)
+      );
+    }
+  } catch (error) {
+    console.error("Error al cargar más artículos:", error);
+  } finally {
+    if (listType === "grid") setLoadingMoreGrid(false);
+    if (listType === "list") setLoadingMoreList(false);
+  }
+};
 
 
   // flatlist card1
@@ -437,6 +139,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
           marginBottom: 10,
           paddingHorizontal: 0,
           backgroundColor: colors.card,
+          
         },
       ]}>
       <Cardstyle1
@@ -490,7 +193,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
-        title={route.params.subcategoryName} // Usa el nombre de la marca
+        title={brandName} // Usa el nombre de la marca
         leftIcon="back"
         titleLeft
         rightIcon1={"search"}
@@ -593,7 +296,8 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
                 resizeMode: "contain",
                 tintColor: show ? colors.text : COLORS.primary,
               }}
-              source={IMAGES.list}
+              source={IMAGES.grid}
+
             />
           </TouchableOpacity>
           <View
@@ -619,7 +323,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
                 resizeMode: "contain",
                 tintColor: show ? COLORS.primary : colors.text,
               }}
-              source={IMAGES.grid}
+              source={IMAGES.list} 
             />
           </TouchableOpacity>
         </View>
@@ -628,32 +332,46 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
       <View
         style={[
           GlobalStyleSheet.container,
-          { paddingTop: 15, paddingHorizontal: 0 },
+          { paddingTop: 15, paddingHorizontal: 0, marginBottom: 80 },
         ]}>
         <View>
-          {show ? (
-            <FlatList
-              data={articles}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()} // Usa un identificador único
-              contentContainerStyle={{ paddingBottom: 20 }}
-              numColumns={2}
-              onEndReached={loadMoreArticles}
-              onEndReachedThreshold={0.5} // Carga más artículos cuando el usuario está al 50% del final
-              ListFooterComponent={loading && <ActivityIndicator size="large" color={COLORS.primary} />}
-            />
-          ) : (
-            <FlatList
-              data={articles}
-              renderItem={renderItem2}
-              keyExtractor={(item, index) => index.toString()}
-              contentContainerStyle={{ paddingBottom: 20 }}
-              key={show ? "grid" : "list"} // Cambia la clave aquí
-              onEndReached={loadMoreArticles}
-              onEndReachedThreshold={0.5} // Carga más artículos cuando el usuario está al 50% del final
-              ListFooterComponent={loading && <ActivityIndicator size="large" color={COLORS.primary} />}
-            />
-          )}
+        {initialLoading ? (
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        ) : (
+          <View>
+            {show ? (
+              <FlatList
+                data={articles}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id.toString()} // Usa un identificador único
+                contentContainerStyle={{ paddingBottom: 20 }}
+                numColumns={2}
+                onEndReached={() => loadMoreArticles("grid")}
+                onEndReachedThreshold={0.5} // Carga más artículos cuando el usuario está al 50% del final
+                ListFooterComponent={
+                  hasMore && articles.length >= 4 && loadingMoreGrid && (
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                  )
+                }
+              />
+            ) : (
+              <FlatList
+                data={articles}
+                renderItem={renderItem2}
+                keyExtractor={(item, index) => `${item.id}:${index}`} // Clave única
+                contentContainerStyle={{ paddingBottom: 20 }}
+                key={show ? "grid" : "list"} // Cambia la clave aquí
+                onEndReached={() => loadMoreArticles("list")}
+                onEndReachedThreshold={0.5} // Carga más artículos cuando el usuario está al 50% del final
+                ListFooterComponent={
+                  hasMore && articles.length >= 4 && loadingMoreList && (
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                  )
+                }
+              />
+            )}
+          </View>
+        )}
         </View>
       </View>
       <BottomSheet2 ref={sheetRef} />

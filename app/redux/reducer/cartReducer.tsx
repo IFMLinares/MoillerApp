@@ -1,39 +1,47 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 export const cartSlice = createSlice({
-    name: "cart",
-    initialState: {
-        cart: [],
+  name: "cart",
+  initialState: {
+    cart: [],
+  },
+  reducers: {
+    addToCart: (state: any, action: any) => {
+      const itemInCart = state.cart.find((item: any) => item.id === action.payload.id);
+      if (itemInCart) {
+        // Si el producto ya está en el carrito, actualiza la cantidad
+        itemInCart.quantity += action.payload.quantity;
+      } else {
+        // Si el producto no está en el carrito, añádelo
+        state.cart.push({ ...action.payload });
+      }
     },
-    reducers:{
-        addToCart : (state:any,action:any) => {
-            const itemInCart = state.cart.find((item:any) => item.id == action.payload.id);
-            if(itemInCart){
-                itemInCart.quantity++;
-            }else{
-                state.cart.push({...action.payload,quantity:1})
-            }
-        },
-        removeFromCart:(state:any,action:any) => {
-            const removeFromCart = state.cart.filter((item:any) => item.id !== action.payload.id);
-            state.cart = removeFromCart;
-        },
-        incrementQuantity : (state:any,action:any) => {
-            const itemInCart = state.cart.find((item:any) => item.id == action.payload.id);
-            itemInCart.quantity++;
-        },
-        decrementQuantity : (state:any,action:any) => {
-            const itemInCart = state.cart.find((item:any) => item.id == action.payload.id);
-            if(itemInCart.quantity == 1){
-                const removeFromCart = state.cart.filter((item:any) => item.id !== action.payload.id);
-                state.cart = removeFromCart;
-            }else{
-                itemInCart.quantity--;
-            }
+    removeFromCart: (state: any, action: any) => {
+      state.cart = state.cart.filter((item: any) => item.id !== action.payload.id);
+    },
+    incrementQuantity: (state: any, action: any) => {
+      const itemInCart = state.cart.find((item: any) => item.id === action.payload.id);
+      if (itemInCart) {
+        itemInCart.quantity++;
+      }
+    },
+    decrementQuantity: (state: any, action: any) => {
+      const itemInCart = state.cart.find((item: any) => item.id === action.payload.id);
+      if (itemInCart) {
+        if (itemInCart.quantity === 1) {
+          state.cart = state.cart.filter((item: any) => item.id !== action.payload.id);
+        } else {
+          itemInCart.quantity--;
         }
-    }
+      }
+    },
+    clearCart: (state: any) => {
+      // Vaciar el carrito
+      state.cart = [];
+    },
+  },
 });
 
-export const {addToCart,removeFromCart,incrementQuantity,decrementQuantity} = cartSlice.actions;
+export const { addToCart, removeFromCart, incrementQuantity, decrementQuantity, clearCart } = cartSlice.actions;
 
 export default cartSlice.reducer;
