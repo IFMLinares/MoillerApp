@@ -61,10 +61,10 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
       try {
         const storedOrders = await AsyncStorage.getItem("orders");
         const existingOrders = storedOrders ? JSON.parse(storedOrders) : [];
-
+  
         if (route.params?.order) {
-          // Agregar una nueva orden al estado existente
-          const newOrders = [...existingOrders, route.params.order];
+          // Agregar una nueva orden al inicio del estado existente
+          const newOrders = [route.params.order, ...existingOrders];
           setOrders(newOrders);
           setFilteredOrders(newOrders);
           saveOrders(newOrders); // Guardar en AsyncStorage
@@ -91,7 +91,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
         console.error("Error al manejar los pedidos:", error);
       }
     };
-
+  
     addOrUpdateOrder();
   }, [route.params?.order, route.params?.updatedOrder]);
 
@@ -208,6 +208,8 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
           </TouchableOpacity>
         </View>
       </View>
+      <ScrollView>
+
       <View
         style={{
           marginTop: 10,
@@ -313,6 +315,8 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
           </View>
         ))}
       </View>
+      </ScrollView>
+
     </View>
   );
 };

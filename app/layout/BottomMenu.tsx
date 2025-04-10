@@ -15,9 +15,8 @@ import { IMAGES } from '../constants/Images';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+} from 'react-native-responsive-screen'; 
+import { useSelector } from "react-redux"; // Importa useSelector
 type Props = {
     state : any,
     navigation : any,
@@ -29,7 +28,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
 
     const theme = useTheme();
     const {colors} : {colors : any} = theme;
-    
+    const cart = useSelector((state: any) => state.cart.cart); // Obtén el carrito desde Redux
     const [tabWidth, setWidth] = useState(wp('100%'));
 
     const tabWD =
@@ -193,6 +192,29 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                                 }
                                             />
                                         {/* </Animated.View> */}
+                                        {label === 'Mi Carrito' && cart.length > 0 && (
+                                        <View
+                                            style={[
+                                                GlobalStyleSheet.notification,
+                                                {
+                                                    position: "absolute",
+                                                    right: 5,
+                                                    top: -5,
+                                                    backgroundColor: "#FFE019",
+                                                },
+                                            ]}
+                                        >
+                                            <Text
+                                                style={{
+                                                    ...FONTS.fontRegular,
+                                                    fontSize: 10,
+                                                    color: COLORS.title,
+                                                }}
+                                            >
+                                                {cart.length}
+                                            </Text>
+                                        </View>
+                                    )}
                                         <Text style={[styles.navText,{color:isFocused ? COLORS.primary : colors.title}]}>{label}</Text>
                                     </TouchableOpacity>
                                 </View>

@@ -9,7 +9,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { COLORS, FONTS } from "../../constants/theme";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
 import { useTheme } from "@react-navigation/native";
@@ -23,9 +23,9 @@ import SelectCountery from "../../components/SelectCountery";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios'; // Asegúrate de tener axios instalado
-import { authLogin } from '../../api/authLogin'; // Importa la función de autenticación
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios"; // Asegúrate de tener axios instalado
+import { authLogin, refreshAccessToken } from "../../api/authLogin"; // Importa las funciones necesarias
 
 type SingInScreenProps = StackScreenProps<RootStackParamList, "SingIn">;
 
@@ -39,6 +39,31 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Verificar si el usuario ya está autenticado
+  const checkAuthentication = async () => {
+    setLoading(true);
+    try {
+      let accessToken = await AsyncStorage.getItem("accessToken");
+      if (!accessToken) {
+        // Intentar refrescar el token si no hay un token de acceso válido
+        accessToken = await refreshAccessToken();
+      }
+      if (accessToken) {
+        // Si el token es válido, redirigir al Home
+        navigation.navigate("DrawerNavigation", { screen: "Home" });
+      }
+    } catch (error) {
+      console.log("No se pudo autenticar automáticamente:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Ejecutar la verificación al cargar la pantalla
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
+
   const handleLogin = async () => {
     setLoading(true);
     setErrorMessage("");
@@ -46,9 +71,9 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
       const data = await authLogin(username, password);
       setLoading(false);
       if (data.access) {
-        await AsyncStorage.setItem('username', username);
-        await AsyncStorage.setItem('access_token', data.access); // Cambiado a 'access_token'
-        await AsyncStorage.setItem('refreshToken', data.refresh);
+        await AsyncStorage.setItem("username", username);
+        await AsyncStorage.setItem("accessToken", data.access);
+        await AsyncStorage.setItem("refreshToken", data.refresh);
         navigation.navigate("DrawerNavigation", { screen: "Home" });
       } else {
         setErrorMessage("Usuario o contraseña incorrectos");
@@ -58,55 +83,55 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
       setErrorMessage(error.message);
     }
   };
-  
 
-  const [inputValue, setInputValue] = useState("");
-
-  const handleChange = (text: any) => {
-    const numericValue = text.replace(/[^0-9]/g, "");
-    setInputValue(numericValue);
-  };
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.primary }}>
-            <LinearGradient
-              start={{ x: 0, y: 1 }}
-              end={{ x: 0, y: 0 }}
-              colors={["#001A44", "#193561"]}
-              style={{ height: undefined, width: "100%" }}>
-      <View
-        style={[
-          GlobalStyleSheet.container,
-          {
-            paddingVertical: 20,
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-          },
-        ]}>
+      <LinearGradient
+        start={{ x: 0, y: 1 }}
+        end={{ x: 0, y: 0 }}
+        colors={["#001A44", "#193561"]}
+        style={{ height: undefined, width: "100%" }}>
         <View
           style={[
-            GlobalStyleSheet.row,
-            { alignItems: "center", justifyContent: "space-between" },
+            GlobalStyleSheet.container,
+            {
+              paddingVertical: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+            },
           ]}>
           <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-              justifyContent: "center",
-            }}>
-            <Image
-              source={require("../../assets/images/logo/logoblanco.png")}
-              resizeMode="contain"
+            style={[
+              GlobalStyleSheet.row,
+              { alignItems: "center", justifyContent: "space-between" },
+            ]}>
+            <View
               style={{
-                width: "90%",
-              }}
-            />
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 10,
+                justifyContent: "center",
+              }}>
+              <Image
+                source={require("../../assets/images/logo/logoblanco.png")}
+                resizeMode="contain"
+                style={{
+                  width: "90%",
+                }}
+              />
+            </View>
           </View>
-        </View>
-        {/* usuario y contraseña*/}
-        <View
+          {/* usuario y contraseña*/}
+          <View
             style={[
               GlobalStyleSheet.row,
               { alignItems: "center", justifyContent: "space-between" },
@@ -128,11 +153,11 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                   }}>
                   <Input
                     value={username}
-                    autoCapitalize="none" 
-                    placeholder="Nombre de usuario" 
+                    autoCapitalize="none"
+                    placeholder="Nombre de usuario"
                     onChangeText={(value) => setUsername(value)}
-                    style={{ 
-                      fontFamily: "RalewayRegular",  
+                    style={{
+                      fontFamily: "RalewayRegular",
                     }}
                   />
                 </View>
@@ -146,16 +171,16 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                   <Input
                     value={password}
                     type={"password"}
-                    autoCapitalize="none" 
+                    autoCapitalize="none"
                     placeholder="Contraseña"
                     // autoCapitalize="none"
                     onChangeText={(value) => setPassword(value)}
                     style={{
                       alignItems: "center",
                       justifyContent: "space-between",
-                      fontFamily: "RalewayRegular", 
+                      fontFamily: "RalewayRegular",
                     }}
-                    />
+                  />
                 </View>
                 {errorMessage ? (
                   <Text style={{ color: "red", marginBottom: 10 }}>
@@ -178,7 +203,6 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                           color: COLORS.card,
                           textDecorationLine: "none",
                           fontFamily: "RalewayBold",
-
                         },
                       ]}>
                       ¿Se le olvido su contraseña?
@@ -188,47 +212,11 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
               </View>
             </View>
           </View>
-        {/* usuario y contraseña */}
-        {/* Boton de crear cuenta e iniciar sesion*/}
-        <View>
-          {/* crear cuenta */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-              justifyContent: "center",
-            }}>
+          {/* usuario y contraseña */}
+          {/* Boton de crear cuenta e iniciar sesion*/}
+          <View>
+            {/* iniciar sesion */}
             <View
-              style={[
-                GlobalStyleSheet.container,
-                {
-                  width: "90%",
-                },
-              ]}>
-              <TouchableOpacity activeOpacity={0.8}>
-                <Text
-                  style={{
-                    paddingVertical: 10,
-                    borderRadius: 40,
-                    borderWidth: 4,
-                    lineHeight: 24,
-                    borderColor: "white",
-                    // width: "100%",
-                    color: "white",
-                    fontFamily: "RalewayExtraBold",
-                    fontSize: 20,
-                    textTransform: "uppercase",
-                    textAlign: "center",
-                  }}>
-                  Crear cuenta
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          {/* crear cuenta */}
-                      {/* iniciar sesion */}
-                      <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -242,9 +230,7 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                     width: "90%",
                   },
                 ]}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleLogin}>
+                <TouchableOpacity activeOpacity={0.8} onPress={handleLogin}>
                   <View
                     style={{
                       backgroundColor: "white",
@@ -276,45 +262,45 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
               </View>
             </View>
             {/* iniciar sesion */}
-        </View>
-        {/* Boton de crear cuenta e iniciar sesion */}
-        {/*iconos */}
-        <View
-          style={[
-            GlobalStyleSheet.row,
-            { alignItems: "center", justifyContent: "space-between" },
-          ]}>
+          </View>
+          {/* Boton de crear cuenta e iniciar sesion */}
+          {/*iconos */}
           <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-            <View style={styles.iconRow}>
-              <Text style={styles.contactUsText}>Contáctanos</Text>
+            style={[
+              GlobalStyleSheet.row,
+              { alignItems: "center", justifyContent: "space-between" },
+            ]}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+              <View style={styles.iconRow}>
+                <Text style={styles.contactUsText}>Contáctanos</Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+              <View style={styles.iconRow}>
+                <TouchableOpacity style={styles.iconCircle}>
+                  <FontAwesome name="instagram" size={20} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconCircle}>
+                  <MaterialIcons name="email" size={20} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconCircle}>
+                  <FontAwesome name="whatsapp" size={20} color="black" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-            <View style={styles.iconRow}>
-              <TouchableOpacity style={styles.iconCircle}>
-                <FontAwesome name="instagram" size={20} color="black" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.iconCircle}>
-                <MaterialIcons name="email" size={20} color="black" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.iconCircle}>
-                <FontAwesome name="whatsapp" size={20} color="black" />
-              </TouchableOpacity>
-            </View>
-          </View>
+          {/*iconos  */}
         </View>
-        {/*iconos  */} 
-      </View>
       </LinearGradient>
     </SafeAreaView>
   );
@@ -334,9 +320,8 @@ const styles = StyleSheet.create({
   iconRow: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "100%", 
+    width: "100%",
     marginTop: 10,
-
   },
   iconCircle: {
     width: 40,

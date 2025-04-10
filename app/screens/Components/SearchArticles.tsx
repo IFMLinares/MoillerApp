@@ -18,6 +18,7 @@ import { COLORS } from "../../constants/theme";
 import { fetchArticles } from "../../api/apiSearch";
 import { useNavigation } from "@react-navigation/native";
 import debounce from "lodash.debounce"; // Instala lodash si no lo tienes: npm install lodash
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Importa AsyncStorage
 
 const SearchArticles = () => {
   const [searchText, setSearchText] = useState("");
@@ -28,7 +29,6 @@ const SearchArticles = () => {
   // Animación para la lista desplegable
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
 
-  // Función para manejar la búsqueda con debounce
   const handleSearch = useCallback(
     debounce(async (text) => {
       if (text.trim() === "") {
@@ -38,16 +38,47 @@ const SearchArticles = () => {
       }
 
       setLoading(true);
-      const results = await fetchArticles();
-      const filteredResults = results.filter((article) =>
-        article.name.toLowerCase().includes(text.toLowerCase())
-      );
-      setArticles(filteredResults.slice(0, 5));
+
+      try {
+        // Verifica si los resultados ya están en AsyncStorage
+        const cachedResults = await AsyncStorage.getItem(`search_${text}`);
+        if (cachedResults) {
+          setArticles(JSON.parse(cachedResults));
+          setLoading(false);
+          return;
+        }
+
+        // Si no hay resultados en caché, realiza la búsqueda
+        const results = await fetchArticles();
+        const filteredResults = results.filter((article) => {
+          const productWords = article.name
+            .toLowerCase()
+            .split(" ")
+            .slice(0, 4)
+            .join(" ");
+          // Verifica si el texto coincide con el nombre, código o modelo
+          return (
+            productWords.includes(text.toLowerCase()) || // Coincidencia en las primeras 4 palabras del nombre
+            article.code.toLowerCase().includes(text.toLowerCase()) || // Coincidencia en el código
+            article.model.toLowerCase().includes(text.toLowerCase()) // Coincidencia en el modelo
+          );
+        });
+
+        // Guarda los resultados en AsyncStorage
+        await AsyncStorage.setItem(
+          `search_${text}`,
+          JSON.stringify(filteredResults)
+        );
+
+        setArticles(filteredResults);
+      } catch (error) {
+        console.error("Error al buscar artículos:", error);
+      }
+
       setLoading(false);
 
-      // Inicia la animación cuando hay resultados
       Animated.timing(dropdownAnimation, {
-        toValue: 1, // Aparece completamente
+        toValue: 1,
         duration: 300,
         useNativeDriver: true,
       }).start();
@@ -55,7 +86,6 @@ const SearchArticles = () => {
     []
   );
 
-  // Actualiza la búsqueda cuando cambia el texto
   useEffect(() => {
     handleSearch(searchText);
   }, [searchText]);
@@ -66,7 +96,7 @@ const SearchArticles = () => {
       return;
     }
     navigation.navigate("ProductsDetails", { product });
-  }; 
+  };
 
   return (
     <View>
@@ -123,25 +153,38 @@ const SearchArticles = () => {
             backgroundColor: COLORS.card,
             borderRadius: 18,
             marginTop: hp("1%"),
-            maxHeight: hp("30%"),
             width: wp("50%"),
             position: "absolute",
             zIndex: 1,
             top: hp("5%"),
             left: wp("3%"),
-          }}
-        >
+            maxHeight: hp("30%"), // Límite de altura para el contenedor
+          }}>
           <FlatList
             data={articles}
             keyExtractor={(item) => item.id.toString()}
-            showsVerticalScrollIndicator={false} // Oculta el indicador de scroll
+            showsVerticalScrollIndicator={true} // Habilita el indicador de scroll
+            nestedScrollEnabled={true} // Permite el desplazamiento anidado
             renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.articleItem}
-                onPress={() => handleNavigateToProduct(item)}
-              >
-                <Text style={styles.articleText}>{item.name}</Text>
-              </TouchableOpacity>
+              <Animated.View
+                style={{
+                  opacity: dropdownAnimation, // Animación de opacidad
+                  transform: [
+                    {
+                      scale: dropdownAnimation, // Animación de escala
+                    },
+                  ],
+                  backgroundColor: COLORS.card,
+                  borderRadius: 18,
+                }}>
+                <TouchableOpacity
+                  style={styles.articleItem}
+                  onPress={() => handleNavigateToProduct(item)}>
+                  <Text style={styles.articleText} numberOfLines={2}>
+                    {item.name}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             )}
           />
         </Animated.View>
@@ -157,10 +200,11 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: COLORS.card,
     borderBottomWidth: 1,
+    borderRadius: 18,
     borderBottomColor: COLORS.title,
   },
   articleText: {
     color: COLORS.title,
-    fontSize: hp("2%"),
+    fontSize: hp("1.5%"),
   },
 });

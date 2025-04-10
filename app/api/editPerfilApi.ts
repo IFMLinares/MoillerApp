@@ -1,21 +1,46 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { refreshAccessToken } from './authLogin';
 
 export const getUserInfo = async () => {
-    try {
-      const token = await AsyncStorage.getItem('accessToken');
-      console.log('Token de acceso:', token); // Verificar el token
-      if (!token) throw new Error('Token no disponible');
-  
-      const response = await axios.get('http://10.0.2.2:8000/api/users/user/', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      console.log('Respuesta de la API:', response.data); // Verificar la respuesta
-      return response.data;
-    } catch (error: any) {
-      console.error('Error al obtener la información del usuario:', error.message);
-      throw new Error('Error al obtener la información del usuario.');
+  try {
+    let token = await AsyncStorage.getItem('accessToken');
+    console.log('Token de acceso:', token); // Verificar el token
+
+    if (!token) {
+      // Intentar refrescar el token si no está disponible
+      token = await refreshAccessToken();
     }
-  };
+
+    const response = await axios.get('http://10.0.2.2:8000/api/users/user/', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('Respuesta de la API:', response.data); // Verificar la respuesta
+    return response.data;
+  } catch (error: any) {
+    console.error('Error al obtener la información del usuario:', error.message);
+
+    // Si el error es de autenticación, intentar refrescar el token
+    if (error.response && error.response.status === 401) {
+      try {
+        const newToken = await refreshAccessToken();
+        const retryResponse = await axios.get('http://10.0.2.2:8000/api/users/user/', {
+          headers: {
+            Authorization: `Bearer ${newToken}`,
+          },
+        });
+        return retryResponse.data;
+      } catch (refreshError) {
+        console.error('Error al refrescar el token:', refreshError.message);
+        await AsyncStorage.removeItem('accessToken');
+        await AsyncStorage.removeItem('refreshToken');
+        throw new Error('Sesión expirada. Por favor, inicie sesión nuevamente.');
+      }
+    }
+
+    throw new Error('Error al obtener la información del usuario.');
+  }
+};

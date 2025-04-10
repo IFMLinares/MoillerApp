@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Image, TouchableOpacity, Alert  } from "react-native";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import Header from "../../layout/Header";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
@@ -23,6 +23,7 @@ const EditProfile = () => {
   const [isFocused3, setisFocused3] = useState(false);
 
   const [userInfo, setUserInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -30,11 +31,30 @@ const EditProfile = () => {
         const data = await getUserInfo();
         console.log("Información del usuario:", data); // Verificar los datos
         setUserInfo(data);
-      } catch (error) {
+      } catch (error: any) {
         console.error(error.message);
+  
+        // Redirigir al inicio de sesión si la sesión ha expirado
+        if (error.message === 'Sesión expirada. Por favor, inicie sesión nuevamente.') {
+          navigation.navigate("SingIn");
+        } else {
+          Alert.alert(
+            "Error",
+            error.message,
+            [
+              {
+                text: "Iniciar sesión",
+                onPress: () => navigation.navigate("SingIn"),
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      } finally {
+        setLoading(false);
       }
     };
-
+  
     fetchUserInfo();
   }, []);
 
@@ -132,7 +152,7 @@ const EditProfile = () => {
                   FONTS.fontMedium,
                   { fontSize: 24, color: colors.title, textAlign: "center" },
                 ]}>
-                {userInfo?.username}
+                {userInfo?.first_name} {userInfo?.last_name}
               </Text>
               <Text
                 style={[
@@ -197,7 +217,7 @@ const EditProfile = () => {
           </Animatable.Text>
         )}
       </ScrollView>
-      <View
+      {/* <View
         style={[
           GlobalStyleSheet.container,
           { paddingHorizontal: 0, paddingBottom: 0 },
@@ -217,7 +237,7 @@ const EditProfile = () => {
             onPress={() => navigation.navigate("Profile")}
           />
         </View>
-      </View>
+      </View> */}
     </View>
   );
 };
