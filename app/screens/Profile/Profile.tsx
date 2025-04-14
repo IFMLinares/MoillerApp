@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Modal,
   SectionList,
   Linking,
+  StyleSheet,
 } from "react-native";
 import Header from "../../layout/Header";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
@@ -21,7 +23,7 @@ import { useDispatch } from "react-redux";
 import { openDrawer } from "../../redux/actions/drawerAction";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ListwithiconData = [
+const getListwithiconData = (navigation: any, setShowModal: any) => [
   {
     title: "Configuracion de la cuenta",
     data: [
@@ -43,18 +45,14 @@ const ListwithiconData = [
       {
         icon: IMAGES.logout,
         title: "Cerrar sesión",
-        navigate: "Login", // Cambia la navegación a la pantalla de Login
-        action: async () => {
-          await AsyncStorage.clear(); // Limpia los datos de sesión
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "Login" }], // Reinicia la navegación a la pantalla de Login
-          });
+        action: () => {
+          setShowModal(true); // Muestra el modal al presionar "Cerrar sesión"
         },
       },
     ],
   },
 ];
+
 const soporteData = [
   {
     title: "Soporte",
@@ -85,10 +83,15 @@ const soporteData = [
     ],
   },
 ];
+
 type ProfileScreenProps = StackScreenProps<RootStackParamList, "Profile">;
 
 const Profile = ({ navigation }: ProfileScreenProps) => {
   const [username, setUsername] = useState("");
+  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
+  const dispatch = useDispatch();
+  const theme = useTheme();
+  const { colors }: { colors: any } = theme;
 
   useEffect(() => {
     const getUsername = async () => {
@@ -101,12 +104,17 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
     getUsername();
   }, []);
 
-  const theme = useTheme();
-  const { colors }: { colors: any } = theme;
+  const handleLogout = async () => {
+    await AsyncStorage.clear(); // Limpia los datos de sesión
+    setShowModal(false); // Oculta el modal
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "SingIn" }], // Navega a la pantalla de Login
+    });
+  };
 
-  //const navigation = useNavigation();
-
-  const dispatch = useDispatch();
+  // Pasa `setShowModal` como argumento a `getListwithiconData`
+  const listWithIconData = getListwithiconData(navigation, setShowModal);
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
@@ -184,7 +192,7 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
       <View style={[GlobalStyleSheet.container, { flex: 1, paddingTop: 0 }]}>
         <View style={{ marginHorizontal: -15, marginTop: 0, flex: 1 }}>
           <SectionList
-            sections={ListwithiconData}
+            sections={listWithIconData} // Usa el resultado de la función
             keyExtractor={(item: any, index) => item + index}
             renderItem={({ item }) => (
               <TouchableOpacity
@@ -336,8 +344,76 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
           />
         </View>
       </View>
+      {/* Modal de confirmación */}
+      <Modal
+        transparent={true}
+        visible={showModal}
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>
+              ¿Seguro que desea Cerrar Sesión?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: COLORS.primary },
+                ]}
+                onPress={handleLogout}>
+                <Text style={styles.modalButtonText}>Sí</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: COLORS.red }]}
+                onPress={() => setShowModal(false)}>
+                <Text style={styles.modalButtonText}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: COLORS.white,
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalButton: {
+    flex: 1,
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
 
 export default Profile;
