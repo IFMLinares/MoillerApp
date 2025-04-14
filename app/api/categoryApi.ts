@@ -1,9 +1,9 @@
 import axios from "axios";
-
+import { BASE_URL } from './globalUrlApi'; // Importar la URL base
 export const fetchCategories = async () => {
   try {
     const response = await axios.get(
-      "http://10.0.2.2:8000/api/core/articles/list",
+      `${BASE_URL}api/core/articles/list`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export const fetchCategories = async () => {
 export const fetchSubcategories = async (categoryId) => {
   try {
     const response = await axios.get(
-      "http://10.0.2.2:8000/api/core/articles/list",
+      `${BASE_URL}api/core/articles/list`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +67,7 @@ export const fetchSubcategories = async (categoryId) => {
 export const fetchBrands = async () => {
   try {
     const response = await axios.get(
-      "http://10.0.2.2:8000/api/core/articles/list",
+      `${BASE_URL}api/core/articles/list`,
       {
         headers: {
           "Content-Type": "application/json",

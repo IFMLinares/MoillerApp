@@ -1,9 +1,10 @@
 import axios from "axios";
+import { BASE_URL } from './globalUrlApi'; // Importar la URL base
 
 export const fetchArticles = async () => {
   try {
     const response = await axios.get(
-      "http://10.0.2.2:8000/api/core/articles/list",
+      `${BASE_URL}api/core/articles/list`,
       {
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { refreshAccessToken } from './authLogin';
+import { BASE_URL } from './globalUrlApi'; // Importar la URL base
 
 export const getUserInfo = async () => {
   try {
@@ -12,7 +13,7 @@ export const getUserInfo = async () => {
       token = await refreshAccessToken();
     }
 
-    const response = await axios.get('http://10.0.2.2:8000/api/users/user/', {
+    const response = await axios.get(`${BASE_URL}api/users/user/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ export const getUserInfo = async () => {
     if (error.response && error.response.status === 401) {
       try {
         const newToken = await refreshAccessToken();
-        const retryResponse = await axios.get('http://10.0.2.2:8000/api/users/user/', {
+        const retryResponse = await axios.get(`${BASE_URL}api/users/user/`, {
           headers: {
             Authorization: `Bearer ${newToken}`,
           },

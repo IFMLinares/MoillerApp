@@ -43,7 +43,14 @@ const ListwithiconData = [
       {
         icon: IMAGES.logout,
         title: "Cerrar sesión",
-        navigate: "Questions",
+        navigate: "Login", // Cambia la navegación a la pantalla de Login
+        action: async () => {
+          await AsyncStorage.clear(); // Limpia los datos de sesión
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Login" }], // Reinicia la navegación a la pantalla de Login
+          });
+        },
       },
     ],
   },
@@ -172,7 +179,6 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
               </Text>
             </TouchableOpacity>
           </View>
- 
         </View>
       </View>
       <View style={[GlobalStyleSheet.container, { flex: 1, paddingTop: 0 }]}>
@@ -183,14 +189,19 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate(item.navigate)}
+                onPress={() => {
+                  if (item.action) {
+                    item.action(); // Ejecuta la acción personalizada si existe
+                  } else if (item.navigate) {
+                    navigation.navigate(item.navigate); // Navega si tiene una ruta definida
+                  }
+                }}
                 style={{
                   flexDirection: "row",
                   paddingHorizontal: 15,
                   height: 55,
                   alignItems: "center",
                   paddingVertical: 15,
-                  //borderRadius: SIZES.radius,
                   backgroundColor: theme.dark
                     ? "rgba(255,255,255,.1)"
                     : colors.card,
