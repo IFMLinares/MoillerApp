@@ -63,10 +63,31 @@ import SearchArticles from "../screens/Components/SearchArticles";
 import ProductDetail from "../screens/Components/ProductDetail";
 import CatalogoScreen from "../screens/Category/Catalogo";
 import PedidoScreen from "../screens/Payment/Pedido";
+
+
+import { useDispatch } from "react-redux";
+import { getUserInfo } from "../api/editPerfilApi";
+import { setClienteId } from "../redux/actions/drawerAction";
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 const StackNavigator = () => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userInfo = await getUserInfo();
+        console.log("Información del usuario:", userInfo); // Verifica la respuesta de la API
+        dispatch(setClienteId(userInfo.id)); // Cambia `cliente_id` por `id`
+      } catch (error) {
+        console.error("Error al obtener la información del usuario:", error);
+      }
+    };
+  
+    fetchUserInfo();
+  }, [dispatch]);
 
   const [initialRoute, setInitialRoute] = useState<string | null>(null);
 

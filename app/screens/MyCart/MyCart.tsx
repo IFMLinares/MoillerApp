@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import React from "react";
+import React, {useEffect} from "react";
 import { View, Text, ScrollView, Image } from "react-native";
 import Header from "../../layout/Header";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
@@ -11,8 +11,8 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
-import { Feather } from "@expo/vector-icons";
-import QuantityButton from "../Components/QuantityButton";
+import { Feather } from "@expo/vector-icons"; 
+import { getCartItemsApi } from "../../api/addItemApi"; // Importa la nueva función
 
 type MyCartScreenProps = StackScreenProps<RootStackParamList, "Mi Carrito">;
 
@@ -21,6 +21,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
+  const clienteId = 1; // Reemplaza con el clienteId dinámico si es necesario
 
   const navigateToProductDetails = (product) => {
     navigation.navigate("ProductsDetails", { product });
@@ -29,6 +30,19 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   const removeItemFromCart = (product) => {
     dispatch(removeFromCart(product));
   };
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const cartItems = await getCartItemsApi(clienteId);
+        console.log("Productos del carrito obtenidos:", cartItems);
+      } catch (error) {
+        console.error("Error al obtener los productos del carrito:", error);
+      }
+    };
+
+    fetchCartItems();
+  }, [clienteId]);
 
   // Función para calcular el total
   const calculateTotal = () => {

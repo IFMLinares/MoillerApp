@@ -8,3 +8,8 @@ export const closeDrawer = () => {
         type: 'CLOSE_DRAWER',
     };
 };
+
+export const setClienteId = (clienteId) => ({
+    type: "SET_CLIENTE_ID",
+    payload: clienteId,
+  });

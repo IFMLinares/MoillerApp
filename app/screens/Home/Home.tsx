@@ -18,7 +18,7 @@ import Button from "../../components/Button/Button";
 import Cardstyle1 from "../../components/Card/Cardstyle1";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { StackScreenProps } from "@react-navigation/stack";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openDrawer } from "../../redux/actions/drawerAction";
 import { LinearGradient } from "expo-linear-gradient";
 import BottomSheet2 from "../Components/BottomSheet2";
@@ -35,8 +35,7 @@ import { Dimensions } from "react-native";
 // api articulos
 import { fetchArticles } from "../../api/authApi";
 // api articulos
-import QuantityButton from "../Components/QuantityButton";
-
+import QuantityButton from "../Components/QuantityButton"; 
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -44,30 +43,7 @@ import {
 // buscador
 import SearchArticles from "../Components/SearchArticles";
 // buscador
-
-const bannerData = [
-  {
-    // image:IMAGES.banner1,
-    title: "AirPods",
-    text: "2nd generation",
-    price: "$1259.00*",
-    bottom: false,
-  },
-  {
-    // image:IMAGES.banner3,
-    title: "Shoes",
-    text: "1nd generation",
-    price: "$125.00*",
-    bottom: true,
-  },
-  {
-    // image:IMAGES.banner2,
-    title: "AirPods",
-    text: "3nd generation",
-    price: "$1029.00*",
-    bottom: true,
-  },
-];
+ 
 
 const PopoulerData = [
   {
@@ -82,84 +58,9 @@ const PopoulerData = [
   },
   {
     title: "Catálogo",
-  },
-  //   {
-  //     title: "Deal of the day",
-  //   },
-  //   {
-  //     title: "Hot Deals",
-  //     image: true,
-  //   },
-  //   {
-  //     title: "Best Sellers",
-  //   },
-  //   {
-  //     title: "New Arrivals",
-  //   },
+  }, 
 ];
-
-const brandData = [
-  {
-    title: "Mobiles",
-    image: IMAGES.item9,
-  },
-  {
-    title: "Electronics",
-    image: IMAGES.item10,
-  },
-  {
-    title: "Camera",
-    image: IMAGES.item11,
-  },
-  {
-    title: "Headphone",
-    image: IMAGES.item12,
-  },
-  {
-    title: "TVs & LED",
-    image: IMAGES.item13,
-  },
-  {
-    title: "Furniture",
-    image: IMAGES.item14,
-  },
-  {
-    title: "Mobiles",
-    image: IMAGES.item9,
-  },
-  {
-    title: "Electronics",
-    image: IMAGES.item10,
-  },
-  {
-    title: "Camera",
-    image: IMAGES.item11,
-  },
-  {
-    title: "Headphone",
-    image: IMAGES.item12,
-  },
-  {
-    title: "TVs & LED",
-    image: IMAGES.item13,
-  },
-  {
-    title: "Furniture",
-    image: IMAGES.item14,
-  },
-];
-
-const absData = [
-  {
-    image: IMAGES.ads12,
-  },
-  // {
-  //     image: IMAGES.ads3,
-  // },
-  // {
-  //     image: IMAGES.ads2,
-  // },
-];
+ 
 const marcas = [
   {
     image: IMAGES.marca,
@@ -181,209 +82,7 @@ const marcas = [
     brand: "AMERICOLD",
     name: "Americold",
   },
-];
-const abs2Data = [
-  {
-    image: IMAGES.ads6,
-  },
-  {
-    image: IMAGES.ads7,
-  },
-  {
-    image: IMAGES.ads6,
-  },
-  {
-    image: IMAGES.ads7,
-  },
-];
-
-const abs3Data = [
-  {
-    image: IMAGES.ads9,
-  },
-  {
-    image: IMAGES.ads10,
-  },
-  {
-    image: IMAGES.ads11,
-  },
-];
-
-const offerData = [
-  {
-    image: IMAGES.deliverytruck,
-    title: "Free Shipping & Returns",
-    text: "For all orders over $99",
-  },
-  {
-    image: IMAGES.check3,
-    title: "Secure Payment",
-    text: "We ensure secure payment",
-  },
-  {
-    image: IMAGES.savemoney,
-    title: "Money Back Guarantee",
-    text: "Any back within 30 days",
-  },
-  {
-    image: IMAGES.technicalsupport,
-    title: "Customer Support",
-    text: "Call or email us 24/7",
-  },
-  {
-    image: IMAGES.wallet2,
-    title: "Flexible Payment",
-    text: "Pay with Multiple Credit Card",
-  },
-];
-
-const ArrivalData = [
-  {
-    image: IMAGES.item15,
-    title: "Fashion",
-  },
-  {
-    image: IMAGES.item16,
-    title: "Beauty",
-  },
-  {
-    image: IMAGES.item17,
-    title: "Home",
-  },
-  {
-    image: IMAGES.item20,
-    title: "phone",
-  },
-  {
-    image: IMAGES.item15,
-    title: "Fashion",
-  },
-  {
-    image: IMAGES.item16,
-    title: "Beauty",
-  },
-  {
-    image: IMAGES.item17,
-    title: "Home",
-  },
-  {
-    image: IMAGES.item20,
-    title: "phone",
-  },
-];
-
-const cardData = [
-  {
-    id: "0",
-    image: IMAGES.item1,
-    title: "APPLE iPhone 14 (Bluetooth)",
-    price: "$199",
-    discount: "$112",
-    offer: "70% OFF",
-    brand: "Apple",
-    color: false,
-    hascolor: true,
-  },
-  {
-    id: "1",
-    image: IMAGES.item2,
-    title: "APPLE iPhone 11 (Bluetooth)",
-    price: "$149",
-    discount: "$114",
-    offer: "50% OFF",
-    brand: "Apple",
-    color: false,
-    hascolor: true,
-  },
-  {
-    id: "2",
-    image: IMAGES.item1,
-    title: "APPLE iPhone 13 (Bluetooth)",
-    price: "$139",
-    discount: "$116",
-    offer: "50% OFF",
-    color: false,
-    brand: "Apple",
-    hascolor: true,
-  },
-  {
-    id: "3",
-    image: IMAGES.item2,
-    title: "APPLE iPhone 15 (Bluetooth)",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    color: true,
-    brand: "Apple",
-    hascolor: true,
-  },
-];
-
-const card2Data = [
-  {
-    id: "4",
-    image: IMAGES.item3,
-    title: "LG TurboWash Washing",
-    price: "$199",
-    discount: "$112",
-    offer: "70% OFF",
-    brand: "OLG",
-    //color:false,
-    hascolor: true,
-  },
-  {
-    id: "5",
-    image: IMAGES.item4,
-    title: "KitchenAid 9-Cup Food",
-    price: "$149",
-    discount: "$114",
-    offer: "50% OFF",
-    brand: "Apple",
-    //color:false,
-    hascolor: true,
-  },
-  {
-    id: "6",
-    image: IMAGES.item5,
-    title: "KitchenAid 9-mixer Food",
-    price: "$199",
-    discount: "$116",
-    offer: "70% OFF",
-    //color:false,
-    brand: "OLG",
-    hascolor: true,
-  },
-  {
-    id: "7",
-    image: IMAGES.item1,
-    title: "APPLE iPhone 15 (Bluetooth)",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    //color:true,
-    brand: "Apple",
-    hascolor: true,
-  },
-];
-
-const swiperimageData = [
-  {
-    image: IMAGES.product1,
-    smallImage: IMAGES.product1,
-  },
-  {
-    image: IMAGES.product2,
-    smallImage: IMAGES.product2,
-  },
-  {
-    image: IMAGES.product3,
-    smallImage: IMAGES.product3,
-  },
-  {
-    image: IMAGES.product4,
-    smallImage: IMAGES.product4,
-  },
-];
+]; 
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
@@ -391,7 +90,11 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(true); 
+
+  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
+  
   // api
   useEffect(() => {
     const getArticles = async () => {
@@ -444,7 +147,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
 
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
-
+  
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const addItemToWishList = (data: any) => {
@@ -916,6 +619,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     item={article}
                     quantities={quantities}
                     setQuantities={setQuantities}
+                    clienteId={clienteId} // Pasa el clienteId automáticamente
                   />
                 </View>
               ))}

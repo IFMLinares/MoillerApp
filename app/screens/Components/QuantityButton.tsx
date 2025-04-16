@@ -9,20 +9,36 @@ import { useDispatch } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
 import { addToCart } from "../../redux/reducer/cartReducer";
-import { addTowishList } from "../../redux/reducer/wishListReducer";
+import { addItemToCartApi } from "../../api/addItemApi";
 
-const QuantityButton = ({ item, quantities, setQuantities }) => {
+const QuantityButton = ({ item, quantities, setQuantities, clienteId  }) => {
     const dispatch = useDispatch();
 
-    // Añadir producto al carrito con la cantidad seleccionada
-    const addItemToCart = useCallback((item) => {
-        const quantity = quantities[item.id] || 1; // Obtener la cantidad seleccionada
-        dispatch(addToCart({ ...item, quantity })); // Pasar la cantidad al carrito
+   // Añadir producto al carrito con la cantidad seleccionada y enviar a la API
+   const addItemToCart = useCallback(async (item) => {
+    const quantity = quantities[item.id] || 1; // Obtener la cantidad seleccionada
+
+    try {
+        // Llamar a la API para añadir el producto al carrito
+        await addItemToCartApi(clienteId, item.id, quantity);
+
+        // Actualizar el estado del carrito en Redux
+        dispatch(addToCart({ ...item, quantity }));
+
+        // Mostrar mensaje de éxito
         Toast.show({
             type: "success",
             text1: "¡Producto/s añadido a su carrito exitosamente!",
         });
-    }, [dispatch, quantities]);
+    } catch (error) {
+        // Manejar errores
+        Toast.show({
+            type: "error",
+            text1: "Error al añadir al carrito",
+            text2: "Por favor, inténtelo de nuevo.",
+        });
+    }
+}, [dispatch, quantities, clienteId]);
 
     // Incrementar la cantidad del producto
     const incrementQuantity = useCallback((id) => {

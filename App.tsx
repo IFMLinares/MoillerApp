@@ -6,13 +6,13 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux'
 import store from './app/redux/store';
-import React, { useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-export default function App() {
-  
+import React, { useEffect } from "react"; 
 
+
+export default function App() { 
   const theme = useTheme();
   const { colors } : {colors : any} = theme;
+
 
   const [loaded] = useFonts({
     RalewayBold: require('./app/assets/fonts/Raleway-Bold.ttf'),
