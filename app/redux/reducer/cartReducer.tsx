@@ -9,15 +9,16 @@ export const cartSlice = createSlice({
     addToCart: (state: any, action: any) => {
       const itemInCart = state.cart.find((item: any) => item.id === action.payload.id);
       if (itemInCart) {
-        // Si el producto ya está en el carrito, actualiza la cantidad
+        // Si el producto ya está en el carrito, suma las cantidades
         itemInCart.quantity += action.payload.quantity;
       } else {
-        // Si el producto no está en el carrito, añádelo
+        // Si el producto no está en el carrito, añádelo con la cantidad inicial
         state.cart.push({ ...action.payload });
       }
     },
     removeFromCart: (state: any, action: any) => {
-      state.cart = state.cart.filter((item: any) => item.id !== action.payload.id);
+      // Filtra los productos que no coincidan con el ID proporcionado
+      state.cart = state.cart.filter((item: any) => item.id !== action.payload);
     },
     incrementQuantity: (state: any, action: any) => {
       const itemInCart = state.cart.find((item: any) => item.id === action.payload.id);

@@ -22,7 +22,7 @@ import Cardstyle2 from "../../components/Card/Cardstyle2";
 import BottomSheet2 from "../Components/BottomSheet2";
 import Header from "../../layout/Header";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import data from "../../data/data.json";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
@@ -51,6 +51,10 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
+
+  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
+  
 
   useEffect(() => {
     const loadArticles = async () => {
@@ -117,6 +121,8 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
+        clienteId={clienteId} // Pasa el clienteId automáticamente
+
       />
     </View>
   );
@@ -141,6 +147,8 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
+        clienteId={clienteId} // Pasa el clienteId automáticamente
+
       />
 
     </View>

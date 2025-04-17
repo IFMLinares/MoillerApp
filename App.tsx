@@ -7,7 +7,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux'
 import store from './app/redux/store';
 import React, { useEffect } from "react"; 
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() { 
   const theme = useTheme();
@@ -29,6 +29,7 @@ export default function App() {
   if(!loaded){
     return null;
   }
+  
   // useEffect(() => {
   //   const clearStorage = async () => {
   //     try {

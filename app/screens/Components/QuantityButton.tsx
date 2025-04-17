@@ -19,11 +19,15 @@ const QuantityButton = ({ item, quantities, setQuantities, clienteId  }) => {
     const quantity = quantities[item.id] || 1; // Obtener la cantidad seleccionada
 
     try {
+        console.log("Cantidad enviada a la API:", quantity); // Depuración
+
         // Llamar a la API para añadir el producto al carrito
-        await addItemToCartApi(clienteId, item.id, quantity);
+        const response = await addItemToCartApi(clienteId, item.id, quantity);
+
+        console.log("Respuesta de la API:", response); // Verificar respuesta de la API
 
         // Actualizar el estado del carrito en Redux
-        dispatch(addToCart({ ...item, quantity }));
+        dispatch(addToCart({ ...item, quantity })); // Aquí se suma en el reducer
 
         // Mostrar mensaje de éxito
         Toast.show({
@@ -31,6 +35,8 @@ const QuantityButton = ({ item, quantities, setQuantities, clienteId  }) => {
             text1: "¡Producto/s añadido a su carrito exitosamente!",
         });
     } catch (error) {
+        console.error("Error al añadir al carrito:", error); // Depuración de errores
+
         // Manejar errores
         Toast.show({
             type: "error",

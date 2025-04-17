@@ -39,6 +39,7 @@ type Props = {
   hideActions?: boolean; // Nueva propiedad para ocultar botones
   quantity: number; // Nueva propiedad
   productId: string; // Nueva propiedad
+  removeItemFromCart?: (productId: string) => void; // Nueva propiedad
   //hascolor:any
 };
 
@@ -66,10 +67,12 @@ const Cardstyle2 = ({
   hideActions = false, // Valor predeterminado: no ocultar botones
   quantity, // Recibe la cantidad
   productId, // Recibe el ID del producto
+  removeItemFromCart, // Recibe la función para eliminar el producto del carrito
 }: Props) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
 
+  
   return (
     <View
       style={{
@@ -228,30 +231,30 @@ const Cardstyle2 = ({
               backgroundColor: COLORS.primaryLight,
             }}
           />
-          <TouchableOpacity
-            onPress={onPress4}
-            activeOpacity={0.5}
-            style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-          >
-            <Image
-              style={{
-                height: 16,
-                width: 16,
-                resizeMode: "contain",
-                tintColor: COLORS.danger,
-              }}
-              source={IMAGES.delete}
-            />
-            <Text
-              style={{
-                ...FONTS.fontMedium,
-                fontSize: 14,
-                color: COLORS.danger,
-              }}
-            >
-              Eliminar
-            </Text>
-          </TouchableOpacity>
+<TouchableOpacity
+  onPress={() => removeItemFromCart && removeItemFromCart(productId)} // Verifica que la función exista
+  activeOpacity={0.5}
+  style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+>
+  <Image
+    style={{
+      height: 16,
+      width: 16,
+      resizeMode: "contain",
+      tintColor: COLORS.danger,
+    }}
+    source={IMAGES.delete}
+  />
+  <Text
+    style={{
+      ...FONTS.fontMedium,
+      fontSize: 14,
+      color: COLORS.danger,
+    }}
+  >
+    Eliminar
+  </Text>
+</TouchableOpacity>
         </View>
       ) : null}
     </View>

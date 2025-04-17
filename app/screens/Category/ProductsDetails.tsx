@@ -23,7 +23,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { ScrollView } from "react-native-gesture-handler";
 import Cardstyle1 from "../../components/Card/Cardstyle1";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import { addToCart } from "../../redux/reducer/cartReducer";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
@@ -34,7 +34,8 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 // api articulos
-import { fetchArticles } from "../../api/authApi";
+import { addItemToCartApi } from "../../api/addItemApi";
+
 // api articulos
 
 const SelectData = [
@@ -154,6 +155,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [Select, setSelect] = useState(offerData[0]);
+  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
 
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -179,17 +181,43 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
 
   const dispatch = useDispatch();
 
-  const addItemToCart = () => {
+  const addItemToCart = async () => {
     const productWithQuantity = {
       ...product,
       quantity, // Incluye la cantidad seleccionada
+      clienteId, // Incluye el clienteId
     };
   
-    dispatch(addToCart(productWithQuantity));
-    Toast.show({
-      type: "success",
-      text1: "¡Producto/s añadido a su carrito exitosamente!",
-    });
+    try {
+      console.log("Enviando a la API:", productWithQuantity); // Depuración
+  
+      // Llamada a la API
+      const response = await addItemToCartApi(clienteId, product.id, quantity);
+  
+      console.log("Respuesta de la API:", response); // Verifica la respuesta
+  
+      // Verifica si la respuesta contiene el mensaje exitoso
+      if (response.message === "Artículo añadido o actualizado en el carrito.") {
+        dispatch(addToCart(productWithQuantity)); // Actualiza el estado en Redux
+        Toast.show({
+          type: "success",
+          text1: "¡Producto añadido al carrito exitosamente!",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error al añadir al carrito",
+          text2: response.message || "Inténtalo de nuevo.",
+        });
+      }
+    } catch (error) {
+      console.error("Error al añadir al carrito:", error); // Depuración de errores
+      Toast.show({
+        type: "error",
+        text1: "Error al añadir al carrito",
+        text2: "Por favor, inténtelo de nuevo.",
+      });
+    }
   };
 
   const addItemToWishList = (data: any) => {
@@ -263,6 +291,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       ],
     },
   ];
+
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
@@ -593,20 +622,12 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                 Agregar al carrito
               </Text>
             </TouchableOpacity>
-          </View>
-          {/* <View style={{width:'50%'}}>
-                        <Button
-                            title='Comprar ahora'
-                            color={COLORS.secondary}
-                            text={COLORS.title}
-                            onPress={() => navigation.navigate('DeliveryAddress')}
-                            style={{borderRadius:0}}
-                        />
-                    </View> */}
+          </View> 
         </View>
       </View>
 
       <Toast ref={(ref) => Toast.setRef(ref)} />
+
       <Modal visible={isModalVisible} transparent={true}>
         <ImageViewer
           imageUrls={[{ url: `http://10.0.2.2:8000${product.highImage}` }]}

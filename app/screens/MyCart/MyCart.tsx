@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
 import { Feather } from "@expo/vector-icons"; 
 import { getCartItemsApi } from "../../api/addItemApi"; // Importa la nueva función
-
+import { deleteItemFromCartApi } from "../../api/deleteItemApi"; // Importa la función correctamente
 type MyCartScreenProps = StackScreenProps<RootStackParamList, "Mi Carrito">;
 
 const MyCart = ({ navigation }: MyCartScreenProps) => {
@@ -27,8 +27,14 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
     navigation.navigate("ProductsDetails", { product });
   };
 
-  const removeItemFromCart = (product) => {
-    dispatch(removeFromCart(product));
+  const removeItemFromCart = async (itemId: string) => {
+    try {
+      await deleteItemFromCartApi(clienteId, itemId); // Llama a la API con itemId
+      dispatch(removeFromCart(itemId)); // Actualiza el estado en Redux
+      console.log("Producto eliminado correctamente.");
+    } catch (error) {
+      console.error("Error al eliminar el producto:", error);
+    }
   };
 
   useEffect(() => {
@@ -104,7 +110,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
                   quantity={data.quantity} // Pasar la cantidad
                   productId={data.id} // Pasar el ID del producto
                   onPress={() => navigateToProductDetails(data)}
-                  onPress4={() => removeItemFromCart(data)}
+                  removeItemFromCart={(itemId) => removeItemFromCart(itemId)} // Pasar la función
                 />
               </View>
             );

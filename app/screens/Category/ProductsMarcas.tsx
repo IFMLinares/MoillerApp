@@ -22,7 +22,7 @@ import Cardstyle2 from "../../components/Card/Cardstyle2";
 import BottomSheet2 from "../Components/BottomSheet2";
 import Header from "../../layout/Header";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import data from "../../data/data.json";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
@@ -58,6 +58,10 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   const [loadingMoreGrid, setLoadingMoreGrid] = useState(false); // Estado para cargar más artículos en la vista de cuadrícula
   const [loadingMoreList, setLoadingMoreList] = useState(false); // Estado para cargar más artículos en la vista de lista
   const [hasMore, setHasMore] = useState(true); // Indica si hay más productos para cargar
+
+  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
+  
 
  // Cargar productos al montar el componente
  useEffect(() => {
@@ -160,6 +164,8 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
+        clienteId={clienteId} // Pasa el clienteId automáticamente
+
       />
     </View>
   );
@@ -184,6 +190,8 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
+        clienteId={clienteId} // Pasa el clienteId automáticamente
+
       />
     </View>
   );
