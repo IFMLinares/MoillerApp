@@ -162,7 +162,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         title={subcategoryName} // Usa el nombre de la subcategoría aquí
         leftIcon="back"
         titleLeft
-        rightIcon1={"search"}
+        rightIcon5={"search"}
         rightIcon2={"cart"}
       />
 

@@ -114,7 +114,7 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
       <Header
         title="Categorías"
         leftIcon="back"
-        titleLeft
+        titleLeft 
         rightIcon4="filter"
       /> 
         <View style={{ padding: 10 }}>

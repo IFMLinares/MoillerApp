@@ -297,8 +297,8 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       <Header
         title="Detalles del producto"
         leftIcon="back"
+        rightIcon5={"search"}
         rightIcon2={"cart"}
-        // rightIcon1={"search"}
       />
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}>
         <View

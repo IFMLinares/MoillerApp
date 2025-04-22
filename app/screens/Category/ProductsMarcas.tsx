@@ -204,7 +204,7 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
         title={brandName} // Usa el nombre de la marca
         leftIcon="back"
         titleLeft
-        rightIcon1={"search"}
+        rightIcon5={"search"}
         rightIcon2={"cart"}
       />
 

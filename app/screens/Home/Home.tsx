@@ -46,22 +46,7 @@ import {
 import SearchArticles from "../Components/SearchArticles";
 // buscador
  
-
-const PopoulerData = [
-  {
-    title: "Ofertas",
-  },
-  {
-    title: "Más vendidos",
-    image: true,
-  },
-  {
-    title: "Nuevo",
-  },
-  {
-    title: "Catálogo",
-  }, 
-];
+ 
  
 const marcas = [
   {
@@ -259,211 +244,8 @@ const Home = ({ navigation }: HomeScreenProps) => {
               }}
               source={require("../../assets/images/carousel/STEINMANN.png")}
             />
-            {/* {bannerData.map((data: any, index) => {
-              return (
-                <LinearGradient
-                  key={index}
-                  start={{ x: 0, y: 1 }}
-                  end={{ x: 0, y: 0 }}
-                  colors={["#001A44", "#193561"]}
-                  style={{ height: undefined, width: "100%" }}>
-                  <View
-                    style={[
-                      GlobalStyleSheet.container,
-                      { paddingHorizontal: 30, overflow: "hidden" },
-                    ]}>
-                    <View style={GlobalStyleSheet.row}>
-                      <View
-                        style={[
-                          GlobalStyleSheet.col50,
-                          { alignSelf: "center", zIndex: 25 },
-                        ]}>
-                        <View style={{ paddingVertical: 10 }}>
-                          <Text
-                            style={[
-                              FONTS.fontSemiBold,
-                              { fontSize: 35, color: "#fff" },
-                            ]}>
-                            {data.title}
-                          </Text>
-                          <Text
-                            style={[
-                              FONTS.fontSemiBold,
-                              {
-                                fontSize: 16,
-                                color: COLORS.secondary,
-                                marginTop: -5,
-                              },
-                            ]}>
-                            {data.text}
-                          </Text>
-                          <Text
-                            style={[
-                              FONTS.fontSemiBold,
-                              {
-                                fontSize: 16,
-                                color: COLORS.white,
-                                marginTop: 10,
-                              },
-                            ]}>
-                            {data.price}*
-                          </Text>
-                          <View style={{ width: "55%", marginTop: 15 }}>
-                            <Button
-                              title="Buy Now"
-                              size={"sm"}
-                              color={COLORS.white}
-                              text={COLORS.title}
-                              onPress={() =>
-                                navigation.navigate("ProductsDetails")
-                              }
-                            />
-                          </View>
-                        </View>
-                      </View>
-                      <View style={[GlobalStyleSheet.col50, {}]}>
-                        <View
-                          style={{
-                            marginTop: -15,
-                            marginBottom: -15,
-                            marginLeft: -15,
-                            marginRight: -15,
-                            position: "absolute",
-                            alignItems: "center",
-                            bottom: data.bottom ? -10 : -50,
-                            right: 15,
-                            zIndex: 30,
-                          }}>
-                          <Image
-                            style={{
-                              height: 200,
-                              width: 150,
-                              //aspectRatio:1/1,
-                              //resizeMode:'contain'
-                            }}
-                            source={data.image}
-                          />
-                        </View>
-                      </View>
-                    </View>
-                    <View
-                      style={{ position: "absolute", right: -90, top: -100 }}>
-                      <Image
-                        style={{
-                          height: undefined,
-                          width: "100%",
-                          aspectRatio: 1 / 0.8,
-                          resizeMode: "contain",
-                        }}
-                        source={IMAGES.bannerborder2}
-                      />
-                    </View>
-                    <View
-                      style={{
-                        position: "absolute",
-                        bottom: -100,
-                        left: -130,
-                      }}>
-                      <Image
-                        style={{
-                          height: undefined,
-                          width: "100%",
-                          aspectRatio: 1 / 0.5,
-                          resizeMode: "contain",
-                        }}
-                        source={IMAGES.bannerborder1}
-                      />
-                    </View>
-                  </View>
-                </LinearGradient>
-              );
-            })} */}
-          </Swiper>
-          {/* <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
-            <View style={{ marginHorizontal: -15, marginVertical: 10 }}>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Category", { initialIndex: 0 })
-                }>
-                <Image
-                  style={{ width: "100%", height: 165 }}
-                  source={require("../../assets/images/home/lineablanca.png")}
-                  resizeMode="stretch"
-                />
-              </TouchableOpacity>
-            </View>
-          </View> */}
-          {/* <View
-            style={[
-              {
-                paddingVertical: 0,
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-between",
-              },
-            ]}>
-            <View style={{ marginHorizontal: 0, marginVertical: 0 }}>
-              <ScrollView contentContainerStyle={{ width: "100%" }}>
-                {absData.map((data, index) => {
-                  return (
-                    <View
-                      key={index}
-                      style={{
-                        justifyContent: "center",
-                        alignItems: "center",
-                        width: "100%",
-                      }}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "center",
-                          width: "100%",
-                          height: 150,
-                        }}>
-                        <TouchableOpacity
-                          style={{
-                            width: "40%",
-                            height: "100%",
-                            marginRight: 10,
-                          }}
-                          onPress={() =>
-                            navigation.navigate("Category", { initialIndex: 1 })
-                          } // Cambia el índice según la pestaña deseada
-                        >
-                          <Image
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              borderRadius: 20,
-                            }}
-                            source={IMAGES.ads12}
-                            resizeMode="stretch"
-                          />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={{ width: "60%", height: "100%" }}
-                          onPress={() =>
-                            navigation.navigate("Category", { initialIndex: 2 })
-                          } // Cambia el índice según la pestaña deseada
-                        >
-                          <Image
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              borderRadius: 20,
-                            }}
-                            source={IMAGES.ads13}
-                            resizeMode="stretch"
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  );
-                })}
-              </ScrollView>
-            </View>
-          </View> */}
+             
+          </Swiper> 
           <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
             <View style={{ marginHorizontal: -0, marginVertical: 10 }}>
               <View
@@ -531,7 +313,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                             FONTS.fontBold,
                             { fontSize: 13, color: "white" },
                           ]}>
-                          Oferta
+                          Ofertas
                         </Text>
                       </View>
                     </TouchableOpacity>

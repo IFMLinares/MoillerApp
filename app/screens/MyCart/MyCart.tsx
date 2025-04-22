@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, Image } from "react-native";
 import Header from "../../layout/Header";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
@@ -11,7 +11,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
-import { Feather } from "@expo/vector-icons"; 
+import { Feather } from "@expo/vector-icons";
 import { getCartItemsApi } from "../../api/cartApi"; // Importa la nueva función
 import { deleteItemFromCartApi } from "../../api/deleteItemApi"; // Importa la función correctamente
 
@@ -35,7 +35,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
         console.error("Error al obtener los productos del carrito:", error);
       }
     };
-  
+
     fetchCartItems();
   }, [clienteId]);
 
@@ -70,7 +70,9 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   const calculateTotal = () => {
     return cart
       .reduce((total: number, item: any) => {
-        const price = parseFloat(item.price.replace(/[^0-9.-]+/g, "").replace(",", "."));
+        const price = parseFloat(
+          item.price.replace(/[^0-9.-]+/g, "").replace(",", ".")
+        );
         return total + price * item.quantity; // Multiplica el precio por la cantidad
       }, 0)
       .toFixed(2);
@@ -78,29 +80,14 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
-      <Header title="Mi carrito" leftIcon="back" titleLeft righttitle2 />
-
-      {/* {cart.length > 0 ?
-                <View style={[GlobalStyleSheet.container,{padding:0}]}>
-                    <View style={{height:45,backgroundColor:'#87E8FF',marginVertical:15,flexDirection:'row',alignItems:'center',width:'100%',justifyContent:'space-between',paddingLeft:15}}>
-                        <View>
-                            <Text style={[FONTS.fontRegular,{fontSize:15,color:COLORS.title}]} >You're saving<Text style={[FONTS.fontSemiBold,{color:'#07A3C5'}]}> $5,565 </Text>on this time</Text>
-                        </View>
-                        <View>
-                            <Image
-                                style={{height:45,resizeMode:'contain',marginRight:-35}}
-                                source={IMAGES.background}
-                            />
-                            <Image
-                                style={{position:'absolute',height:28,width:28,top:10,right:15}}
-                                source={IMAGES.gift}
-                            />
-                        </View>
-                    </View>
-                </View>
-                :
-                null
-            } */}
+      <Header
+        title="Mi carrito"
+        leftIcon="back"
+        titleLeft
+        righttitle2
+        rightIcon5={"search"}
+      />
+ 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}>

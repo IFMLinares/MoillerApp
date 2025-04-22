@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, { useRef } from "react";
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import { useSelector } from "react-redux";
 // import Feather from "react-native-vector-icons/Feather";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import Toast from "react-native-toast-message";
-import BottomSheet2 from "../screens/Components/BottomSheet2";
+import BottomSheet2 from "../screens/Components/BottomSheet2"; 
 
 type Props = {
   title: string;
@@ -35,6 +35,7 @@ type Props = {
   rightIcon2?: any;
   rightIcon3?: any;
   rightIcon4?: any;
+  rightIcon5?: any;
   righttitle?: any;
   righttitle2?: any;
 };
@@ -69,6 +70,7 @@ const Header = ({
   rightIcon2,
   rightIcon3,
   rightIcon4,
+  rightIcon5,
   righttitle,
   righttitle2,
 }: Props) => {
@@ -179,26 +181,15 @@ const Header = ({
                   // flex: 1,
                 }}
               />
-              {/* <View
-                style={{
-                  transform: [{ rotate: "90deg" }],
-                  // marginLeft: 1,
-                  position: "relative",
-                  left: 1,
-                }}>
-                <SimpleLineIcons
-                  name="equalizer"
-                  size={18}
-                  color={COLORS.white}
-                  style={{
-                    padding: 16,
-                    backgroundColor: COLORS.primary,
-                    borderRadius: 18,
-                  }}
-                />
-              </View> */}
             </View>
           </View>
+        )}
+        {rightIcon5 == "search" && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Search")}
+            style={[styles.actionBtn, {}]}>
+            <Feather size={22} color={COLORS.card} name={"search"} />
+          </TouchableOpacity>
         )}
         {righttitle && (
           <View style={[styles.actionBtn, { width: 60 }]}>
@@ -291,7 +282,7 @@ const Header = ({
               source={IMAGES.filter3}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: COLORS.card  }]}>
+              style={[FONTS.fontMedium, { fontSize: 15, color: COLORS.card }]}>
               FILTROS
             </Text>
             <BottomSheet2 ref={sheetRef} />
