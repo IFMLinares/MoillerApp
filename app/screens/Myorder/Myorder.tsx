@@ -61,7 +61,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
   useEffect(() => {
     if (route.params?.order) {
       const newOrder = route.params.order;
-      setOrders((prevOrders) => [newOrder, ...prevOrders]);
+      setOrders((prevOrders) => [newOrder, ...prevOrders]); // Agrega el nuevo pedido al principio
       setFilteredOrders((prevOrders) => [newOrder, ...prevOrders]); // Actualiza también los pedidos filtrados
     }
   }, [route.params?.order]);
@@ -147,8 +147,14 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
         }
         const clienteId = parseInt(storedClienteId, 10); // Convierte a número
         const data = await fetchShoppingCartsApi(clienteId); // Llama a la API con clienteId dinámico
-        setOrders(data); // Almacena los datos en el estado
-        setFilteredOrders(data); // Inicializa los datos filtrados
+  
+        // Ordena los datos por fecha de creación (más reciente primero)
+        const sortedData = data.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+  
+        setOrders(sortedData); // Almacena los datos ordenados en el estado
+        setFilteredOrders(sortedData); // Inicializa los datos filtrados
       } catch (error) {
         console.error("Error al obtener los datos del carrito:", error);
       }
@@ -378,9 +384,9 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                       color: colors.title,
                       marginBottom: 10,
                     }}>
-                    Cantidad pedida:{" "}
+                    Cantidad de articulos:{" "}
                     <Text style={{ fontWeight: "bold", ...FONTS.fontRegular }}>
-                      {order.cliente?.tip_cli || "No disponible"}
+                      {/* {order.cliente?.tip_cli || "No disponible"} */}
                     </Text>
                   </Text>
                 </TouchableOpacity>
