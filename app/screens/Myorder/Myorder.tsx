@@ -19,6 +19,8 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchShoppingCartsApi } from "../../api/shoppingListApi";
+import { useSelector } from "react-redux";
+
 type MyorderScreenProps = StackScreenProps<RootStackParamList, "Myorder">;
 
 const Myorder = ({ navigation, route }: MyorderScreenProps) => {
@@ -28,6 +30,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
   const [activeFilter, setActiveFilter] = useState("all"); // Track active filter
   const [orders, setOrders] = useState([]); // Estado inicial vacío
   const [filteredOrders, setFilteredOrders] = useState(orders);
+  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
 
   const saveOrders = async (newOrders) => {
     try {
@@ -132,20 +135,25 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
       );
     }
   };
-  
+
   // api
   useEffect(() => {
     const fetchShoppingCarts = async () => {
       try {
-        const clienteId = 2084; // Reemplaza con el cliente_id dinámico si es necesario
-        const data = await fetchShoppingCartsApi(clienteId); // Llama a la función de la API
+        const storedClienteId = await AsyncStorage.getItem("clienteId"); // Recupera clienteId de AsyncStorage
+        if (!storedClienteId) {
+          console.error("Cliente ID no encontrado");
+          return;
+        }
+        const clienteId = parseInt(storedClienteId, 10); // Convierte a número
+        const data = await fetchShoppingCartsApi(clienteId); // Llama a la API con clienteId dinámico
         setOrders(data); // Almacena los datos en el estado
         setFilteredOrders(data); // Inicializa los datos filtrados
       } catch (error) {
         console.error("Error al obtener los datos del carrito:", error);
       }
     };
-
+  
     fetchShoppingCarts();
   }, []);
 
