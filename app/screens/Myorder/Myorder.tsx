@@ -18,7 +18,7 @@ import Cardstyle2 from "../../components/Card/Cardstyle2";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { fetchShoppingCartsApi } from "../../api/shoppingListApi";
 type MyorderScreenProps = StackScreenProps<RootStackParamList, "Myorder">;
 
 const Myorder = ({ navigation, route }: MyorderScreenProps) => {
@@ -29,7 +29,14 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
   const [orders, setOrders] = useState([]); // Estado inicial vacío
   const [filteredOrders, setFilteredOrders] = useState(orders);
 
-  // Cargar pedidos al iniciar
+  const saveOrders = async (newOrders) => {
+    try {
+      await AsyncStorage.setItem("orders", JSON.stringify(newOrders));
+    } catch (error) {
+      console.error("Error al guardar los pedidos:", error);
+    }
+  };
+
   useEffect(() => {
     const loadOrders = async () => {
       try {
@@ -47,29 +54,27 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
     loadOrders();
   }, []);
 
-  const saveOrders = async (newOrders) => {
-    try {
-      await AsyncStorage.setItem("orders", JSON.stringify(newOrders));
-    } catch (error) {
-      console.error("Error al guardar los pedidos:", error);
+  // Nuevo useEffect para manejar pedidos recibidos desde la navegación
+  useEffect(() => {
+    if (route.params?.order) {
+      const newOrder = route.params.order;
+      setOrders((prevOrders) => [newOrder, ...prevOrders]);
+      setFilteredOrders((prevOrders) => [newOrder, ...prevOrders]); // Actualiza también los pedidos filtrados
     }
-  };
+  }, [route.params?.order]);
 
-  // Manejar nuevos pedidos o actualizaciones
   useEffect(() => {
     const addOrUpdateOrder = async () => {
       try {
         const storedOrders = await AsyncStorage.getItem("orders");
         const existingOrders = storedOrders ? JSON.parse(storedOrders) : [];
-  
+
         if (route.params?.order) {
-          // Agregar una nueva orden al inicio del estado existente
           const newOrders = [route.params.order, ...existingOrders];
           setOrders(newOrders);
           setFilteredOrders(newOrders);
-          saveOrders(newOrders); // Guardar en AsyncStorage
+          saveOrders(newOrders);
         } else if (route.params?.updatedOrder) {
-          // Actualizar una orden existente
           const updatedOrders = existingOrders.map((order) =>
             order.id === route.params.updatedOrder.id
               ? {
@@ -85,24 +90,64 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
           );
           setOrders(updatedOrders);
           setFilteredOrders(updatedOrders);
-          saveOrders(updatedOrders); // Guardar en AsyncStorage
+          saveOrders(updatedOrders);
         }
       } catch (error) {
         console.error("Error al manejar los pedidos:", error);
       }
     };
-  
+
     addOrUpdateOrder();
   }, [route.params?.order, route.params?.updatedOrder]);
 
   const filterData = (filter: string) => {
     setActiveFilter(filter);
-    if (filter === "all") {
-      setFilteredOrders(orders);
-    } else {
-      setFilteredOrders(orders.filter((order) => order.status === filter));
+  
+    if (filter === "Cotizaciones") {
+      setFilteredOrders(
+        orders.filter(
+          (order) =>
+            order.is_cotizacion === true &&
+            order.is_order === false &&
+            order.is_invoice === false
+        )
+      );
+    } else if (filter === "Órdenes") {
+      setFilteredOrders(
+        orders.filter(
+          (order) =>
+            order.is_order === true &&
+            order.is_cotizacion === true &&
+            order.is_invoice === false
+        )
+      );
+    } else if (filter === "Facturado") {
+      setFilteredOrders(
+        orders.filter(
+          (order) =>
+            order.is_invoice === true &&
+            order.is_cotizacion === true &&
+            order.is_order === true
+        )
+      );
     }
   };
+  
+  // api
+  useEffect(() => {
+    const fetchShoppingCarts = async () => {
+      try {
+        const clienteId = 2084; // Reemplaza con el cliente_id dinámico si es necesario
+        const data = await fetchShoppingCartsApi(clienteId); // Llama a la función de la API
+        setOrders(data); // Almacena los datos en el estado
+        setFilteredOrders(data); // Inicializa los datos filtrados
+      } catch (error) {
+        console.error("Error al obtener los datos del carrito:", error);
+      }
+    };
+
+    fetchShoppingCarts();
+  }, []);
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
@@ -144,7 +189,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
             }}
           />
           <TouchableOpacity
-            onPress={() => filterData("Pendiente")}
+            onPress={() => filterData("Cotizaciones")}
             activeOpacity={0.5}
             style={styles.TopbarCenterLine}>
             <Image
@@ -163,12 +208,12 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                 {
                   fontSize: 15,
                   color:
-                    activeFilter === "Pendiente"
+                    activeFilter === "Cotizaciones"
                       ? COLORS.primary
                       : colors.title,
                 },
               ]}>
-              Pendiente
+              Cotizaciones
             </Text>
           </TouchableOpacity>
           <View
@@ -179,7 +224,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
             }}
           />
           <TouchableOpacity
-            onPress={() => filterData("Completado")}
+            onPress={() => filterData("Órdenes")}
             activeOpacity={0.5}
             style={styles.TopbarCenterLine}>
             <Image
@@ -198,125 +243,144 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                 {
                   fontSize: 15,
                   color:
-                    activeFilter === "Completado"
+                    activeFilter === "Órdenes" ? COLORS.primary : colors.title,
+                },
+              ]}>
+              Órdenes
+            </Text>
+          </TouchableOpacity>
+          <View
+            style={{
+              width: 1,
+              height: 40,
+              backgroundColor: COLORS.primaryLight,
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => filterData("Facturado")}
+            activeOpacity={0.5}
+            style={styles.TopbarCenterLine}>
+            <Image
+              style={{
+                height: 16,
+                width: 16,
+                resizeMode: "contain",
+                tintColor:
+                  activeFilter === "Completado" ? COLORS.primary : colors.title,
+              }}
+              source={IMAGES.savecheck}
+            />
+            <Text
+              style={[
+                FONTS.fontRegular,
+                {
+                  fontSize: 15,
+                  color:
+                    activeFilter === "Facturado"
                       ? COLORS.primary
                       : colors.title,
                 },
               ]}>
-              Completado
+              Facturado
             </Text>
           </TouchableOpacity>
         </View>
       </View>
       <ScrollView>
+        <View
+          style={{
+            marginTop: 10,
+            padding: 15,
+            backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
+          }}>
+          {/* Cuadro blanco con detalles del pedido */}
+          {filteredOrders.map((order, index) => {
+            // Determinar el color según el estado
+            const textColor = order.is_invoice
+              ? COLORS.success // Verde para facturado
+              : order.is_order
+              ? COLORS.blue // Azul para órdenes
+              : COLORS.warning; // Amarillo para cotizaciones
 
-      <View
-        style={{
-          marginTop: 10,
-          padding: 15,
-          backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
-        }}>
-        {/* Cuadro blanco con detalles del pedido */}
-        {filteredOrders.map((order, index) => (
-          <View
-            key={index}
-            style={{
-              backgroundColor: COLORS.white,
-              borderRadius: 10,
-              padding: 15,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              elevation: 5,
-              marginBottom: 15,
-              borderWidth: 1,
-              borderColor:
-                order.status === "Completado" ? COLORS.success : COLORS.warning,
-            }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Pedido", { order })}>
+            return (
               <View
+                key={index}
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 10,
+                  backgroundColor: COLORS.white,
+                  borderRadius: 10,
+                  padding: 15,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  elevation: 5,
+                  marginBottom: 15,
+                  borderWidth: 1,
+                  borderColor: textColor, // Color del borde según el estado
                 }}>
-                <Text
-                  style={{
-                    ...FONTS.fontRegular,
-                    fontSize: 16,
-                    color: colors.title,
-                  }}>
-                  Nro° de orden:{" "}
-                  <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.id}</Text>
-                </Text>
-                <Text
-                  style={{
-                    ...FONTS.fontRegular,
-                    fontSize: 16,
-                    color:
-                      order.status === "Completado"
-                        ? COLORS.success
-                        : COLORS.warning,
-                  }}>
-                  Status:{" "}
-                  <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.status}</Text>
-                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("Pedido", { order })}>
+                  {/* ID del carrito */}
+                  <Text
+                    style={{
+                      ...FONTS.fontRegular,
+                      fontSize: 16,
+                      color: colors.title,
+                    }}>
+                    Nro° de carrito:{" "}
+                    <Text style={{ fontWeight: "bold", ...FONTS.fontRegular }}>
+                      {order.id}
+                    </Text>
+                  </Text>
+
+                  {/* Fecha de creación */}
+                  <Text
+                    style={{
+                      ...FONTS.fontRegular,
+                      fontSize: 16,
+                      color: colors.title,
+                      marginBottom: 10,
+                    }}>
+                    Fecha de creación:{" "}
+                    <Text style={{ fontWeight: "bold", ...FONTS.fontRegular }}>
+                      {order.created_at}
+                    </Text>
+                  </Text>
+
+                  {/* Total */}
+                  <Text
+                    style={{
+                      ...FONTS.fontRegular,
+                      fontSize: 16,
+                      color: textColor, // Color del texto según el estado
+                      marginBottom: 10,
+                    }}>
+                    Total a pagar:{" "}
+                    <Text style={{ fontWeight: "bold", ...FONTS.fontRegular }}>
+                      {parseFloat(order.total).toFixed(2)}€{" "}
+                      {/* Formatear a dos decimales */}
+                    </Text>
+                  </Text>
+
+                  {/* Cantidad pedida (tip_cli) */}
+                  <Text
+                    style={{
+                      ...FONTS.fontRegular,
+                      fontSize: 16,
+                      color: colors.title,
+                      marginBottom: 10,
+                    }}>
+                    Cantidad pedida:{" "}
+                    <Text style={{ fontWeight: "bold", ...FONTS.fontRegular }}>
+                      {order.cliente?.tip_cli || "No disponible"}
+                    </Text>
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <Text
-                style={{
-                  ...FONTS.fontRegular,
-                  fontSize: 16,
-                  color: colors.title,
-                  marginBottom: 10,
-                }}>
-                Cantidad de productos:{" "}
-                <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.productCount}</Text>
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  marginBottom: 10,
-                }}>
-                <Text
-                  style={{
-                    ...FONTS.fontRegular,
-                    fontSize: 16,
-                    color: colors.title,
-                  }}>
-                  Total:{" "}
-                  <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.total}€</Text>
-                </Text>
-                {/* <Text
-                  style={{
-                    ...FONTS.fontRegular,
-                    fontSize: 16,
-                    color: COLORS.success,
-                  }}>
-                  Abonado:{" "}
-                  <Text style={{ fontWeight: "bold",...FONTS.fontRegular, }}>{order.paid}€</Text>
-                </Text>
-              <Text
-                style={{
-                  ...FONTS.fontRegular,
-                  fontSize: 16,
-                  color: COLORS.warning,
-                }}>
-                Restante:{" "}
-                <Text style={{ fontWeight: "bold" ,...FONTS.fontRegular,}}>
-                  {(order.total - order.paid).toFixed(2)}€
-                </Text>
-              </Text> */}
-              </View>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
+            );
+          })}
+        </View>
       </ScrollView>
-
     </View>
   );
 };
@@ -326,7 +390,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    width: "40%",
+    width: "30%",
     justifyContent: "center",
   },
 });

@@ -9,7 +9,10 @@ export const closeDrawer = () => {
     };
 };
 
-export const setClienteId = (clienteId) => ({
-    type: "SET_CLIENTE_ID",
-    payload: clienteId,
-  });
+export const setClienteId = (clienteId) => {
+    console.log("Cliente ID en la acción:", clienteId); // Verifica el valor aquí
+    return {
+      type: "SET_CLIENTE_ID",
+      payload: clienteId,
+    };
+  };

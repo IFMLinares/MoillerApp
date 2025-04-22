@@ -21,7 +21,8 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch } from "react-redux";
 import { openDrawer } from "../../redux/actions/drawerAction";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
+import { setClienteId } from "../../redux/actions/drawerAction";
 
 const getListwithiconData = (navigation: any, setShowModal: any) => [
   {
@@ -104,13 +105,31 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
     getUsername();
   }, []);
 
+    // redux
+    useEffect(() => {
+      const restoreClienteId = async () => {
+        try {
+          const storedClienteId = await AsyncStorage.getItem("clienteId");
+          if (storedClienteId) {
+            console.log("Cliente ID restaurado desde AsyncStorage:", storedClienteId);
+            dispatch(setClienteId(parseInt(storedClienteId, 10))); // Restaura el clienteId en Redux
+          }
+        } catch (error) {
+          console.error("Error al restaurar el clienteId:", error);
+        }
+      };
+  
+      restoreClienteId();
+    }, []);
+
   const handleLogout = async () => {
-    await AsyncStorage.clear(); // Limpia los datos de sesión
-    setShowModal(false); // Oculta el modal
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "SingIn" }], // Navega a la pantalla de Login
-    });
+    try {
+      await AsyncStorage.removeItem("clienteId"); // Elimina el clienteId de AsyncStorage
+      dispatch(setClienteId(null)); // Limpia el clienteId en Redux
+      navigation.navigate("SingIn");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   };
 
   // Pasa `setShowModal` como argumento a `getListwithiconData`

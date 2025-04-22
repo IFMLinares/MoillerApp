@@ -38,6 +38,8 @@ type Props = {
   onPress4?: (e: any) => void;
   hideActions?: boolean; // Nueva propiedad para ocultar botones
   //hascolor:any
+  quantity: string; // Nueva propiedad para la cantidad
+  subtotal: string; // Nueva propiedad para el subtotal
 };
 
 const Cardstyle3 = ({

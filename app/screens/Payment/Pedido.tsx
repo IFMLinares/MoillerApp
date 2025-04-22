@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -22,13 +22,14 @@ import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { Ionicons } from "@expo/vector-icons";
 import Cardstyle3 from "../../components/Card/Cardstyle3";
 import { useDispatch, useSelector } from "react-redux";
-
+import { fetchShoppingCartDetailsApi } from "../../api/shoppingApi";
 import * as ImagePicker from "expo-image-picker"; // Para Expo
 
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Pedido">;
 
 const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
   const { order } = route.params; // Recibir los datos del pedido
+  const [cartDetails, setCartDetails] = useState(null); // Estado para almacenar los detalles del carrito
   const cart = useSelector((state: any) => state.cart.cart);
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -39,10 +40,36 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
   const [selectedImage, setSelectedImage] = useState(null); // Estado para almacenar la imagen seleccionada
   const [amountPaid, setAmountPaid] = useState(0); // Estado para el monto abonado
 
+  useEffect(() => {
+    const fetchCartDetails = async () => {
+      try {
+        const data = await fetchShoppingCartDetailsApi(order.id); // Llama a la API con el cart_id
+        setCartDetails(data); // Almacena los datos en el estado
+      } catch (error) {
+        console.error("Error al obtener los detalles del carrito:", error);
+      }
+    };
+
+    fetchCartDetails();
+  }, [order.id]);
+
+  if (!cartDetails) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: colors.title, fontSize: 16 }}>Cargando...</Text>
+      </View>
+    );
+  }
+
   // Calcular el monto total de los productos
   const calculateTotal = () => {
-    return order.products
-      .reduce((total: number, product: any) => total + product.price * product.quantity, 0)
+    if (!cartDetails || !cartDetails.items) return 0; // Validar que los datos existan
+    return cartDetails.items
+      .reduce(
+        (total: number, item: any) =>
+          total + parseFloat(item.co_precio) * parseFloat(item.cantidad),
+        0
+      )
       .toFixed(2);
   };
 
@@ -53,7 +80,6 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
     const numericValue = parseFloat(value) || 0; // Convertir el valor ingresado a número
     setAmountPaid(numericValue);
   };
-
 
   // Función para abrir la cámara
   const handleTakePhoto = async () => {
@@ -93,7 +119,6 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
       setSelectedImage(result.assets[0].uri); // Guarda la URI de la imagen seleccionada
     }
   };
- 
 
   const handleConfirmOrder = () => {
     setIsConfirmationModalVisible(false);
@@ -116,34 +141,32 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
   const handleCancelOrder = () => {
     setIsConfirmationModalVisible(false);
   };
- 
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header title="Todos los productos" leftIcon="back" titleRight />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
- 
         <View>
           <ScrollView
             contentContainerStyle={{ flexGrow: 1 }}
             showsVerticalScrollIndicator={true}>
             <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
-            {order.products.map((product: any, index: number) => (
-            <View key={index} style={{ marginBottom: 10 }}>
-              <Cardstyle3
-                title={product.name}
-                price={product.price}
-                discount={product.discount}
-                delevery={product.delevery}
-                image={{ uri: `http://10.0.2.2:8000${product.highImage}` }}
-                offer={product.offer}
-                brand={product.brand}
-                marca={product.code}
-                modelo={product.line}
-                hideActions={true}
-              />
-            </View>
-          ))}
+              {cartDetails.items.map((item: any, index: number) => (
+                <View key={index} style={{ marginBottom: 10 }}>
+                  <Cardstyle3
+                    title={item.articulo.art_des} // Nombre del producto
+                    price={parseFloat(item.co_precio).toFixed(2)} // Precio unitario
+                    quantity={parseFloat(item.cantidad).toFixed(2)} // Cantidad
+                    subtotal={parseFloat(item.subtotal).toFixed(2)} // Subtotal
+                    image={{
+                      uri: `http://10.0.2.2:8000${item.articulo.images[0]?.image}`, // Imagen del producto
+                    }}
+                    marca={item.articulo.co_cat.cat_des} // Marca
+                    modelo={item.articulo.modelo} // Modelo
+                    hideActions={true} // Ocultar acciones
+                  />
+                </View>
+              ))}
             </View>
           </ScrollView>
         </View>
@@ -229,7 +252,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
               flexDirection: "row",
               justifyContent: "space-around",
               alignItems: "center",
-              marginTop: 15, 
+              marginTop: 15,
             }}>
             <Text
               style={{
@@ -267,7 +290,6 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
               marginTop: 15,
             },
           ]}>
- 
           <View style={{ marginTop: 20 }}>
             <Text
               style={{
@@ -296,7 +318,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
             />
           </View>
         </View>
-        {/* <View
+        <View
           style={[
             GlobalStyleSheet.container,
             {
@@ -355,62 +377,10 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
                 {totalAmount.toFixed(2)}€
               </Text>
             </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 5,
-                marginTop: 15,
-              }}>
-              <Text
-                style={{
-                  ...FONTS.fontRegular,
-                  fontSize: 14,
-                  color: colors.title,
-                }}>
-                Monto abonado:
-              </Text>
-              <Text
-                style={{
-                  ...FONTS.fontMediumItalic,
-                  fontSize: 14,
-                  color: COLORS.success,
-                  fontWeight: "bold",
-                }}>
-                {amountPaid.toFixed(2)}€
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 5,
-                marginTop: 15,
-              }}>
-              <Text
-                style={{
-                  ...FONTS.fontRegular,
-                  fontSize: 14,
-                  color: colors.title,
-                }}>
-                Monto restante:
-              </Text>
-              <Text
-                style={{
-                  ...FONTS.fontMediumItalic,
-                  fontSize: 14,
-                  color: remainingAmount <= 0 ? COLORS.success : COLORS.warning,
-                  fontWeight: "bold",
-                }}>
-                {remainingAmount.toFixed(2)}€
-              </Text>
-            </View>
+ 
+ 
           </View>
-        </View> */}
+        </View>
       </ScrollView>
       <View
         style={[

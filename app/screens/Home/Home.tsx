@@ -19,6 +19,8 @@ import Cardstyle1 from "../../components/Card/Cardstyle1";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
+import { setClienteId } from "../../redux/actions/drawerAction";
 import { openDrawer } from "../../redux/actions/drawerAction";
 import { LinearGradient } from "expo-linear-gradient";
 import BottomSheet2 from "../Components/BottomSheet2";
@@ -90,11 +92,27 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true); 
+  const [hasMore, setHasMore] = useState(true);  
 
   const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
   console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
   
+  // redux
+  useEffect(() => {
+    const restoreClienteId = async () => {
+      try {
+        const storedClienteId = await AsyncStorage.getItem("clienteId");
+        if (storedClienteId) {
+          console.log("Cliente ID restaurado desde AsyncStorage:", storedClienteId);
+          dispatch(setClienteId(parseInt(storedClienteId, 10))); // Restaura el clienteId en Redux
+        }
+      } catch (error) {
+        console.error("Error al restaurar el clienteId:", error);
+      }
+    };
+
+    restoreClienteId();
+  }, []);
   // api
   useEffect(() => {
     const getArticles = async () => {

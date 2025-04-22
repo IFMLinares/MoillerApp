@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -19,66 +19,72 @@ import Button from "../../components/Button/Button";
 import { clearCart } from "../../redux/reducer/cartReducer";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 import Cardstyle2 from "../../components/Card/Cardstyle2";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
+import { convertCartToCotizacion } from "../../api/checkoutCotizacionApi";
 
-const checkoutData = [
-  {
-    image: IMAGES.map,
-    title: "Dirección de entrega",
-    text: " ",
-    navigate: "DeliveryAddress",
-  },
-  {
-    image: IMAGES.card2,
-    title: "Método de pago",
-    text: " ",
-    navigate: "Payment",
-  },
-];
-
- 
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Checkout">;
 
-const Checkout = ({ navigation }: CheckoutScreenProps) => {
+const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
+  const { clienteId, cartId } = route.params; // Recibe el cliente_id y el cart_id
   const cart = useSelector((state: any) => state.cart.cart);
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
-  const [isModalVisible, setIsModalVisible] = useState(false); 
-  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isConfirmationModalVisible, setIsConfirmationModalVisible] =
+    useState(false);
   const dispatch = useDispatch();
+  
+  console.log("Cliente ID recibido en Checkout:", clienteId);
+  console.log("Cart ID recibido en Checkout:", cartId);
 
   const navigateToProductDetails = (product) => {
-    navigation.navigate('ProductsDetails', { product });
+    navigation.navigate("ProductsDetails", { product });
   };
-  
-  const handleConfirmOrder = () => {
+
+  const handleConfirmOrder = async () => {
     setIsConfirmationModalVisible(false);
     setIsModalVisible(true);
   
-    const totalPrice = calculateTotal(); // Precio total
-    const productCount = cart.length; // Cantidad de productos
+    try {
+      const totalPrice = calculateTotal(); // Precio total
+      const productCount = cart.length; // Cantidad de productos
   
-    setTimeout(() => {
+      if (!clienteId || !cartId) {
+        throw new Error("El ID del cliente o del carrito no está definido.");
+      }
+  
+      const response = await convertCartToCotizacion(clienteId, cartId);
+      console.log("Respuesta de la API:", response);
+  
+      const newOrder = {
+        id: response.id,
+        clienteId,
+        cartId,
+        total: totalPrice,
+        productCount,
+        status: "Pendiente",
+      };
+  
+      setTimeout(() => {
+        setIsModalVisible(false);
+        navigation.navigate("Myorder", { order: newOrder });
+        dispatch(clearCart());
+      }, 2000);
+    } catch (error) {
+      console.error("Error al confirmar el pedido:", error.response?.data || error.message);
+  
+      // Manejo de errores específicos
+      if (error.response?.data?.message === "Articulo no posee unidad.") {
+        alert("Uno de los artículos en el carrito no tiene una unidad asociada. Por favor, verifica los datos.");
+      } else {
+        alert("Ocurrió un error al confirmar el pedido. Por favor, intenta nuevamente.");
+      }
+  
       setIsModalVisible(false);
-  
-      // Navegar a "Mis Órdenes" con los datos del pedido
-      navigation.navigate("Myorder", {
-        order: {
-          id: `#${Math.floor(Math.random() * 100000)}`, // Generar un ID aleatorio
-          status: "Pendiente",
-          total: totalPrice,
-          paid: 0, // Asumimos que no está pagado aún
-          productCount: productCount,
-          products: cart, // Pasar los productos comprados
-        },
-      });
-  
-      // Vaciar el carrito
-      dispatch(clearCart());
-    }, 2000);
+    }
   };
 
   const handleOpenConfirmationModal = () => {
@@ -89,30 +95,30 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
     setIsConfirmationModalVisible(false);
   };
 
-    // Función para calcular el total
-    const calculateTotal = () => {
-      return cart
-        .reduce((total: number, item: any) => {
-          const price = parseFloat(item.price.replace(/[^0-9.-]+/g, "").replace(",", "."));
-          return total + price * item.quantity; // Multiplica el precio por la cantidad
-        }, 0)
-        .toFixed(2);
-    };
-  
-    const removeItemFromCart = (product) => {
-      dispatch(removeFromCart(product));
-    };
+  // Función para calcular el total
+  const calculateTotal = () => {
+    return cart
+      .reduce((total: number, item: any) => {
+        const price = parseFloat(
+          item.price.replace(/[^0-9.-]+/g, "").replace(",", ".")
+        );
+        return total + price * item.quantity; // Multiplica el precio por la cantidad
+      }, 0)
+      .toFixed(2);
+  };
+
+  const removeItemFromCart = (product) => {
+    dispatch(removeFromCart(product));
+  };
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header title="Verificar Pedido" leftIcon="back" titleRight />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-
-        <View  >
+        <View>
           <ScrollView
             contentContainerStyle={{ flexGrow: 1 }}
-            showsVerticalScrollIndicator={true}
-          >
+            showsVerticalScrollIndicator={true}>
             <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
               {cart.map((data: any, index: any) => {
                 return (
@@ -149,7 +155,6 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
               marginTop: 15,
             },
           ]}>
- 
           <View style={{ marginTop: 20 }}>
             <Text
               style={{
@@ -232,8 +237,8 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                 }}>
                 {calculateTotal()}€
               </Text>
-            </View> 
-            
+            </View>
+
             <View
               style={{
                 borderTopWidth: 1,
@@ -256,12 +261,12 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
               <Text
                 style={[
                   FONTS.fontMediumItalic,
-                  { fontSize: 16, color: COLORS.success, fontWeight: "bold", },
+                  { fontSize: 16, color: COLORS.success, fontWeight: "bold" },
                 ]}>
                 {calculateTotal()}€
               </Text>
             </View>
- 
+
             <View
               style={{
                 borderTopWidth: 1,
@@ -284,7 +289,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
               <Text
                 style={[
                   FONTS.fontMediumItalic,
-                  { fontSize: 16, color: COLORS.success, fontWeight: "bold", },
+                  { fontSize: 16, color: COLORS.success, fontWeight: "bold" },
                 ]}>
                 {calculateTotal()}€
               </Text>
@@ -296,8 +301,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
         style={[
           GlobalStyleSheet.container,
           { paddingHorizontal: 0, paddingBottom: 0 },
-        ]}
-      >
+        ]}>
         <View
           style={{
             height: 88,
@@ -305,8 +309,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
             backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
             justifyContent: "center",
             paddingHorizontal: 15,
-          }}
-        >
+          }}>
           <Button
             title="CONFIRMAR PEDIDO"
             color={COLORS.primary}
@@ -315,22 +318,20 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
           />
         </View>
       </View>
-      
-{/* Modal de confirmación */}
-<Modal
+
+      {/* Modal de confirmación */}
+      <Modal
         visible={isConfirmationModalVisible}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setIsConfirmationModalVisible(false)}
-      >
+        onRequestClose={() => setIsConfirmationModalVisible(false)}>
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "rgba(0,0,0,0.5)",
-          }}
-        >
+          }}>
           <View
             style={{
               width: 300,
@@ -338,19 +339,22 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
               backgroundColor: colors.card,
               borderRadius: 10,
               alignItems: "center",
-            }}
-          >
+            }}>
             <Text
               style={{
                 ...FONTS.fontMedium,
                 fontSize: 18,
                 color: colors.title,
                 marginBottom: 20,
-              }}
-            >
+              }}>
               ¿Estás seguro de realizar el pedido?
             </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
               <TouchableOpacity
                 style={{
                   backgroundColor: "green",
@@ -360,9 +364,13 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                   marginRight: 5,
                   alignItems: "center",
                 }}
-                onPress={handleConfirmOrder}
-              >
-                <Text style={{ color: COLORS.white, fontSize: 16, ...FONTS.fontMedium }}>
+                onPress={handleConfirmOrder}>
+                <Text
+                  style={{
+                    color: COLORS.white,
+                    fontSize: 16,
+                    ...FONTS.fontMedium,
+                  }}>
                   Aceptar
                 </Text>
               </TouchableOpacity>
@@ -375,9 +383,13 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                   marginLeft: 5,
                   alignItems: "center",
                 }}
-                onPress={handleCancelOrder}
-              >
-                <Text style={{ color: COLORS.white, fontSize: 16, ...FONTS.fontMedium }}>
+                onPress={handleCancelOrder}>
+                <Text
+                  style={{
+                    color: COLORS.white,
+                    fontSize: 16,
+                    ...FONTS.fontMedium,
+                  }}>
                   Cancelar
                 </Text>
               </TouchableOpacity>
@@ -391,16 +403,14 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
         visible={isModalVisible}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setIsModalVisible(false)}
-      >
+        onRequestClose={() => setIsModalVisible(false)}>
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "rgba(0,0,0,0.5)",
-          }}
-        >
+          }}>
           <View
             style={{
               width: 300,
@@ -408,8 +418,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
               backgroundColor: colors.card,
               borderRadius: 10,
               alignItems: "center",
-            }}
-          >
+            }}>
             <Ionicons name="checkmark-circle" size={80} color="green" />
             <Text
               style={{
@@ -417,8 +426,7 @@ const Checkout = ({ navigation }: CheckoutScreenProps) => {
                 fontSize: 18,
                 color: colors.title,
                 marginVertical: 20,
-              }}
-            >
+              }}>
               ¡Pedido realizado exitosamente!
             </Text>
           </View>

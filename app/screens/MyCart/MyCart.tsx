@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import { View, Text, ScrollView, Image } from "react-native";
 import Header from "../../layout/Header";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
@@ -12,8 +12,9 @@ import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
 import { Feather } from "@expo/vector-icons"; 
-import { getCartItemsApi } from "../../api/addItemApi"; // Importa la nueva función
+import { getCartItemsApi } from "../../api/cartApi"; // Importa la nueva función
 import { deleteItemFromCartApi } from "../../api/deleteItemApi"; // Importa la función correctamente
+
 type MyCartScreenProps = StackScreenProps<RootStackParamList, "Mi Carrito">;
 
 const MyCart = ({ navigation }: MyCartScreenProps) => {
@@ -21,7 +22,22 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
-  const clienteId = 1; // Reemplaza con el clienteId dinámico si es necesario
+  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
+  const [cartId, setCartId] = useState<number | null>(null); // Estado para almacenar el cart_id
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const cartData = await getCartItemsApi(clienteId);
+        setCartId(cartData.id); // Guarda el cart_id en el estado
+        console.log("Cart ID obtenido:", cartData.id);
+      } catch (error) {
+        console.error("Error al obtener los productos del carrito:", error);
+      }
+    };
+  
+    fetchCartItems();
+  }, [clienteId]);
 
   const navigateToProductDetails = (product) => {
     navigation.navigate("ProductsDetails", { product });
@@ -168,7 +184,13 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
             title="REALIZAR PEDIDO"
             color={COLORS.primary}
             text={COLORS.white}
-            onPress={() => navigation.navigate("Checkout")}
+            onPress={() => {
+              if (cartId) {
+                navigation.navigate("Checkout", { clienteId, cartId }); // Pasa el cartId
+              } else {
+                console.error("Cart ID no está definido.");
+              }
+            }}
           />
         </View>
       ) : (

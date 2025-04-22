@@ -26,6 +26,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios"; // Asegúrate de tener axios instalado
 import { authLogin, refreshAccessToken } from "../../api/authLogin"; // Importa las funciones necesarias
+import { useDispatch } from "react-redux";
+import { setClienteId } from "../../redux/actions/drawerAction";
 
 type SingInScreenProps = StackScreenProps<RootStackParamList, "SingIn">;
 
@@ -64,16 +66,27 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
     checkAuthentication();
   }, []);
 
+  const dispatch = useDispatch(); // Inicializa el dispatch
+
   const handleLogin = async () => {
     setLoading(true);
     setErrorMessage("");
     try {
       const data = await authLogin(username, password);
+      console.log("Respuesta de la API:", data); // Verifica que `cliente_id` sea correcto
       setLoading(false);
       if (data.access) {
         await AsyncStorage.setItem("username", username);
         await AsyncStorage.setItem("accessToken", data.access);
         await AsyncStorage.setItem("refreshToken", data.refresh);
+  
+        // Guarda el cliente_id en AsyncStorage
+        await AsyncStorage.setItem("clienteId", data.cliente_id.toString());
+  
+        // Despacha el cliente_id al estado global
+        console.log("Cliente ID antes de despachar:", data.cliente_id); // Verifica el valor aquí
+        dispatch(setClienteId(data.cliente_id));
+  
         navigation.navigate("DrawerNavigation", { screen: "Home" });
       } else {
         setErrorMessage("Usuario o contraseña incorrectos");
