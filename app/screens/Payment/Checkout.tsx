@@ -24,7 +24,7 @@ import Cardstyle2 from "../../components/Card/Cardstyle2";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
 import { convertCartToCotizacion } from "../../api/checkoutCotizacionApi";
-
+import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Checkout">;
 
 const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
@@ -128,7 +128,7 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
                       price={data.price}
                       discount={data.discount}
                       delevery={data.delevery}
-                      image={{ uri: `http://10.0.2.2:8000${data.highImage}` }} // Usa la URL de la imagen de baja calidad
+                      image={{ uri: `${BASE_URL}${data.highImage}` }} // Usa la URL de la imagen de baja calidad
                       offer={data.offer}
                       brand={data.brand}
                       marca={data.code}

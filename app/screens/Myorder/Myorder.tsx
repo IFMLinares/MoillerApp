@@ -341,7 +341,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                       fontSize: 16,
                       color: colors.title,
                     }}>
-                    Nro° de carrito:{" "}
+                    Id del pedido:{" "}
                     <Text style={{ fontWeight: "bold", ...FONTS.fontRegular }}>
                       {order.id}
                     </Text>

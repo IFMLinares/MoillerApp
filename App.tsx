@@ -8,11 +8,12 @@ import { Provider } from 'react-redux'
 import store from './app/redux/store';
 import React, { useEffect } from "react"; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from "react-native-toast-message";
 
 export default function App() { 
   const theme = useTheme();
   const { colors } : {colors : any} = theme;
-
+ 
 
   const [loaded] = useFonts({
     RalewayBold: require('./app/assets/fonts/Raleway-Bold.ttf'),
@@ -26,9 +27,7 @@ export default function App() {
     RalewayExtraBold: require('./app/assets/fonts/Raleway-ExtraBold.ttf'),
   });  
 
-  if(!loaded){
-    return null;
-  }
+ 
   
   // useEffect(() => {
   //   const clearStorage = async () => {
@@ -42,6 +41,11 @@ export default function App() {
 
   //   clearStorage();
   // }, []);
+  
+    // Mueve la lógica condicional aquí, después de que todos los hooks hayan sido llamados
+    if (!loaded) {
+      return null;
+    }
   return (
     <SafeAreaProvider>
         <SafeAreaView
@@ -53,6 +57,7 @@ export default function App() {
             <StatusBar style="dark" />
             <Provider store={store}>
               <Route/>
+              <Toast/>
             </Provider>
         </SafeAreaView>
     </SafeAreaProvider>

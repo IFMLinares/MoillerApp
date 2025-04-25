@@ -14,6 +14,7 @@ import { removeFromCart } from "../../redux/reducer/cartReducer";
 import { Feather } from "@expo/vector-icons";
 import { getCartItemsApi } from "../../api/cartApi"; // Importa la nueva función
 import { deleteItemFromCartApi } from "../../api/deleteItemApi"; // Importa la función correctamente
+import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
 type MyCartScreenProps = StackScreenProps<RootStackParamList, "Mi Carrito">;
 
@@ -71,9 +72,11 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
     return cart
       .reduce((total: number, item: any) => {
         const price = parseFloat(
-          item.price.replace(/[^0-9.-]+/g, "").replace(",", ".")
+          (typeof item.price === "string" ? item.price : "0")
+            .replace(/[^0-9.-]+/g, "")
+            .replace(",", ".")
         );
-        return total + price * item.quantity; // Multiplica el precio por la cantidad
+        return total + price * (item.quantity || 0); // Multiplica el precio por la cantidad
       }, 0)
       .toFixed(2);
   };
@@ -93,10 +96,17 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
         showsVerticalScrollIndicator={false}>
         <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
           {cart.map((data: any, index: any) => {
-            const totalPricePerProduct =
-              parseFloat(
-                data.price.replace(/[^0-9.-]+/g, "").replace(",", ".")
-              ) * data.quantity;
+  if (!data.price || !data.quantity) {
+    console.warn(`Producto con datos incompletos: ${JSON.stringify(data)}`);
+    return null; // No renderiza productos con datos incompletos
+  }
+
+  const totalPricePerProduct =
+  parseFloat(
+    (typeof data.price === "string" ? data.price : data.price?.toString() || "0")
+      .replace(/[^0-9.-]+/g, "")
+      .replace(",", ".")
+  ) * (data.quantity || 0);
 
             return (
               <View key={index} style={{ marginBottom: 10 }}>
@@ -105,7 +115,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
                   price={data.price}
                   discount={data.discount}
                   delevery={data.delevery}
-                  image={{ uri: `http://10.0.2.2:8000${data.highImage}` }} // Usa la URL de la imagen de baja calidad
+                  image={{ uri: `${BASE_URL}${data.highImage}` }} // Usa la URL de la imagen de baja calidad
                   offer={data.offer}
                   brand={data.brand}
                   marca={data.code}

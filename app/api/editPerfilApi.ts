@@ -6,13 +6,14 @@ import { BASE_URL } from './globalUrlApi'; // Importar la URL base
 export const getUserInfo = async () => {
   try {
     let token = await AsyncStorage.getItem('accessToken');
-    console.log('Token de acceso:', token); // Verificar el token
+    console.log('Token de acceso inicial:', token); // Verificar el token
 
+    // Si no hay token o el token ha expirado, intenta refrescarlo
     if (!token) {
-      // Intentar refrescar el token si no está disponible
       token = await refreshAccessToken();
     }
 
+    // Realiza la solicitud con el token válido
     const response = await axios.get(`${BASE_URL}api/users/user/`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -24,9 +25,10 @@ export const getUserInfo = async () => {
   } catch (error: any) {
     console.error('Error al obtener la información del usuario:', error.message);
 
-    // Si el error es de autenticación, intentar refrescar el token
+    // Si el error es de autenticación (401), intenta refrescar el token
     if (error.response && error.response.status === 401) {
       try {
+        console.log('Intentando refrescar el token...');
         const newToken = await refreshAccessToken();
         const retryResponse = await axios.get(`${BASE_URL}api/users/user/`, {
           headers: {

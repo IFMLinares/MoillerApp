@@ -13,14 +13,14 @@ import {
 type Props = {
   id: string;
   title: string;
-  color: any;
+  // color: any;
   //style ?: object;
   //rounded ?: any;
   //size ?: string;
   price: string;
   modelo: string;
   image?: any;
-  offer: string;
+  // offer: string;
   hascolor?: any;
   brand?: any;
   discount?: any;
@@ -38,8 +38,8 @@ const Cardstyle1 = ({
   price,
   modelo,
   image,
-  offer,
-  color,
+  // offer,
+  // color,
   hascolor,
   onPress,
   brand,

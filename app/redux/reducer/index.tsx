@@ -11,4 +11,5 @@ const rootReducer = combineReducers({
     wishList : wishListReducer
 });
 
+export type RootState = ReturnType<typeof rootReducer>;
 export default rootReducer;

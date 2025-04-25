@@ -36,6 +36,7 @@ import { fetchArticles } from "../../api/listSubCategoryApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
+import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
  
 
@@ -51,6 +52,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
+  const [sortCriteria, setSortCriteria] = useState("De la A a la Z"); // Estado para el criterio de ordenación
 
   const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
   console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
@@ -72,7 +74,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         } else {
           // Si no están en caché, obtenerlos de la API
           const fetchedArticles = await fetchArticles(subcategoryName);
-
+          fetchedArticles.sort((a, b) => a.name.localeCompare(b.name)); // Orden inicial
           // Guardar en AsyncStorage para futuras solicitudes
           await AsyncStorage.setItem(
             `products_${subcategoryId}`,
@@ -91,7 +93,29 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
     loadArticles();
   }, [subcategoryId, subcategoryName]);
 
- 
+   // Función para ordenar los artículos
+   const sortArticles = (criteria) => {
+    let sortedArticles = [...articles];
+    if (criteria === "De la A a la Z") {
+      sortedArticles.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (criteria === "De la Z a la A") {
+      sortedArticles.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (criteria === "Precio: menor a mayor") {
+      sortedArticles.sort((a, b) => a.price - b.price);
+    } else if (criteria === "Precio: mayor a menor") {
+      sortedArticles.sort((a, b) => b.price - a.price);
+    } else if (criteria === "Lo más nuevo primero") {
+      sortedArticles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    setArticles(sortedArticles);
+  };
+
+  // Manejar el cambio de criterio de ordenación
+  const handleSortChange = (criteria) => {
+    setSortCriteria(criteria);
+    sortArticles(criteria);
+  };
+
   // flatlist card1
   const renderItem = ({ item }) => (
     <View
@@ -106,7 +130,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
       <Cardstyle1
         id={item.id}
         title={item.name}
-        image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
+        image={{ uri: `${BASE_URL}${item.highImage}` }}
         price={item.price}
         modelo={item.code}
         borderTop
@@ -134,7 +158,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         title={item.name}
         price={item.price}
         marca={item.code}
-        image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
+        image={{ uri: `${BASE_URL}${item.highImage}` }}
         removebottom
         onPress={() =>
           navigation.navigate("ProductsDetails", {
@@ -324,7 +348,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
           />
         )}
       </View>
-      <BottomSheet2 ref={sheetRef} />
+      <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />
       <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>
   );

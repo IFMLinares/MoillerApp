@@ -14,7 +14,7 @@ type Props = {
    height ?: string,
 }
 
-const BottomSheet2 = forwardRef((props, ref) => {
+const BottomSheet2 = forwardRef(({ onSortChange }: { onSortChange: (criteria: string) => void }, ref) => {
     const {colors} : {colors : any} = useTheme();
     const rbsheetRef = useRef<any>();
     const [sheetType, setSheetType ] = useState<any>('');
@@ -58,7 +58,7 @@ const BottomSheet2 = forwardRef((props, ref) => {
                 <GenderSheet genderRef={rbsheetRef}/>
             }
             {(sheetType === "short") &&
-                <ShortSheet ShortRef={rbsheetRef}/>
+                <ShortSheet ShortRef={rbsheetRef} onSortChange={onSortChange} />
             }
             {(sheetType === "notification") &&
                 <NotificationSheet2 moresheet2={rbsheetRef}/>
@@ -78,15 +78,15 @@ const BottomSheet2 = forwardRef((props, ref) => {
 });
 
 
-const ShortSheet = forwardRef(({ ShortRef } : { ShortRef : any}, ref) => {
-    return(
-        <View>
-            <ShortSheet2
-                shortRef={ShortRef}
-            />
-        </View>
-    )
-});
+const ShortSheet = forwardRef(
+    ({ ShortRef, onSortChange }: { ShortRef: any; onSortChange: (criteria: string) => void }, ref) => {
+        return (
+            <View>
+                <ShortSheet2 shortRef={ShortRef} onSortChange={onSortChange} />
+            </View>
+        );
+    }
+);
 
 const GenderSheet = forwardRef(({ genderRef } : { genderRef : any}, ref) => {
     return(

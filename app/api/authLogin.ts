@@ -5,15 +5,18 @@ import { BASE_URL } from './globalUrlApi'; // Importar la URL base
 // Función para iniciar sesión
 export const authLogin = async (username: string, password: string) => {
   try {
+    console.log('Iniciando sesión con:', username, password);
     const response = await axios.post(`${BASE_URL}api/users/login/`, {
       username,
       password
     });
+    console.log('Respuesta del servidor:', response.data);
     const { access, refresh } = response.data;
     await AsyncStorage.setItem('accessToken', access); // Guardar el token de acceso
     await AsyncStorage.setItem('refreshToken', refresh); // Guardar el token de actualización
     return response.data;
   } catch (error) {
+    console.error('Error al iniciar sesión:', error.response?.data || error.message);
     throw new Error("Error al iniciar sesión. Por favor, inténtelo de nuevo.");
   }
 };
@@ -26,7 +29,7 @@ export const refreshAccessToken = async () => {
       throw new Error('No se encontró el token de actualización.');
     }
 
-    const response = await axios.post('http://10.0.2.2:8000/api/users/token/refresh/', {
+    const response = await axios.post(`${BASE_URL}api/users/token/refresh/`, {
       refresh: refreshToken,
     });
 

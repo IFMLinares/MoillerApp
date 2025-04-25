@@ -21,10 +21,8 @@ import Cardstyle1 from "../../components/Card/Cardstyle1";
 import Cardstyle2 from "../../components/Card/Cardstyle2";
 import BottomSheet2 from "../Components/BottomSheet2";
 import Header from "../../layout/Header";
-import { addTowishList } from "../../redux/reducer/wishListReducer";
 import { useDispatch, useSelector } from "react-redux";
-import data from "../../data/data.json";
-import FontAwesome from "react-native-vector-icons/FontAwesome6";
+import { RootState } from "../../redux/reducer";
 import Toast from "react-native-toast-message";
 import { addToCart } from "../../redux/reducer/cartReducer";
 import { Dimensions } from "react-native";
@@ -37,9 +35,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
 
- 
+import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
 type ProductsScreenProps = StackScreenProps<RootStackParamList, "Catalogo">;
+
+// Define el tipo SortCriteria
+type SortCriteria = string;
 
 const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
   const { subcategoryName } = route.params;
@@ -47,56 +48,85 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
   const theme = useTheme();
   const { colors } = theme;
   const [show, setShow] = useState(false);
-  const [articles, setArticles] = useState([]);
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
-  const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
+  const [sortCriteria, setSortCriteria] = useState("De la A a la Z"); // Estado para el criterio de ordenación
 
-  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
-  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
+
+  const [articles, setArticles] = useState<Article[]>([]); // Define el tipo como un array de artículos
+  interface Article {
+    id: number;
+    name: string;
+    price: number;
+    code: string;
+    highImage: string;
+    createdAt: string;
+    line?: string; // Agrega esta propiedad si es opcional
+    delevery?: string; // Agrega esta propiedad si es opcional
+    quantity?: number; // Agrega esta propiedad si es opcional
+  }
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const flatListRef = useRef(null); // Referencia para FlatList
 
   useEffect(() => {
-    const loadArticles = async () => {
-      try {
-        setIsLoading(true);
-
-        // Intentar cargar los productos desde AsyncStorage
-        const cachedArticles = await AsyncStorage.getItem("cachedArticles");
-
-        if (cachedArticles) {
-          // Si hay datos en AsyncStorage, cargarlos
-          setArticles(JSON.parse(cachedArticles));
-          setIsLoading(false);
-        }
-
-        // Realizar la solicitud a la API para obtener los productos más recientes
-        const fetchedArticles = await fetchArticles();
-
-        // Ordenar los artículos alfabéticamente por nombre
-        fetchedArticles.sort((a, b) => a.name.localeCompare(b.name));
-
-        // Guardar los productos en el estado y en AsyncStorage
-        setArticles(fetchedArticles);
-        await AsyncStorage.setItem(
-          "cachedArticles",
-          JSON.stringify(fetchedArticles)
-        );
-      } catch (error) {
-        console.error("Error fetching articles:", error);
-        Toast.show({
-          type: "error",
-          text1: "Error al cargar los productos",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadArticles();
-  }, []);
- 
+  }, [page]);
+
+  const loadArticles = async () => {
+    if (!hasMore || isLoading) return;
+  
+    setIsLoading(true);
+    try {
+      const { articles: newArticles, next } = await fetchArticles(clienteId, page);
+  
+      const articlesWithDefaultPrice = newArticles.map((article: Article) => ({
+        ...article,
+        price: article.price || 0, // Asigna un precio predeterminado si no está definido
+      }));
+  
+      setArticles((prevArticles) => [...prevArticles, ...articlesWithDefaultPrice]);
+      setHasMore(!!next);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error al cargar los productos",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Función para ordenar los artículos
+  const sortArticles = (criteria: SortCriteria) => {
+    let sortedArticles = [...articles];
+    if (criteria === "De la A a la Z") {
+      sortedArticles.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (criteria === "De la Z a la A") {
+      sortedArticles.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (criteria === "Precio: menor a mayor") {
+      sortedArticles.sort((a, b) => a.price - b.price);
+    } else if (criteria === "Precio: mayor a menor") {
+      sortedArticles.sort((a, b) => b.price - a.price);
+    } else if (criteria === "Lo más nuevo primero") {
+      sortedArticles.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    }
+    setArticles(sortedArticles);
+  };
+
+  const handleSortChange = (criteria: SortCriteria) => {
+    setSortCriteria(criteria);
+    sortArticles(criteria);
+  };
+
   // flatlist card1
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: Article }) => (
     <View
       style={[
         GlobalStyleSheet.col50,
@@ -107,10 +137,10 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
         },
       ]}>
       <Cardstyle1
-        id={item.id}
+        id={item.id.toString()}
         title={item.name}
-        image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
-        price={item.price}
+        image={{ uri: `${BASE_URL}${item.highImage}` }}
+        price={(item.price || 0).toString()} // Proporciona un valor predeterminado si `price` es undefined
         modelo={item.code}
         borderTop
         onPress={() =>
@@ -118,7 +148,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
             product: item, // Pasa el objeto completo del producto aquí
           })
         }
-        onPress3={() => addItemToWishList(item)}
+        // onPress3={() => addItemToWishList(item)}
       />
       <QuantityButton
         item={item}
@@ -130,13 +160,17 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
   );
   // flatlist card1
   // flatlist card2
-  const renderItem2 = ({ item, index }) => (
-    <View key={index} style={{ marginBottom: 10 }}>
+  const renderItem2 = ({ item, index }: { item: Article; index: number }) => (
+    <View key={index} style={{ marginBottom: 10  }}>
       <Cardstyle2
         title={item.name}
-        price={item.price}
-        marca={item.code}
-        image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
+        price={(item.price || 0).toString()} // Proporciona un valor predeterminado si `price` es undefined // Convierte el precio a string si es necesario
+        marca={item.code} // Proporciona el código como marca
+        modelo={item.line || "Sin modelo"} // Proporciona un valor predeterminado si `line` es undefined
+        delevery={item.delevery || "Sin información"} // Proporciona un valor predeterminado si `delevery` es undefined
+        quantity={item.quantity || 0} // Proporciona un valor predeterminado si `quantity` es undefined
+        productId={item.id.toString()} // Convierte el ID a string
+        image={{ uri: `${BASE_URL}${item.highImage}` }}
         removebottom
         onPress={() =>
           navigation.navigate("ProductsDetails", {
@@ -144,15 +178,13 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
           })
         }
       />
-      
+
       <QuantityButton2
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
-
       />
-
     </View>
   );
 
@@ -184,8 +216,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
             height: 40,
             width: "100%",
           },
-        ]}
-      >
+        ]}>
         <View
           style={[
             GlobalStyleSheet.container,
@@ -195,8 +226,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               flexDirection: "row",
               alignItems: "center",
             },
-          ]}
-        >
+          ]}>
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={() => sheetRef.current.openSheet("short")}
@@ -206,15 +236,13 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               gap: 5,
               width: "35%",
               justifyContent: "center",
-            }}
-          >
+            }}>
             <Image
               style={{ height: 16, width: 16, resizeMode: "contain" }}
               source={IMAGES.list2}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}
-            >
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text}]}>
               ORDENAR POR
             </Text>
           </TouchableOpacity>
@@ -234,15 +262,13 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               gap: 5,
               width: "35%",
               justifyContent: "center",
-            }}
-          >
+            }}>
             <Image
               style={{ height: 16, width: 16, resizeMode: "contain" }}
               source={IMAGES.filter3}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}
-            >
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text}]}>
               FILTROS
             </Text>
           </TouchableOpacity>
@@ -261,8 +287,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               width: "15%",
               justifyContent: "center",
               alignItems: "center",
-            }}
-          >
+            }}>
             <Image
               style={{
                 height: 22,
@@ -288,8 +313,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               width: "15%",
               justifyContent: "center",
               alignItems: "center",
-            }}
-          >
+            }}>
             <Image
               style={{
                 height: 22,
@@ -307,27 +331,38 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
         style={[
           GlobalStyleSheet.container,
           { paddingTop: 15, paddingHorizontal: 0 },
-        ]}
-      >
-        {isLoading ? (
-          <ActivityIndicator
-            size="large"
-            color={COLORS.primary}
-            style={{ marginTop: 20 }}
-          />
-        ) : (
-          <FlatList
-            data={articles}
-            renderItem={show ? renderItem : renderItem2}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            numColumns={show ? 2 : 1}
-            key={show ? "grid" : "list"} // Cambia la clave aquí
-          />
-        )}
+        ]}>
+        <FlatList
+          ref={flatListRef} // Referencia para mantener la posición
+          data={articles}
+          renderItem={show ? renderItem : renderItem2}
+          keyExtractor={(item, index) => `${item.id}-${index}`} // Genera una clave única combinando el id y el índice
+          contentContainerStyle={{ paddingBottom: 20 }}
+          numColumns={2}
+          onEndReached={() => {
+            if (hasMore && !isLoading) {
+              setPage((prevPage) => prevPage + 1); // Incrementa la página solo si hay más productos
+            }
+          }}
+          onEndReachedThreshold={0.5} // Umbral para cargar más productos
+          ListFooterComponent={
+            hasMore && isLoading ? (
+              <ActivityIndicator size="large" color={COLORS.primary} />
+            ) : null
+          }
+          initialNumToRender={10} // Renderiza inicialmente 10 artículos
+          getItemLayout={(data, index) => ({
+            length: 200, // Altura aproximada de cada elemento
+            offset: 200 * index,
+            index,
+          })} // Optimización para mantener la posición
+          maintainVisibleContentPosition={{
+            minIndexForVisible: 0, // Mantiene la posición visible desde el índice 0
+          }}
+        />
       </View>
-      <BottomSheet2 ref={sheetRef} />
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />
+      <Toast />
     </View>
   );
 };

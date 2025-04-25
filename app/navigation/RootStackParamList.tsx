@@ -34,7 +34,7 @@ export type RootStackParamList = {
     Marcas: undefined;
     Notifications: undefined;
     Questions: undefined;
-    ProductsDetails: undefined;
+    // ProductsDetails: undefined;
     Writereview: undefined;
     Profile: undefined;
     Wishlist: undefined;
@@ -51,7 +51,7 @@ export type RootStackParamList = {
     Myorder: undefined;
     Notification: undefined;
     Home: undefined;
-    Catalogo: undefined;
+    // Catalogo: undefined;
     Accordion: undefined;
     BottomSheet: undefined;
     ModalBox: undefined;
@@ -74,4 +74,8 @@ export type RootStackParamList = {
     TabStyle2: undefined;
     TabStyle3: undefined;
     TabStyle4: undefined;
+
+    // prueba
+    Catalogo: { subcategoryName: string }; // Asegúrate de incluir esta definición
+    ProductsDetails: { product: any }; // Otros parámetros de navegación
 };

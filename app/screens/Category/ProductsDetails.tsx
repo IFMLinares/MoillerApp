@@ -35,6 +35,7 @@ import {
 } from "react-native-responsive-screen";
 // api articulos
 import { addItemToCartApi } from "../../api/addItemApi";
+import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
 // api articulos
 
@@ -340,7 +341,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                     width: "100%",
                     resizeMode: "contain",
                   }}
-                  source={{ uri: `http://10.0.2.2:8000${product.highImage}` }} // Mostrar imagen de alta calidad
+                  source={{ uri: `${BASE_URL}${product.highImage}` }} // Mostrar imagen de alta calidad
                 />
               </TouchableOpacity>
             )}
@@ -630,7 +631,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
 
       <Modal visible={isModalVisible} transparent={true}>
         <ImageViewer
-          imageUrls={[{ url: `http://10.0.2.2:8000${product.highImage}` }]}
+          imageUrls={[{ url: `${BASE_URL}${product.highImage}` }]}
           index={selectedImageIndex}
           onSwipeDown={closeModal}
           enableSwipeDown={true}

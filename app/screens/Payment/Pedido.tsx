@@ -24,7 +24,7 @@ import Cardstyle3 from "../../components/Card/Cardstyle3";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShoppingCartDetailsApi } from "../../api/shoppingApi";
 import * as ImagePicker from "expo-image-picker"; // Para Expo
-
+import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Pedido">;
 
 const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
@@ -159,7 +159,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
                     quantity={parseFloat(item.cantidad).toFixed(2)} // Cantidad
                     subtotal={parseFloat(item.subtotal).toFixed(2)} // Subtotal
                     image={{
-                      uri: `http://10.0.2.2:8000${item.articulo.images[0]?.image}`, // Imagen del producto
+                      uri: `${BASE_URL}${item.articulo.images[0]?.image}`, // Imagen del producto
                     }}
                     marca={item.articulo.co_cat.cat_des} // Marca
                     modelo={item.articulo.modelo} // Modelo

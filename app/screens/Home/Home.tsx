@@ -19,7 +19,7 @@ import Cardstyle1 from "../../components/Card/Cardstyle1";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useDispatch, useSelector } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage"; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setClienteId } from "../../redux/actions/drawerAction";
 import { openDrawer } from "../../redux/actions/drawerAction";
 import { LinearGradient } from "expo-linear-gradient";
@@ -36,8 +36,9 @@ import { addToCart } from "../../redux/reducer/cartReducer";
 import { Dimensions } from "react-native";
 // api articulos
 import { fetchArticles } from "../../api/authApi";
+import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 // api articulos
-import QuantityButton from "../Components/QuantityButton"; 
+import QuantityButton from "../Components/QuantityButton";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -45,9 +46,7 @@ import {
 // buscador
 import SearchArticles from "../Components/SearchArticles";
 // buscador
- 
- 
- 
+
 const marcas = [
   {
     image: IMAGES.marca,
@@ -69,7 +68,7 @@ const marcas = [
     brand: "AMERICOLD",
     name: "Americold",
   },
-]; 
+];
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
@@ -77,18 +76,21 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);  
+  const [hasMore, setHasMore] = useState(true);
 
   const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
-  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
-  
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
+
   // redux
   useEffect(() => {
     const restoreClienteId = async () => {
       try {
         const storedClienteId = await AsyncStorage.getItem("clienteId");
         if (storedClienteId) {
-          console.log("Cliente ID restaurado desde AsyncStorage:", storedClienteId);
+          console.log(
+            "Cliente ID restaurado desde AsyncStorage:",
+            storedClienteId
+          );
           dispatch(setClienteId(parseInt(storedClienteId, 10))); // Restaura el clienteId en Redux
         }
       } catch (error) {
@@ -97,18 +99,15 @@ const Home = ({ navigation }: HomeScreenProps) => {
     };
 
     restoreClienteId();
-  }, []);
+  }, [dispatch]);
+
   // api
   useEffect(() => {
     const getArticles = async () => {
       try {
         setLoading(true);
-
-        // Obtener los artículos directamente de la API
-        const data = await fetchArticles(page);
-
+        const data = await fetchArticles(clienteId); 
         setArticles(data);
-        setHasMore(data.length > 0);
       } catch (error) {
         console.error("Error al obtener los artículos:", error);
       } finally {
@@ -116,27 +115,10 @@ const Home = ({ navigation }: HomeScreenProps) => {
       }
     };
 
-    getArticles();
-  }, [page]);
-
-  const loadMoreArticles = async () => {
-    if (hasMore) {
-      try {
-        setLoading(true);
-
-        // Obtener más artículos directamente de la API
-        const data = await fetchArticles(page + 1);
-
-        setArticles((prevArticles) => [...prevArticles, ...data]);
-        setPage((prevPage) => prevPage + 1);
-        setHasMore(data.length > 0);
-      } catch (error) {
-        console.error("Error al cargar más artículos:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (clienteId) {
+      getArticles();
     }
-  };
+  }, [clienteId, page]);
 
   const navigateToProductDetails = (product) => {
     navigation.navigate("ProductsDetails", { product });
@@ -150,7 +132,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
 
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
-  
+
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const addItemToWishList = (data: any) => {
@@ -244,8 +226,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
               }}
               source={require("../../assets/images/carousel/STEINMANN.png")}
             />
-             
-          </Swiper> 
+          </Swiper>
           <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
             <View style={{ marginHorizontal: -0, marginVertical: 10 }}>
               <View
@@ -411,7 +392,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     modelo={article.code}
                     price={article.price}
                     hascolor={true}
-                    image={{ uri: `http://10.0.2.2:8000${article.highImage}` }}
+                    image={{ uri: `${BASE_URL}${article.highImage}` }}
                     onPress={() => navigateToProductDetails(article)}
                     onPress3={() => addItemToWishList(article)}
                   />

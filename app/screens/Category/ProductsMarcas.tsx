@@ -36,6 +36,7 @@ import { fetchArticles } from "../../api/listMarcasApi";
 import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
  
 
@@ -58,6 +59,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   const [loadingMoreGrid, setLoadingMoreGrid] = useState(false); // Estado para cargar más artículos en la vista de cuadrícula
   const [loadingMoreList, setLoadingMoreList] = useState(false); // Estado para cargar más artículos en la vista de lista
   const [hasMore, setHasMore] = useState(true); // Indica si hay más productos para cargar
+  const [sortCriteria, setSortCriteria] = useState("De la A a la Z"); // Estado para el criterio de ordenación
 
   const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
   console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
@@ -80,7 +82,8 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
 
       // Si no hay datos en caché, cargar desde la API
       console.log("Cargando artículos desde la API");
-      const fetchedArticles = await fetchArticles(brandName, page); // Filtra por marca y página
+      const fetchedArticles = await fetchArticles(brandName, page); // Filtra por marca y págin
+      fetchedArticles.sort((a, b) => a.name.localeCompare(b.name)); // Orden iniciala
       if (fetchedArticles.length === 0) {
         setHasMore(false); // No hay más productos para cargar
       } else {
@@ -101,6 +104,29 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
 
   loadArticles();
 }, [brandId, brandName, page]); // Escucha cambios en los parámetros y la página
+
+  // Función para ordenar los artículos
+  const sortArticles = (criteria) => {
+    let sortedArticles = [...articles];
+    if (criteria === "De la A a la Z") {
+      sortedArticles.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (criteria === "De la Z a la A") {
+      sortedArticles.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (criteria === "Precio: menor a mayor") {
+      sortedArticles.sort((a, b) => a.price - b.price);
+    } else if (criteria === "Precio: mayor a menor") {
+      sortedArticles.sort((a, b) => b.price - a.price);
+    } else if (criteria === "Lo más nuevo primero") {
+      sortedArticles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    setArticles(sortedArticles);
+  };
+
+  // Manejar el cambio de criterio de ordenación
+  const handleSortChange = (criteria) => {
+    setSortCriteria(criteria);
+    sortArticles(criteria);
+  };
 
 const loadMoreArticles = async (listType: "grid" | "list") => {
   if (!hasMore) return; // No cargar más si no hay más productos
@@ -149,7 +175,7 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
       <Cardstyle1
         id={item.id}
         title={item.name}
-        image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
+        image={{ uri: `${BASE_URL}${item.highImage}` }}
         price={item.price}
         modelo={item.code}
         borderTop
@@ -177,7 +203,7 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
         title={item.name}
         price={item.price}
         marca={item.code}
-        image={{ uri: `http://10.0.2.2:8000${item.highImage}` }}
+        image={{ uri: `${BASE_URL}${item.highImage}` }}
         removebottom
         onPress={() =>
           navigation.navigate("ProductsDetails", {
@@ -382,7 +408,7 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
         )}
         </View>
       </View>
-      <BottomSheet2 ref={sheetRef} />
+      <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />
       <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>
   );

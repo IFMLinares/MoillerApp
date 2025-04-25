@@ -18,7 +18,7 @@ type Props = {
   //rounded ?: any;
   //size ?: string;
   marca: string;
-  modelo: string;
+  modelo?: string; // Haz que `modelo` sea opcional
   price: string;
   image?: any;
   delevery: string;

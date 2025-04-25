@@ -28,30 +28,31 @@ const EditProfile = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
+        setLoading(true); // Mostrar indicador de carga
         const data = await getUserInfo();
-        console.log("Información del usuario:", data); // Verificar los datos
+        console.log('Información del usuario:', data);
         setUserInfo(data);
       } catch (error: any) {
-        console.error(error.message);
+        console.error('Error al obtener la información del usuario:', error.message);
   
-        // Redirigir al inicio de sesión si la sesión ha expirado
+        // Si la sesión ha expirado, redirige al inicio de sesión
         if (error.message === 'Sesión expirada. Por favor, inicie sesión nuevamente.') {
-          navigation.navigate("SingIn");
-        } else {
           Alert.alert(
-            "Error",
-            error.message,
+            'Sesión expirada',
+            'Por favor, inicie sesión nuevamente.',
             [
               {
-                text: "Iniciar sesión",
-                onPress: () => navigation.navigate("SingIn"),
+                text: 'Iniciar sesión',
+                onPress: () => navigation.navigate('SignIn'),
               },
             ],
             { cancelable: false }
           );
+        } else {
+          Alert.alert('Error', error.message);
         }
       } finally {
-        setLoading(false);
+        setLoading(false); // Ocultar indicador de carga
       }
     };
   
@@ -60,7 +61,7 @@ const EditProfile = () => {
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
-      <Header title="Editar Perfil" leftIcon="back" titleRight />
+      <Header title="Perfil de usuario" leftIcon="back" titleRight />
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 20 }}>
         {userInfo ? (
           <Animatable.View

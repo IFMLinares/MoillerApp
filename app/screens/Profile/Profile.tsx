@@ -30,7 +30,7 @@ const getListwithiconData = (navigation: any, setShowModal: any) => [
     data: [
       {
         icon: IMAGES.user3,
-        title: "Editar Perfil",
+        title: "Perfil de usuario",
         navigate: "EditProfile",
       },
       {

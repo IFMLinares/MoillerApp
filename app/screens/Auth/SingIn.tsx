@@ -8,6 +8,7 @@ import {
   TextInput,
   StyleSheet,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { COLORS, FONTS } from "../../constants/theme";
@@ -22,6 +23,7 @@ import ButtonOutline from "../../components/Button/ButtonOutline";
 import SelectCountery from "../../components/SelectCountery";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Entypo from "react-native-vector-icons/Entypo";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios"; // Asegúrate de tener axios instalado
@@ -79,15 +81,16 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
         await AsyncStorage.setItem("username", username);
         await AsyncStorage.setItem("accessToken", data.access);
         await AsyncStorage.setItem("refreshToken", data.refresh);
-  
+
         // Guarda el cliente_id en AsyncStorage
         await AsyncStorage.setItem("clienteId", data.cliente_id.toString());
-  
+
         // Despacha el cliente_id al estado global
         console.log("Cliente ID antes de despachar:", data.cliente_id); // Verifica el valor aquí
         dispatch(setClienteId(data.cliente_id));
-  
+
         navigation.navigate("DrawerNavigation", { screen: "Home" });
+        console.log("Respuesta de la API:", data);
       } else {
         setErrorMessage("Usuario o contraseña incorrectos");
       }
@@ -99,7 +102,8 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color={COLORS.primary} />
       </SafeAreaView>
     );
@@ -218,7 +222,7 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                           fontFamily: "RalewayBold",
                         },
                       ]}>
-                      ¿Se le olvido su contraseña?
+                      {/* ¿Se le olvido su contraseña? */}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -300,14 +304,39 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                 justifyContent: "center",
               }}>
               <View style={styles.iconRow}>
-                <TouchableOpacity style={styles.iconCircle}>
+                <TouchableOpacity
+                  style={styles.iconCircle}
+                  onPress={() =>
+                    Linking.openURL("https://www.instagram.com/mollier_3000/")
+                  } // URL de Instagram
+                >
                   <FontAwesome name="instagram" size={20} color="black" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconCircle}>
+                <TouchableOpacity
+                  style={styles.iconCircle}
+                  onPress={() =>
+                    Linking.openURL("mailto:ventas@mollierca.com")
+                  } // URL para enviar un correo
+                >
                   <MaterialIcons name="email" size={20} color="black" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconCircle}>
+                <TouchableOpacity
+                  style={styles.iconCircle}
+                  onPress={() =>
+                    Linking.openURL(
+                      "https://api.whatsapp.com/send/?phone=584243789402&text&type=phone_number&app_absent=0"
+                    )
+                  } // URL de WhatsApp
+                >
                   <FontAwesome name="whatsapp" size={20} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.iconCircle}
+                  onPress={() =>
+                    Linking.openURL("https://maps.app.goo.gl/tM2K5Pj7MrgpryRBA")
+                  } // URL de Mapas
+                >
+                  <Entypo name="location" size={20} color="black" />
                 </TouchableOpacity>
               </View>
             </View>
