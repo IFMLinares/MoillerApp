@@ -106,7 +106,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
     const getArticles = async () => {
       try {
         setLoading(true);
-        const data = await fetchArticles(clienteId); 
+        const data = await fetchArticles(clienteId);
         setArticles(data);
       } catch (error) {
         console.error("Error al obtener los artículos:", error);
@@ -227,39 +227,41 @@ const Home = ({ navigation }: HomeScreenProps) => {
               source={require("../../assets/images/carousel/STEINMANN.png")}
             />
           </Swiper>
+
           <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
-            <View style={{ marginHorizontal: -0, marginVertical: 10 }}>
+            <View style={{ marginHorizontal: 0, marginVertical: 10 }}>
               <View
                 style={{
                   borderTopColor: "white",
                   borderBottomColor: "white",
                   borderTopWidth: 3,
                   borderBottomWidth: 3,
+                  flexDirection: "row", // Asegura que las imágenes estén en fila
+                  flexWrap: "wrap", // Permite que las imágenes pasen a la siguiente línea si no caben
+                  justifyContent: "space-between", // Espaciado uniforme entre las imágenes
+                  paddingVertical: 15,
                 }}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{}}>
-                  {marcas.map((marca, index) => (
-                    <View
-                      key={index}
-                      style={{ marginRight: 10, marginVertical: 15 }}>
-                      <TouchableOpacity
-                        onPress={() =>
-                          navigateToProductsMarcas(marca.brand, marca.name)
-                        }>
-                        <Image
-                          style={{ width: 95, height: 20 }}
-                          source={marca.image}
-                          resizeMode="stretch"
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </ScrollView>
+                {marcas.map((marca, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    // style={{ marginBottom: hp('2%') }} // Margen inferior adaptado al dispositivo
+                    onPress={() =>
+                      navigateToProductsMarcas(marca.brand, marca.name)
+                    }>
+                    <Image
+                      style={{
+                        width: wp("20%"), // Ancho adaptado al 20% del ancho del dispositivo
+                        height: hp("2.5%"), // Alto adaptado al 5% del alto del dispositivo
+                      }}
+                      source={marca.image}
+                      resizeMode="stretch"
+                    />
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
           </View>
+
           <View style={{ height: 50 }}>
             <View
               style={[

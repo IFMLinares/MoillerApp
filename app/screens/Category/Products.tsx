@@ -32,7 +32,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { fetchArticles } from "../../api/listSubCategoryApi";
+import { fetchProductsBySubcategory } from "../../api/listSubCategoryApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
@@ -43,7 +43,7 @@ import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 type ProductsScreenProps = StackScreenProps<RootStackParamList, "Products">;
 
 const Products = ({ navigation, route }: ProductsScreenProps) => {
-  const { subcategoryId, subcategoryName } = route.params;
+  const { subcategoryId, subcategoryName, clienteId } = route.params;
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors } = theme;
@@ -53,45 +53,36 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
   const sheetRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
   const [sortCriteria, setSortCriteria] = useState("De la A a la Z"); // Estado para el criterio de ordenación
-
-  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
-  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
-  
+  const [currentPage, setCurrentPage] = useState(1); // Estado para la paginación
+  const [hasMore, setHasMore] = useState(true); // Controlar si hay más páginas
 
   useEffect(() => {
     const loadArticles = async () => {
       try {
-        setIsLoading(true); // Mostrar el indicador de carga
+        setIsLoading(true);
+ await AsyncStorage.clear(); // Limpiar AsyncStorage para pruebas
+        // Llamar a la API con los parámetros subcategoryId y clienteId
+        const data = await fetchProductsBySubcategory(subcategoryId, clienteId, currentPage);
 
-        // Verificar si los artículos están en AsyncStorage
-        const cachedArticles = await AsyncStorage.getItem(
-          `products_${subcategoryId}`
-        );
-
-        if (cachedArticles) {
-          // Si están en caché, cargarlos desde AsyncStorage
-          setArticles(JSON.parse(cachedArticles));
-        } else {
-          // Si no están en caché, obtenerlos de la API
-          const fetchedArticles = await fetchArticles(subcategoryName);
-          fetchedArticles.sort((a, b) => a.name.localeCompare(b.name)); // Orden inicial
-          // Guardar en AsyncStorage para futuras solicitudes
-          await AsyncStorage.setItem(
-            `products_${subcategoryId}`,
-            JSON.stringify(fetchedArticles)
-          );
-
-          setArticles(fetchedArticles);
-        }
+        // Actualizar los artículos y manejar la paginación
+        setArticles((prevArticles) => [...prevArticles, ...data.results]);
+        setHasMore(!!data.next); // Verificar si hay más páginas
       } catch (error) {
-        console.error("Error fetching articles:", error);
+        console.error("Error al cargar los productos:", error);
       } finally {
-        setIsLoading(false); // Ocultar el indicador de carga
+        setIsLoading(false);
       }
     };
 
     loadArticles();
-  }, [subcategoryId, subcategoryName]);
+  }, [subcategoryId, clienteId, currentPage]);
+
+  // Función para cargar más productos al llegar al final de la lista
+  const loadMoreArticles = () => {
+    if (hasMore) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
 
    // Función para ordenar los artículos
    const sortArticles = (criteria) => {
@@ -328,16 +319,12 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
       <View
         style={[
           GlobalStyleSheet.container,
-          { paddingTop: 15, paddingHorizontal: 0 },
+          { paddingTop: 15, paddingHorizontal: 0, marginBottom: 100,},
         ]}
       >
-        {isLoading ? (
-          <ActivityIndicator
-            size="large"
-            color={COLORS.primary}
-            style={{ marginTop: 20 }}
-          />
-        ) : (
+      {isLoading && currentPage === 1 ? (
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      ) : (
           <FlatList
             data={articles}
             renderItem={show ? renderItem : renderItem2}
@@ -345,6 +332,11 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
             contentContainerStyle={{ paddingBottom: 20 }}
             numColumns={show ? 2 : 1}
             key={show ? "grid" : "list"} // Cambia la clave aquí
+            onEndReached={loadMoreArticles} // Cargar más productos al llegar al final
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              hasMore ? <ActivityIndicator size="small" color={COLORS.primary} /> : null
+            }
           />
         )}
       </View>

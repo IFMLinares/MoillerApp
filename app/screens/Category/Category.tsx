@@ -21,10 +21,11 @@ import { IMAGES } from "../../constants/Images";
 import BottomSheet2 from "../Components/BottomSheet2";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/reducer";
 
 type CategoryScreenProps = StackScreenProps<RootStackParamList, "Category">;
 
- 
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
@@ -37,6 +38,9 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
   const sheetRef = useRef<any>(null);
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -70,13 +74,16 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
 
   const renderCategory = ({ item }) => {
     // Busca la imagen correspondiente en el objeto IMAGES
-    const imageName = item.name.toLowerCase() ; // Convierte el nombre a minúsculas y elimina espacios
+    const imageName = item.name.toLowerCase(); // Convierte el nombre a minúsculas y elimina espacios
     const categoryImage = IMAGES[imageName] || IMAGES.default; // Usa una imagen por defecto si no se encuentra
 
     return (
       <TouchableOpacity
         style={{ alignItems: "center", margin: 10 }}
-        onPress={() => setSelectedCategory(item.id)}>
+        onPress={() => {
+          console.log("Categoría seleccionada (co_lin):", item.id); // Log del co_lin
+          setSelectedCategory(item.id); // Actualiza la categoría seleccionada
+        }}>
         <View
           style={{
             height: 70,
@@ -108,24 +115,24 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
       </TouchableOpacity>
     );
   };
-  
+
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
         title="Categorías"
         leftIcon="back"
-        titleLeft 
+        titleLeft
         rightIcon4="filter"
-      /> 
-        <View style={{ padding: 10 }}>
+      />
+      <View style={{ padding: 10 }}>
         {isLoading ? (
-            // Mostrar el ActivityIndicator mientras se cargan los datos
-            <ActivityIndicator
-              size="large"
-              color={COLORS.primary}
-              style={{ marginTop: 20 }}
-            />
-          ) : (
+          // Mostrar el ActivityIndicator mientras se cargan los datos
+          <ActivityIndicator
+            size="large"
+            color={COLORS.primary}
+            style={{ marginTop: 20 }}
+          />
+        ) : (
           <FlatList
             data={categories}
             renderItem={renderCategory}
@@ -134,8 +141,10 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
             contentContainerStyle={{ alignItems: "center" }}
           />
         )}
-        </View>
-        {selectedCategory && <CategoryCart categoryId={selectedCategory} />} 
+      </View>
+      {selectedCategory && (
+        <CategoryCart categoryId={selectedCategory} /> // selectedCategory ya contiene el co_lin
+      )}
       <BottomSheet2 ref={sheetRef} />
       <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>

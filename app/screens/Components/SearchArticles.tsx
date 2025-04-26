@@ -119,7 +119,7 @@ const SearchArticles = () => {
           placeholderTextColor={COLORS.title}
           style={{
             backgroundColor: COLORS.card,
-            width: wp("45%"),
+            width: wp("40%"),
             height: hp("5%"),
             borderRadius: 18,
             paddingLeft: wp("2.5%"),

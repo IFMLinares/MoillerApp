@@ -13,7 +13,8 @@ import { GlobalStyleSheet } from "../constants/StyleSheet";
 import { ScrollView } from "react-native"; 
 import { fetchSubcategories } from "../api/categoryApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/reducer";
  
 
 const capitalizeFirstLetter = (string) => {
@@ -30,43 +31,41 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
   const [subcategories, setSubcategories] = useState([]);
   const [showAll, setShowAll] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
-
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
+  const dispatch = useDispatch();
+  
   useEffect(() => {
     const loadSubcategories = async () => {
       try {
-        setIsLoading(true); // Mostrar el indicador de carga
-
+        setIsLoading(true);
+  
         // Verificar si las subcategorías están en AsyncStorage
         const cachedSubcategories = await AsyncStorage.getItem(
           `subcategories_${categoryId}`
-        );
-
+        ); 
         if (cachedSubcategories) {
           // Si están en caché, cargarlas desde AsyncStorage
           setSubcategories(JSON.parse(cachedSubcategories));
         } else {
           // Si no están en caché, obtenerlas de la API
           const subcategories = await fetchSubcategories(categoryId);
-          const uniqueSubcategories = subcategories.filter(
-            (subcategory, index, self) =>
-              index === self.findIndex((s) => s.id === subcategory.id)
-          );
-
+  
           // Guardar en AsyncStorage para futuras solicitudes
           await AsyncStorage.setItem(
             `subcategories_${categoryId}`,
-            JSON.stringify(uniqueSubcategories)
+            JSON.stringify(subcategories)
           );
-
-          setSubcategories(uniqueSubcategories);
+  
+          setSubcategories(subcategories);
         }
       } catch (error) {
         console.error("Error fetching subcategories:", error);
       } finally {
-        setIsLoading(false); // Ocultar el indicador de carga
+        setIsLoading(false);
       }
     };
-
+  
     loadSubcategories();
   }, [categoryId]);
 
@@ -107,12 +106,15 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
                 key={index}
                 style={{ alignItems: "center" }}
                 activeOpacity={0.5}
-                onPress={() =>
+                onPress={() => {
+                  console.log("co_subl:", subcategory.id, "co_cli:", clienteId); // Depuración
                   navigation.navigate("Products", {
-                    subcategoryId: subcategory.id,
+                    subcategoryId: subcategory.id, // co_subl
                     subcategoryName: subcategory.name,
-                  })
-                }>
+                    clienteId: clienteId, // co_cli
+                  });
+                }}
+              >
                 <View
                   style={[
                     {
