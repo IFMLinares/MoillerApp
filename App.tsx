@@ -6,14 +6,14 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux'
 import store from './app/redux/store';
-import React, { useEffect } from "react"; 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect } from "react";  
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() { 
   const theme = useTheme();
   const { colors } : {colors : any} = theme;
- 
+
 
   const [loaded] = useFonts({
     RalewayBold: require('./app/assets/fonts/Raleway-Bold.ttf'),
@@ -27,8 +27,8 @@ export default function App() {
     RalewayExtraBold: require('./app/assets/fonts/Raleway-ExtraBold.ttf'),
   });  
 
- 
   
+
   // useEffect(() => {
   //   const clearStorage = async () => {
   //     try {

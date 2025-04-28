@@ -1,18 +1,28 @@
 import axios from "axios";
 import { BASE_URL } from './globalUrlApi'; // Importar la URL base
-export const fetchArticles = async (brandName?: string, page = 1, limit = 6) => {
+
+export const fetchProductsBrand = async (co_cat: string, co_cli: string, page: number = 1) => {
   try {
+    console.log("Llamando a la API con:", { co_cat, co_cli, page }); // Depuración
     const response = await axios.get(
-      `${BASE_URL}api/core/articles/list`,
+      `${BASE_URL}api/core/articles/list-by-cliente`,
       {
+        params: {
+          co_cli: co_cli, // Cliente ID
+          co_cat: co_cat, // marcas (actualizado)
+          page: page, // Página para la paginación
+        },
         headers: {
           "Content-Type": "application/json",
         },
       }
     );
 
-    const articles = response.data
-      .map((article) => ({
+    return {
+      count: response.data.count,
+      next: response.data.next,
+      previous: response.data.previous,
+      results: response.data.results.map((article: any) => ({
         id: article.id,
         code: article.co_art.trim(),
         name: article.art_des.trim(),
@@ -31,22 +41,12 @@ export const fetchArticles = async (brandName?: string, page = 1, limit = 6) => 
         volume: article.volumen?.trim() || "",
         weight: article.peso?.trim() || "",
         warranty: article.garantia?.trim() || "",
-        brand: article.co_cat.cat_des?.trim() || "", // Campo que identifica la marca
-      }))
-      .filter((article) => article.stock > 0); // Filtrar productos con stock > 0
-
-    // Si se proporciona `brandName`, filtrar los artículos por marca
-    const filteredArticles = brandName
-      ? articles.filter((article) => article.brand === brandName)
-      : articles;
-
-    // Implementar paginación
-    const startIndex = (page - 1) * limit;
-    const paginatedArticles = filteredArticles.slice(startIndex, startIndex + limit);
-
-    return paginatedArticles;
+        brand: article.co_cat.cat_des?.trim() || "",
+        precio_cliente: article.precio_cliente || 0,
+      })),
+    };
   } catch (error) {
-    console.error("Error fetching articles:", error);
+    console.error("Error al llamar a la API:", error);
     throw error;
   }
 };

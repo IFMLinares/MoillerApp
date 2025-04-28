@@ -84,42 +84,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                             paddingBottom: 0,
                         }]}
                     >
-
-                        {/* <Animated.View style={{transform: [{translateX: circlePosition}]}}>
-                            <View
-                                style={{
-                                    width: tabWidth < SIZES.container ? tabWidth / 5 : SIZES.container / 5,
-                                    position: 'absolute',
-                                    //backgroundColor:'red',
-                                    zIndex: 1,
-                                    top:0,
-                                    left: 0,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <View
-                                    style={{
-                                        height:65,
-                                        width:65,
-                                        borderRadius:0,
-                                        backgroundColor:'rgba(255,255,255,.1)',
-                                        position:'absolute',
-                                    }}
-                                />
-                                <View
-                                    style={{
-                                        height:4,
-                                        width:54,
-                                        borderRadius:4,
-                                        borderTopLeftRadius:0,
-                                        borderTopRightRadius:0,
-                                        backgroundColor:theme.dark ? COLORS.white :COLORS.primary,
-                                    }}
-                                />
-                            </View>
-                        </Animated.View> */}
-
+ 
                         {state.routes.map((route:any , index:string) => {
 
                             const {options} = descriptors[route.key];

@@ -31,6 +31,7 @@ type Props = {
     inputBorder?:any,
     text?:any,
     isFocused?:any,
+    autoCapitalize?: "none" | "sentences" | "words" | "characters", // Agregado aquí
 }
 
 const Input = ({
@@ -52,7 +53,8 @@ const Input = ({
     inputBorder,
     text,
     keyboardType,
-    isFocused
+    isFocused,
+    autoCapitalize, // Agregado aquí
 }: Props) => {
 
     const [showPass , setShowPass] = useState<boolean>(true);
@@ -120,6 +122,7 @@ const Input = ({
                 onBlur={onBlur}
                 numberOfLines={numberOfLines}
                 placeholderTextColor={inputBorder ? COLORS.text :theme.dark ? 'rgba(255,255,255,.5)' : 'rgba(0,0,0,.4)'}
+                autoCapitalize={autoCapitalize} // Agregado aquí
             />
             {text &&
                 <View style={{position:'absolute',top:12,left:35}}>

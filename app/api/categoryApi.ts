@@ -85,38 +85,30 @@ interface ArticleApiResponse {
 
 export const fetchBrands = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}api/core/articles/list`, {
+    const response = await axios.get(`${BASE_URL}api/core/categories/list`, {
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    // Filtrar y mapear las marcas únicas basadas en "co_cat"
-    const brands = Array.from(
-      new Map(
-        response.data
-          .filter((article: ArticleApiResponse) =>
-            article.co_cat &&
-            article.co_cat.cat_des &&
-            article.sa_stock_almacen[0]?.stock > 0
-          ) // Filtrar artículos con "co_cat" y stock > 0
-          .map((article: ArticleApiResponse) => [
-            article.co_cat!.cat_des.trim(), // Usar "cat_des" como clave única
-            {
-              id: article.co_cat!.cat_des.trim(), // ID único basado en "cat_des"
-              name: article.co_cat!.cat_des.trim(), // Nombre de la marca
-            },
-          ])
-      ).values()
-    );
+    // Verificar que los datos de la API sean un array
+    if (!Array.isArray(response.data)) {
+      throw new Error("La respuesta de la API no es un array.");
+    }
+
+    // Mapear las marcas correctamente
+    const brands = response.data.map((brand: { co_cat: string; cat_des: string }) => {
+      return {
+        id: brand.co_cat?.trim() || "", // Usar "co_cat" como ID único
+        name: brand.cat_des?.trim() || "Sin nombre", // Usar "cat_des" como nombre de la marca
+      };
+    });
+
+    console.log("Marcas mapeadas correctamente:", brands);
 
     return brands.sort((a, b) => a.name.localeCompare(b.name)); // Ordenar alfabéticamente
   } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error al obtener las marcas:", error.message);
-    } else {
-      console.error("Error desconocido al obtener las marcas:", error);
-    }
+    console.error("Error al obtener las marcas:", error);
     throw error;
   }
 };

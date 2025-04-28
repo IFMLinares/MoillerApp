@@ -9,10 +9,18 @@ export const closeDrawer = () => {
     };
 };
 
-export const setClienteId = (clienteId) => {
-    console.log("Cliente ID en la acción:", clienteId); // Verifica el valor aquí
-    return {
-      type: "SET_CLIENTE_ID",
-      payload: clienteId,
-    };
-  };
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export const setClienteId = (clienteId) => async (dispatch) => {
+  if (!clienteId || clienteId === 1) {
+    console.error("Cliente ID inválido en la acción:", clienteId);
+    return;
+  }
+
+  console.log("Cliente ID en la acción:", clienteId);
+  await AsyncStorage.setItem("clienteId", clienteId.toString());
+  dispatch({
+    type: "SET_CLIENTE_ID",
+    payload: clienteId,
+  });
+};

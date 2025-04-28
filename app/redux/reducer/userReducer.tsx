@@ -1,3 +1,5 @@
+import { createSlice } from "@reduxjs/toolkit";
+
 const initialState = {
   clienteId: null, // Valor inicial
 };
@@ -5,10 +7,14 @@ const initialState = {
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
     case "SET_CLIENTE_ID":
-      console.log("Cliente ID en el reducer:", action.payload); // Verifica el valor aquí
+      if (!action.payload || action.payload === 1) {
+        console.error("Cliente ID inválido en el reducer:", action.payload);
+        return state;
+      }
+      console.log("Cliente ID en el reducer:", action.payload);
       return {
         ...state,
-        clienteId: action.payload, // Actualiza el clienteId en el estado
+        clienteId: action.payload,
       };
     default:
       return state;

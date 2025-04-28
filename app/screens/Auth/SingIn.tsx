@@ -77,20 +77,27 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
       const data = await authLogin(username, password);
       console.log("Respuesta de la API:", data); // Verifica que `cliente_id` sea correcto
       setLoading(false);
+  
       if (data.access) {
         await AsyncStorage.setItem("username", username);
         await AsyncStorage.setItem("accessToken", data.access);
         await AsyncStorage.setItem("refreshToken", data.refresh);
-
-        // Guarda el cliente_id en AsyncStorage
-        await AsyncStorage.setItem("clienteId", data.cliente_id.toString());
-
-        // Despacha el cliente_id al estado global
-        console.log("Cliente ID antes de despachar:", data.cliente_id); // Verifica el valor aquí
-        dispatch(setClienteId(data.cliente_id));
-
-        navigation.navigate("DrawerNavigation", { screen: "Home" });
-        console.log("Respuesta de la API:", data);
+  
+        // Validar cliente_id antes de guardarlo
+        if (data.cliente_id && data.cliente_id !== 1) {
+          // Guarda el cliente_id en AsyncStorage
+          await AsyncStorage.setItem("clienteId", data.cliente_id.toString());
+  
+          // Despacha el cliente_id al estado global
+          console.log("Cliente ID antes de despachar:", data.cliente_id);
+          dispatch(setClienteId(data.cliente_id));
+  
+          // Redirigir al Home
+          navigation.navigate("DrawerNavigation", { screen: "Home" });
+        } else {
+          setErrorMessage("Error: Cliente ID inválido.");
+          console.error("Cliente ID inválido:", data.cliente_id);
+        }
       } else {
         setErrorMessage("Usuario o contraseña incorrectos");
       }

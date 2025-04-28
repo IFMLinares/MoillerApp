@@ -21,6 +21,9 @@ import { IMAGES } from "../../constants/Images";
 import BottomSheet2 from "../Components/BottomSheet2";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/reducer";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 type MarcasScreenProps = StackScreenProps<RootStackParamList, "Marcas">;
 
@@ -34,36 +37,31 @@ const Marcas = ({ navigation, route }: MarcasScreenProps) => {
   const [brands, setBrands] = useState([]); // Cambiar a "brands"
   const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
   const sheetRef = useRef<any>(null);
-  const [visibleBrands, setVisibleBrands] = useState(27); // Controla cuántas marcas se muestran
+  const [visibleBrands, setVisibleBrands] = useState(21); // Controla cuántas marcas se muestran
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
+
   useEffect(() => {
     const loadBrands = async () => {
       try {
         setIsLoading(true); // Mostrar el indicador de carga
-
-        // Verificar si las marcas están en AsyncStorage
-        const cachedBrands = await AsyncStorage.getItem("brands");
-
-        if (cachedBrands) {
-          // Si están en caché, cargarlas desde AsyncStorage
-          setBrands(JSON.parse(cachedBrands));
-        } else {
-          // Si no están en caché, obtenerlas de la API
-          const fetchedBrands = await fetchBrands();
-
-          // Guardar en AsyncStorage para futuras solicitudes
-          await AsyncStorage.setItem("brands", JSON.stringify(fetchedBrands));
-
-          setBrands(fetchedBrands);
-        }
+  
+        // Obtener las marcas directamente desde la API
+        const fetchedBrands = await fetchBrands();
+        console.log("Marcas desde la API:", fetchedBrands);
+  
+        // Establecer las marcas en el estado
+        setBrands(fetchedBrands);
       } catch (error) {
         console.error("Error fetching brands:", error);
       } finally {
         setIsLoading(false); // Ocultar el indicador de carga
       }
     };
-
+  
     loadBrands();
   }, []);
+
 
   const handleShowMore = () => {
     setVisibleBrands((prev) => prev + 12); // Muestra 12 marcas más
@@ -78,20 +76,23 @@ const Marcas = ({ navigation, route }: MarcasScreenProps) => {
         <TouchableOpacity
       style={{
         alignItems: "center",
-        margin: 10,
-        width: "30%", // Ajusta el ancho para un diseño más uniforme
+        margin: wp("2%"),
+        width: wp("28%"), // Ajusta el ancho dinámicamente
       }}
-      onPress={() =>
+      onPress={() =>{
+        console.log("co_cat (id de la marca):", item.id); // Log del co_cat (ID único de la marca)
         navigation.navigate("ProductsMarcas", {
-          brandId: item.id,
-          brandName: item.name,
-        })
-      }>
+          brandId: item.id, // co_cat (código único de la marca)
+          brandName: item.name, // Nombre de la marca
+          clienteId: clienteId, // Pasar clienteId
+        });
+      }}
+    >
       <View
         style={{
-          height: 50,
+          height: hp("4%"), // Ajusta la altura dinámicamente
           width: "100%",
-          paddingHorizontal: 10,
+          paddingHorizontal: wp("2%"),
           backgroundColor: COLORS.primary,
           alignItems: "center",
           justifyContent: "center",
@@ -101,7 +102,7 @@ const Marcas = ({ navigation, route }: MarcasScreenProps) => {
           style={[
             FONTS.fontRegular,
             {
-              fontSize: 10,
+              fontSize: wp("2.3%"),
               color: colors.card,
               textAlign: "center",
               fontWeight: "bold",

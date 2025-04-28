@@ -245,39 +245,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
               }}
             />
           )}
-
-          {/* Input numérico para el monto en euros */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-around",
-              alignItems: "center",
-              marginTop: 15,
-            }}>
-            <Text
-              style={{
-                ...FONTS.fontMedium,
-                fontSize: 16,
-                color: colors.title,
-                marginBottom: 10,
-              }}>
-              Monto en euros:
-            </Text>
-            <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: COLORS.primaryLight,
-                borderRadius: 10,
-                padding: 10,
-                fontSize: 16,
-                color: colors.title,
-              }}
-              keyboardType="numeric"
-              placeholder=" Ingresa el monto"
-              placeholderTextColor={colors.text}
-              onChangeText={handleAmountChange} // Actualizar el monto abonado
-            />
-          </View>
+ 
         </View>
         <View
           style={[

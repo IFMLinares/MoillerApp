@@ -23,6 +23,7 @@ import { useDispatch } from "react-redux";
 import { openDrawer } from "../../redux/actions/drawerAction";
 import AsyncStorage from "@react-native-async-storage/async-storage"; 
 import { setClienteId } from "../../redux/actions/drawerAction";
+import { cerrarSesion } from "../../api/cerrarSesionApi"; // Importar la función cerrarSesion
 
 const getListwithiconData = (navigation: any, setShowModal: any) => [
   {
@@ -122,15 +123,21 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
       restoreClienteId();
     }, []);
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("clienteId"); // Elimina el clienteId de AsyncStorage
-      dispatch(setClienteId(null)); // Limpia el clienteId en Redux
-      navigation.navigate("SingIn");
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
-  };
+    const handleLogout = async () => {
+      try {
+        // Llamar a la función cerrarSesion
+        await cerrarSesion();
+  
+        // Eliminar clienteId de AsyncStorage y Redux
+        await AsyncStorage.removeItem("clienteId");
+        dispatch(setClienteId(null));
+  
+        // Navegar a la pantalla de inicio de sesión
+        navigation.navigate("SingIn");
+      } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+      }
+    };
 
   // Pasa `setShowModal` como argumento a `getListwithiconData`
   const listWithIconData = getListwithiconData(navigation, setShowModal);
@@ -368,7 +375,8 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
         transparent={true}
         visible={showModal}
         animationType="fade"
-        onRequestClose={() => setShowModal(false)}>
+        onRequestClose={() => setShowModal(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>
@@ -380,12 +388,17 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
                   styles.modalButton,
                   { backgroundColor: COLORS.primary },
                 ]}
-                onPress={handleLogout}>
+                onPress={() => {
+                  setShowModal(false); // Cierra el modal
+                  handleLogout(); // Llama a la función handleLogout
+                }}
+              >
                 <Text style={styles.modalButtonText}>Sí</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, { backgroundColor: COLORS.red }]}
-                onPress={() => setShowModal(false)}>
+                onPress={() => setShowModal(false)}
+              >
                 <Text style={styles.modalButtonText}>No</Text>
               </TouchableOpacity>
             </View>

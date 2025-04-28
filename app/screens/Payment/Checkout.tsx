@@ -36,7 +36,7 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] =
     useState(false);
   const dispatch = useDispatch();
-  
+
   console.log("Cliente ID recibido en Checkout:", clienteId);
   console.log("Cart ID recibido en Checkout:", cartId);
 
@@ -46,19 +46,22 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
 
   const handleConfirmOrder = async () => {
     setIsConfirmationModalVisible(false);
-    setIsModalVisible(true);
-  
+    // Esperar 4 segundos antes de mostrar el modal de éxito
+    setTimeout(() => {
+      setIsModalVisible(true);
+    }, 2000);
+
     try {
       const totalPrice = calculateTotal(); // Precio total
       const productCount = cart.length; // Cantidad de productos
-  
+
       if (!clienteId || !cartId) {
         throw new Error("El ID del cliente o del carrito no está definido.");
       }
-  
+
       const response = await convertCartToCotizacion(clienteId, cartId);
       console.log("Respuesta de la API:", response);
-  
+
       const newOrder = {
         id: response.id,
         clienteId,
@@ -67,22 +70,29 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
         productCount,
         status: "Pendiente",
       };
-  
+
       setTimeout(() => {
         setIsModalVisible(false);
         navigation.navigate("Myorder", { order: newOrder });
         dispatch(clearCart());
       }, 2000);
     } catch (error) {
-      console.error("Error al confirmar el pedido:", error.response?.data || error.message);
-  
+      console.error(
+        "Error al confirmar el pedido:",
+        error.response?.data || error.message
+      );
+
       // Manejo de errores específicos
       if (error.response?.data?.message === "Articulo no posee unidad.") {
-        alert("Uno de los artículos en el carrito no tiene una unidad asociada. Por favor, verifica los datos.");
+        alert(
+          "Uno de los artículos en el carrito no tiene una unidad asociada. Por favor, verifica los datos."
+        );
       } else {
-        alert("Ocurrió un error al confirmar el pedido. Por favor, intenta nuevamente.");
+        alert(
+          "Ocurrió un error al confirmar el pedido. Por favor, intenta nuevamente."
+        );
       }
-  
+
       setIsModalVisible(false);
     }
   };

@@ -71,10 +71,10 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
 
   const displayedSubcategories = showAll
     ? subcategories
-    : subcategories.slice(0, 7);
+    : subcategories.slice(0, 3);
 
   return (
-    <View>
+    <ScrollView>
       <View
         style={[
           GlobalStyleSheet.container,
@@ -137,7 +137,7 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
                 </View>
               </TouchableOpacity>
             ))}
-            {subcategories.length > 7 && !showAll && (
+            {subcategories.length > 3 && !showAll && (
               <TouchableOpacity
                 style={{ alignItems: "center" }}
                 activeOpacity={0.5}
@@ -166,7 +166,7 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
           </View>
         )}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

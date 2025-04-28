@@ -32,13 +32,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { fetchArticles } from "../../api/listMarcasApi";
+import { fetchProductsBrand } from "../../api/listMarcasApi";
 import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
-
- 
 
 type ProductsScreenProps = StackScreenProps<
   RootStackParamList,
@@ -46,7 +44,7 @@ type ProductsScreenProps = StackScreenProps<
 >;
 
 const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
-  const { brandId, brandName } = route.params; // Recibe los parámetros de la marca
+  const { brandId, brandName, clienteId } = route.params; // Recibe los parámetros de la marca
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors } = theme;
@@ -61,49 +59,51 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   const [hasMore, setHasMore] = useState(true); // Indica si hay más productos para cargar
   const [sortCriteria, setSortCriteria] = useState("De la A a la Z"); // Estado para el criterio de ordenación
 
-  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
-  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId 
-  
+  // Cargar productos al montar el componente
+  useEffect(() => {
+    const loadArticles = async () => {
+      try {
+        setInitialLoading(true); // Inicia el indicador de carga inicial
 
- // Cargar productos al montar el componente
- useEffect(() => {
-  const loadArticles = async () => {
-    try {
-      setInitialLoading(true); // Inicia el indicador de carga inicial
-
-      // Verificar si los productos ya están en AsyncStorage
-      const cachedArticles = await AsyncStorage.getItem(`articles_${brandId}`);
-      if (cachedArticles) {
-        console.log("Cargando artículos desde AsyncStorage");
-        setArticles(JSON.parse(cachedArticles));
-        setHasMore(false); // No hay más productos para cargar
-        return; // Salir si los datos están en caché
-      }
-
-      // Si no hay datos en caché, cargar desde la API
-      console.log("Cargando artículos desde la API");
-      const fetchedArticles = await fetchArticles(brandName, page); // Filtra por marca y págin
-      fetchedArticles.sort((a, b) => a.name.localeCompare(b.name)); // Orden iniciala
-      if (fetchedArticles.length === 0) {
-        setHasMore(false); // No hay más productos para cargar
-      } else {
-        setArticles(fetchedArticles);
-
-        // Guardar los productos en AsyncStorage
-        await AsyncStorage.setItem(
-          `articles_${brandId}`,
-          JSON.stringify(fetchedArticles)
+        // Verificar si los productos ya están en AsyncStorage
+        const cachedArticles = await AsyncStorage.getItem(
+          `articles_${brandId}`
         );
-      }
-    } catch (error) {
-      console.error("Error al cargar los artículos:", error);
-    } finally {
-      setInitialLoading(false); // Detén el indicador de carga inicial
-    }
-  };
+        if (cachedArticles) {
+          console.log("Cargando artículos desde AsyncStorage");
+          setArticles(JSON.parse(cachedArticles));
+          setHasMore(false); // No hay más productos para cargar
+          return; // Salir si los datos están en caché
+        }
 
-  loadArticles();
-}, [brandId, brandName, page]); // Escucha cambios en los parámetros y la página
+        // Si no hay datos en caché, cargar desde la API
+        console.log("Cargando artículos desde la API");
+        const fetchedArticles = await fetchProductsBrand(
+          brandId,
+          clienteId,
+          page
+        ); // Filtra por marca y cliente
+        fetchedArticles.results.sort((a, b) => a.name.localeCompare(b.name)); // Orden inicial
+        if (fetchedArticles.results.length === 0) {
+          setHasMore(false); // No hay más productos para cargar
+        } else {
+          setArticles(fetchedArticles.results);
+
+          // Guardar los productos en AsyncStorage
+          await AsyncStorage.setItem(
+            `articles_${brandId}`,
+            JSON.stringify(fetchedArticles.results)
+          );
+        }
+      } catch (error) {
+        console.error("Error al cargar los artículos:", error);
+      } finally {
+        setInitialLoading(false); // Detén el indicador de carga inicial
+      }
+    };
+
+    loadArticles();
+  }, [brandId, clienteId, page]); // Escucha cambios en los parámetros y la página
 
   // Función para ordenar los artículos
   const sortArticles = (criteria) => {
@@ -117,7 +117,9 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
     } else if (criteria === "Precio: mayor a menor") {
       sortedArticles.sort((a, b) => b.price - a.price);
     } else if (criteria === "Lo más nuevo primero") {
-      sortedArticles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      sortedArticles.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
     }
     setArticles(sortedArticles);
   };
@@ -128,37 +130,40 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
     sortArticles(criteria);
   };
 
-const loadMoreArticles = async (listType: "grid" | "list") => {
-  if (!hasMore) return; // No cargar más si no hay más productos
-  if (listType === "grid" && loadingMoreGrid) return; // Evitar múltiples solicitudes simultáneas para la cuadrícula
-  if (listType === "list" && loadingMoreList) return; // Evitar múltiples solicitudes simultáneas para la lista
+  const loadMoreArticles = async (listType: "grid" | "list") => {
+    if (!hasMore) return; // No cargar más si no hay más productos
+    if (listType === "grid" && loadingMoreGrid) return; // Evitar múltiples solicitudes simultáneas para la cuadrícula
+    if (listType === "list" && loadingMoreList) return; // Evitar múltiples solicitudes simultáneas para la lista
 
-  if (listType === "grid") setLoadingMoreGrid(true);
-  if (listType === "list") setLoadingMoreList(true);
+    if (listType === "grid") setLoadingMoreGrid(true);
+    if (listType === "list") setLoadingMoreList(true);
 
-  try {
-    const newArticles = await fetchArticles(brandName, page + 1); // Filtra por marca y página
-    if (newArticles.length === 0) {
-      setHasMore(false); // No hay más productos para cargar
-    } else {
-      const updatedArticles = [...articles, ...newArticles];
-      setArticles(updatedArticles);
-      setPage((prevPage) => prevPage + 1); // Incrementa la página
+    try {
+      const newArticles = await fetchProductsBrand(
+        brandId,
+        clienteId,
+        page + 1
+      ); // Filtra por marca y cliente
+      if (newArticles.results.length === 0) {
+        setHasMore(false); // No hay más productos para cargar
+      } else {
+        const updatedArticles = [...articles, ...newArticles.results];
+        setArticles(updatedArticles);
+        setPage((prevPage) => prevPage + 1); // Incrementa la página
 
-      // Actualizar los productos en AsyncStorage
-      await AsyncStorage.setItem(
-        `articles_${brandId}`,
-        JSON.stringify(updatedArticles)
-      );
+        // Actualizar los productos en AsyncStorage
+        await AsyncStorage.setItem(
+          `articles_${brandId}`,
+          JSON.stringify(updatedArticles)
+        );
+      }
+    } catch (error) {
+      console.error("Error al cargar más artículos:", error);
+    } finally {
+      if (listType === "grid") setLoadingMoreGrid(false);
+      if (listType === "list") setLoadingMoreList(false);
     }
-  } catch (error) {
-    console.error("Error al cargar más artículos:", error);
-  } finally {
-    if (listType === "grid") setLoadingMoreGrid(false);
-    if (listType === "list") setLoadingMoreList(false);
-  }
-};
-
+  };
 
   // flatlist card1
   const renderItem = ({ item }) => (
@@ -169,7 +174,6 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
           marginBottom: 10,
           paddingHorizontal: 0,
           backgroundColor: colors.card,
-          
         },
       ]}>
       <Cardstyle1
@@ -191,7 +195,6 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
-
       />
     </View>
   );
@@ -217,7 +220,6 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
-
       />
     </View>
   );
@@ -331,7 +333,6 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
                 tintColor: show ? colors.text : COLORS.primary,
               }}
               source={IMAGES.grid}
-
             />
           </TouchableOpacity>
           <View
@@ -357,7 +358,7 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
                 resizeMode: "contain",
                 tintColor: show ? COLORS.primary : colors.text,
               }}
-              source={IMAGES.list} 
+              source={IMAGES.list}
             />
           </TouchableOpacity>
         </View>
@@ -369,43 +370,25 @@ const loadMoreArticles = async (listType: "grid" | "list") => {
           { paddingTop: 15, paddingHorizontal: 0, marginBottom: 80 },
         ]}>
         <View>
-        {initialLoading ? (
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        ) : (
-          <View>
-            {show ? (
-              <FlatList
-                data={articles}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()} // Usa un identificador único
-                contentContainerStyle={{ paddingBottom: 20 }}
-                numColumns={2}
-                onEndReached={() => loadMoreArticles("grid")}
-                onEndReachedThreshold={0.5} // Carga más artículos cuando el usuario está al 50% del final
-                ListFooterComponent={
-                  hasMore && articles.length >= 4 && loadingMoreGrid && (
-                    <ActivityIndicator size="large" color={COLORS.primary} />
-                  )
-                }
-              />
-            ) : (
-              <FlatList
-                data={articles}
-                renderItem={renderItem2}
-                keyExtractor={(item, index) => `${item.id}:${index}`} // Clave única
-                contentContainerStyle={{ paddingBottom: 20 }}
-                key={show ? "grid" : "list"} // Cambia la clave aquí
-                onEndReached={() => loadMoreArticles("list")}
-                onEndReachedThreshold={0.5} // Carga más artículos cuando el usuario está al 50% del final
-                ListFooterComponent={
-                  hasMore && articles.length >= 4 && loadingMoreList && (
-                    <ActivityIndicator size="large" color={COLORS.primary} />
-                  )
-                }
-              />
-            )}
-          </View>
-        )}
+          {initialLoading ? (
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          ) : (
+            <FlatList
+              data={articles}
+              renderItem={show ? renderItem : renderItem2}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              numColumns={show ? 2 : 1}
+              key={show ? "grid" : "list"} // Cambia la clave aquí
+              onEndReached={loadMoreArticles} // Cargar más productos al llegar al final
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={
+                hasMore ? (
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                ) : null
+              }
+            />
+          )}
         </View>
       </View>
       <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />

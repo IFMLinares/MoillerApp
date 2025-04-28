@@ -133,21 +133,21 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
       <View
         style={[
           GlobalStyleSheet.container,
-          {
-            paddingTop: 10,
-            backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
-            marginTop: 15,
+          { 
+            backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card, 
+            padding:0,
+            paddingTop:3,
+            margin:0,
           },
         ]}>
-        <View>
+        <View >
           <View>
             <View
-              style={{
-                marginHorizontal: -0,
+              style={{ 
                 paddingHorizontal: 15,
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "space-between",
+                justifyContent: "space-between", 
               }}>
               <Text
                 style={[
