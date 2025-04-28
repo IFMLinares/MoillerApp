@@ -174,7 +174,7 @@ const StackNavigator = () => {
         <Stack.Screen name="TabStyle3" component={TabStyle3} />
         <Stack.Screen name="TabStyle4" component={TabStyle4} />
         <Stack.Screen name="Inputs" component={Inputs} />
-        <Stack.Screen name="lists" component={ListScreen} />
+        {/* <Stack.Screen name="lists" component={ListScreen} /> */}
         <Stack.Screen name="Pricings" component={Pricings} />
         <Stack.Screen name="DividerElements" component={DividerElements} />
         <Stack.Screen name="Snackbars" component={Snackbars} />

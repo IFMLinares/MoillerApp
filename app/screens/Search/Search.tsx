@@ -17,66 +17,47 @@ import { COLORS, FONTS } from "../../constants/theme";
 import { IMAGES } from "../../constants/Images";
 import debounce from "lodash.debounce"; // Instala lodash si no lo tienes: npm install lodash
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Importa AsyncStorage
-import { fetchArticles } from "../../api/apiSearch"; // Asegúrate de tener esta función
+import { searchArticles, Article } from "../../api/apiSearch"; // Asegúrate de tener esta función
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/reducer";
+import { BASE_URL } from "../../api/globalUrlApi";
 
 const Search = ({ navigation }: any) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
 
   const [searchText, setSearchText] = useState("");
-  const [articles, setArticles] = useState([]); // Estado para los resultados de búsqueda
+  const [articles, setArticles] = useState<Article[]>([]); // Especifica el tipo Article[]
   const [loading, setLoading] = useState(false); // Estado para el indicador de carga
 
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
+
   // Función de búsqueda con debounce
-  const handleSearch = useCallback(
-    debounce(async (text) => {
-      if (text.trim() === "") {
-        setArticles([]);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-
-      try {
-        // Verifica si los resultados ya están en AsyncStorage
-        const cachedResults = await AsyncStorage.getItem(`search_${text}`);
-        if (cachedResults) {
-          setArticles(JSON.parse(cachedResults));
-          setLoading(false);
-          return;
-        }
-
-        // Si no hay resultados en caché, realiza la búsqueda
-        const results = await fetchArticles();
-        const filteredResults = results.filter((article) => {
-          const productWords = article.name
-            .toLowerCase()
-            .split(" ")
-            .slice(0, 4)
-            .join(" ");
-          return (
-            productWords.includes(text.toLowerCase()) || // Coincidencia en las primeras 4 palabras del nombre
-            article.code.toLowerCase().includes(text.toLowerCase()) || // Coincidencia en el código
-            article.model.toLowerCase().includes(text.toLowerCase()) // Coincidencia en el modelo
-          );
-        });
-
-        // Guarda los resultados en AsyncStorage
-        await AsyncStorage.setItem(
-          `search_${text}`,
-          JSON.stringify(filteredResults)
-        );
-
-        setArticles(filteredResults);
-      } catch (error) {
-        console.error("Error al buscar artículos:", error);
-      }
-
+const handleSearch = useCallback(
+  debounce(async (text: string) => { // Especifica el tipo 'string'
+    if (text.trim() === "") {
+      console.log("Texto de búsqueda vacío, limpiando resultados.");
+      setArticles([]);
       setLoading(false);
-    }, 500),
-    []
-  );
+      return;
+    }
+
+    console.log("Buscando artículos con texto:", text);
+    setLoading(true);
+
+    try {
+      const results = await searchArticles(text); // Llama a searchArticles
+      console.log("Resultados procesados en el componente:", results); // Log de los resultados procesados
+      setArticles(results);
+    } catch (error) {
+      console.error("Error al buscar artículos:", error);
+    }
+
+    setLoading(false);
+  }, 500),
+  []
+);
 
   // Actualiza los resultados de búsqueda cuando cambia el texto
   const handleTextChange = (text: string) => {
@@ -84,9 +65,10 @@ const Search = ({ navigation }: any) => {
     handleSearch(text);
   };
 
-  const handleNavigateToProduct = (product: any) => {
+  const handleNavigateToProduct = (product: Article) => {
     navigation.navigate("ProductsDetails", { product });
   };
+
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
@@ -174,8 +156,8 @@ const Search = ({ navigation }: any) => {
                   width: "90%",
                 }}>
                 <Image
-                  style={{ height: 20, width: 20, resizeMode: "contain" }}
-                  source={IMAGES.timer} // Cambia esto según la imagen que quieras mostrar
+                  style={{ height: 40, width: 40, resizeMode: "contain" }}
+                  source={{ uri: `${BASE_URL}${item.lowImage}` }} // Cambia "low_Image" por "lowImage"
                 />
                 <Text
                   style={[

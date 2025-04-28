@@ -176,8 +176,28 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     source={IMAGES.appname}
                   />
                 </View>
-
-                <SearchArticles />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("Search")}
+                    style={{
+                      height: 35,
+                      width: 35,
+                      // borderRadius:8,
+                      // backgroundColor:theme.dark ? 'rgba(255,255,255,0.10)' : COLORS.background,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}>
+                  <Image
+                    style={{
+                      height: 22,
+                      width: 22,
+                      tintColor: COLORS.card,
+                      resizeMode: "contain",
+                    }}
+                    source={IMAGES.search}
+                  />
+                  </TouchableOpacity> 
+                </View>
               </View>
             </View>
           </View>
