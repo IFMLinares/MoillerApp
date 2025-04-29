@@ -9,9 +9,10 @@ export const closeDrawer = () => {
     };
 };
 
+import { Dispatch } from "redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const setClienteId = (clienteId) => async (dispatch) => {
+export const setClienteId = (clienteId: number | null) => async (dispatch: Dispatch) => {
   if (!clienteId || clienteId === 1) {
     console.error("Cliente ID inválido en la acción:", clienteId);
     return;

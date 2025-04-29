@@ -5,6 +5,7 @@ import { BASE_URL } from "./globalUrlApi"; // Importar la URL base
 interface CategoryApiResponse {
   co_lin: string;
   lin_des: string;
+  image_url?: string | null; // URL de la imagen, opcional
 }
 
 export const fetchCategories = async () => {
@@ -22,6 +23,7 @@ export const fetchCategories = async () => {
     const categories = response.data.map((category: CategoryApiResponse) => ({
       id: category.co_lin.trim(),
       name: category.lin_des.trim(),
+      imageUrl: category.image_url || null, // Asignar image_url si existe
     }));
 
     // Tipar explícitamente los parámetros a y b en el método sort

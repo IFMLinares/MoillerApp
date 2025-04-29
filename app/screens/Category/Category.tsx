@@ -26,15 +26,21 @@ import { RootState } from "../../redux/reducer";
 
 type CategoryScreenProps = StackScreenProps<RootStackParamList, "Category">;
 
-const capitalizeFirstLetter = (string) => {
+interface Category {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+}
+
+const capitalizeFirstLetter = (string: string) => {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
 
 const Category = ({ navigation, route }: CategoryScreenProps) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
   const sheetRef = useRef<any>(null);
@@ -72,10 +78,9 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
     loadCategories();
   }, []);
 
-  const renderCategory = ({ item }) => {
+  const renderCategory = ({ item }: { item: Category }) => {
     // Busca la imagen correspondiente en el objeto IMAGES
     const imageName = item.name.toLowerCase(); // Convierte el nombre a minúsculas y elimina espacios
-    const categoryImage = IMAGES[imageName] || IMAGES.default; // Usa una imagen por defecto si no se encuentra
 
     return (
       <TouchableOpacity
@@ -94,7 +99,7 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
             justifyContent: "center",
           }}>
           <Image
-            source={categoryImage}
+              source={item.imageUrl ? { uri: item.imageUrl } : IMAGES.defaultImage}
             style={{ height: 70, width: 70, borderRadius: 25 }}
           />
         </View>
@@ -143,10 +148,22 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
         )}
       </View>
       {selectedCategory && (
-        <CategoryCart categoryId={selectedCategory} /> // selectedCategory ya contiene el co_lin
+        <CategoryCart
+          categoryId={selectedCategory}
+          categoryTitle={
+            categories.find((cat) => cat.id === selectedCategory)?.name ||
+            "Sin título"
+          }
+        />
       )}
-      <BottomSheet2 ref={sheetRef} />
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <BottomSheet2
+        ref={sheetRef}
+        onSortChange={(criteria: string) => {
+          console.log("Criterio de ordenación seleccionado:", criteria);
+          // Aquí puedes manejar el cambio de orden, por ejemplo, actualizar el estado o realizar una acción
+        }}
+      />
+      <Toast />
     </View>
   );
 };

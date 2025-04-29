@@ -12,52 +12,96 @@ import {
 } from "react-native-responsive-screen";
 import { COLORS, FONTS } from "../../constants/theme";
 import { useDispatch } from "react-redux";
-import FontAwesome from "react-native-vector-icons/FontAwesome6";
-import Toast from "react-native-toast-message";
 import { addToCart } from "../../redux/reducer/cartReducer";
+import FontAwesome from "react-native-vector-icons/FontAwesome6";
+import Toast from "react-native-toast-message"; 
 import { addItemToCartApi } from "../../api/addItemApi";
 
-const QuantityButton = ({ item, quantities, setQuantities, clienteId }) => {
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  highImage: string;
+  code: string;
+};
+
+type CartItem = Product & {
+  id: number;
+  name: string;
+  price: number;
+  highImage: string;
+  code: string;
+  quantity: number;
+};
+
+
+const QuantityButton = ({
+  item,
+  quantities,
+  setQuantities,
+  clienteId,
+  showToast,
+}: {
+  item: Product; // Aplica el tipo aquí
+  quantities: { [key: number]: number };
+  setQuantities: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>;
+  clienteId: number;
+  showToast: (type: string, text1: string, text2?: string) => void;
+}) => {
+  
+  type Product = {
+    id: number;
+    name: string;
+    price: number;
+    highImage: string;
+    code: string;
+  };
+
   const dispatch = useDispatch();
 
   // Añadir producto al carrito con la cantidad seleccionada y enviar a la API
-  const addItemToCart = useCallback(
-    async (item) => {
-      const quantity = quantities[item.id] || 1; // Obtener la cantidad seleccionada
+const addItemToCart = useCallback(
+  async (item: Product) => {
+    const quantity = quantities[item.id] || 1;
 
-      try {
-        console.log("Cantidad enviada a la API:", quantity); // Depuración
+    try {
+      console.log("Datos enviados a la API de carrito:", {
+        articulo: item.id,
+        cantidad: quantity,
+        cliente_id: clienteId,
+      });
 
-        // Llamar a la API para añadir el producto al carrito
-        const response = await addItemToCartApi(clienteId, item.id, quantity);
+      const response = await addItemToCartApi(clienteId, item.id, quantity);
 
-        console.log("Respuesta de la API:", response); // Verificar respuesta de la API
+      console.log("Respuesta de la API:", response);
 
-        // Actualizar el estado del carrito en Redux
-        dispatch(addToCart({ ...item, quantity })); // Aquí se suma en el reducer
+      dispatch(
+        addToCart({
+          ...item,
+          quantity,
+        } as CartItem)
+      );
 
-        // Mostrar mensaje de éxito
-        Toast.show({
-          type: "success",
-          text1: "¡Producto/s añadido a su carrito exitosamente!",
-        });
-      } catch (error) {
-        console.error("Error al añadir al carrito:", error); // Depuración de errores
+      showToast(
+        "success",
+        `¡Producto añadido al carrito exitosamente!`
+      );
+    } catch (error) {
+      console.error("Error al añadir al carrito:", error);
 
-        // Manejar errores
-        Toast.show({
-          type: "error",
-          text1: "Error al añadir al carrito",
-          text2: "Por favor, inténtelo de nuevo.",
-        });
-      }
-    },
-    [dispatch, quantities, clienteId]
-  );
+      showToast(
+        "error",
+        `Error al añadir el producto ${item.id} al carrito`,
+        "Por favor, inténtelo de nuevo."
+      );
+    }
+  },
+  [dispatch, quantities, clienteId, showToast]
+);
 
   // Incrementar la cantidad del producto
   const incrementQuantity = useCallback(
-    (id) => {
+    (id: number) => {
       setQuantities((prevQuantities) => ({
         ...prevQuantities,
         [id]: (prevQuantities[id] || 1) + 1,
@@ -65,10 +109,9 @@ const QuantityButton = ({ item, quantities, setQuantities, clienteId }) => {
     },
     [setQuantities]
   );
-
-  // Decrementar la cantidad del producto
+  
   const decrementQuantity = useCallback(
-    (id) => {
+    (id: number) => {
       setQuantities((prevQuantities) => ({
         ...prevQuantities,
         [id]: prevQuantities[id] > 1 ? prevQuantities[id] - 1 : 1,
@@ -76,10 +119,9 @@ const QuantityButton = ({ item, quantities, setQuantities, clienteId }) => {
     },
     [setQuantities]
   );
-
-  // Cambiar la cantidad manualmente desde el TextInput
+  
   const handleQuantityChange = useCallback(
-    (id, value) => {
+    (id: number, value: string) => {
       const numericValue = parseInt(value, 10);
       if (!isNaN(numericValue) && numericValue > 0) {
         setQuantities((prevQuantities) => ({
@@ -110,7 +152,7 @@ const QuantityButton = ({ item, quantities, setQuantities, clienteId }) => {
           alignItems: "center",
           backgroundColor: COLORS.light,
           borderRadius: 10,
-          height: hp("4.0%"), 
+          height: hp("4.0%"),
         }}>
         <TouchableOpacity
           onPress={() => decrementQuantity(item.id)}
@@ -137,7 +179,6 @@ const QuantityButton = ({ item, quantities, setQuantities, clienteId }) => {
           style={{
             paddingHorizontal: wp("1.5%"),
             // backgroundColor: COLORS.primary,
-            
           }}>
           <Text style={{ fontSize: hp("2.25%") }}>+</Text>
         </TouchableOpacity>

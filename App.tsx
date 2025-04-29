@@ -7,7 +7,6 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux'
 import store from './app/redux/store';
 import React, { useEffect } from "react";  
-import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() { 
@@ -57,9 +56,9 @@ export default function App() {
             <StatusBar style="dark" />
             <Provider store={store}>
               <Route/>
-              <Toast/>
             </Provider>
         </SafeAreaView>
     </SafeAreaProvider>
   );
 }
+

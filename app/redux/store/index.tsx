@@ -1,15 +1,11 @@
-// import { applyMiddleware, createStore } from 'redux';
-// import rootReducer from '../reducer/index';
-// import thunk from 'redux-thunk';
+import { configureStore } from "@reduxjs/toolkit";
+import thunk from "redux-thunk";
+import rootReducer from "../reducer";
 
-// const store = createStore(rootReducer, applyMiddleware(thunk));
+const store = configureStore({
+  reducer: rootReducer,
+  // No es necesario agregar thunk manualmente, ya está incluido por defecto
+});
 
-// export default store;
-
-
-import { configureStore } from '@reduxjs/toolkit';
-import rootReducer from '../reducer';
-
-const store = configureStore({ reducer: rootReducer })
-
+export type RootState = ReturnType<typeof store.getState>; // Define y exporta RootState
 export default store;

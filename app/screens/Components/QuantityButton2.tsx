@@ -19,30 +19,46 @@ import { addTowishList } from "../../redux/reducer/wishListReducer";
 import { useTheme } from "@react-navigation/native";
 import { addItemToCartApi } from "../../api/addItemApi";
 
-const QuantityButton2 = ({ item, quantities, setQuantities, clienteId }) => {
+type Article = {
+  id: number;
+  name: string;
+  price: number;
+  code: string;
+  highImage: string;
+};
+
+type QuantityButton2Props = {
+  item: Article; // Define el tipo de `item` como `Article`
+  quantities: { [key: number]: number }; // Define `quantities` como un objeto con claves numéricas y valores numéricos
+  setQuantities: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>; // Define `setQuantities` como una función de React para actualizar el estado
+  clienteId: number; // Define `clienteId` como un número
+  showToast: (type: string, text1: string, text2?: string) => void; // Define `showToast` como una función que muestra un mensaje
+};
+
+const QuantityButton2: React.FC<QuantityButton2Props> = ({
+  item,
+  quantities,
+  setQuantities,
+  clienteId,
+  showToast,
+}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors } = theme;
-  
-  const addItemToWishList = useCallback(
-    (data) => {
-      dispatch(addTowishList(data));
-    },
-    [dispatch]
-  );
+   
 
   // Añadir producto al carrito con la cantidad seleccionada y enviar a la API
   const addItemToCart = useCallback(
-    async (item) => {
+    async (item: Article) => { // Define el tipo de `item` como `Article`
       const quantity = quantities[item.id] || 1; // Obtener la cantidad seleccionada
-
+  
       try {
         // Llamar a la API para añadir el producto al carrito
         await addItemToCartApi(clienteId, item.id, quantity);
-
+  
         // Actualizar el estado del carrito en Redux
         dispatch(addToCart({ ...item, quantity }));
-
+  
         // Mostrar mensaje de éxito
         Toast.show({
           type: "success",
@@ -57,34 +73,34 @@ const QuantityButton2 = ({ item, quantities, setQuantities, clienteId }) => {
         });
       }
     },
-    [dispatch, quantities, clienteId]
+    [dispatch, quantities, clienteId, showToast]
   );
 
   const incrementQuantity = useCallback(
-    (id) => {
-      setQuantities((prevQuantities) => ({
+    (id: number) => {
+      setQuantities((prevQuantities: { [key: number]: number }) => ({
         ...prevQuantities,
         [id]: (prevQuantities[id] || 1) + 1,
       }));
     },
     [setQuantities]
   );
-
+  
   const decrementQuantity = useCallback(
-    (id) => {
-      setQuantities((prevQuantities) => ({
+    (id: number) => {
+      setQuantities((prevQuantities: { [key: number]: number }) => ({
         ...prevQuantities,
         [id]: prevQuantities[id] > 1 ? prevQuantities[id] - 1 : 1,
       }));
     },
     [setQuantities]
   );
-
+  
   const handleQuantityChange = useCallback(
-    (id, value) => {
+    (id: number, value: string) => {
       const numericValue = parseInt(value, 10);
       if (!isNaN(numericValue) && numericValue > 0) {
-        setQuantities((prevQuantities) => ({
+        setQuantities((prevQuantities: { [key: number]: number }) => ({
           ...prevQuantities,
           [id]: numericValue,
         }));

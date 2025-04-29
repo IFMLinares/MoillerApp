@@ -19,6 +19,9 @@ import Cardstyle1 from "../../components/Card/Cardstyle1";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { RootState } from "../../redux/reducer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setClienteId } from "../../redux/actions/drawerAction";
 import { openDrawer } from "../../redux/actions/drawerAction";
@@ -29,14 +32,13 @@ import StopWatch2 from "../../components/StopWatch2";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
 import Swiper from "react-native-swiper/src";
 import Toast from "react-native-toast-message";
-import FontAwesome from "react-native-vector-icons/FontAwesome6";
-import Feather from "react-native-vector-icons/Feather";
-import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { addToCart } from "../../redux/reducer/cartReducer";
 import { Dimensions } from "react-native";
 // api articulos
-import { fetchArticles } from "../../api/authApi";
+import { fetchArticles, Article } from "../../api/authApi";
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
+import { fetchBanners } from "../../api/bannerApi"; // Importar la función desde bannerApi
+
 // api articulos
 import QuantityButton from "../Components/QuantityButton";
 import {
@@ -44,42 +46,93 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 // buscador
-import SearchArticles from "../Components/SearchArticles";
+import { fetchProductsBrand } from "../../api/listMarcasApi"; // Importar la función de la API
+
 // buscador
 
 const marcas = [
   {
     image: IMAGES.marca,
-    brand: "STEINMANN", // Identificador único para la marca
+    brand: "STE", // Identificador único para la marca
     name: "STEINMANN", // Nombre de la marca
   },
   {
     image: IMAGES.marca1,
-    brand: "MASLEX",
-    name: "Maslex",
+    brand: "MAS",
+    name: "MASLEX",
   },
   {
     image: IMAGES.marca2,
-    brand: "SECOP",
-    name: "Secop",
+    brand: "SEC",
+    name: "SECOP",
   },
   {
     image: IMAGES.marca3,
-    brand: "AMERICOLD",
-    name: "Americold",
+    brand: "AMR",
+    name: "AMERICOLD",
   },
 ];
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
+type Banner = {
+  id: number;
+  banner_image: string;
+};
+
 const Home = ({ navigation }: HomeScreenProps) => {
-  const [articles, setArticles] = useState([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]); // Define el tipo del estado
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-
-  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
+  const dispatch: ThunkDispatch<RootState, void, AnyAction> = useDispatch();
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
   console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
+  const [marca, setMarcas] = useState([]); // Estado para las marcas
+  const [loadingMarcas, setLoadingMarcas] = useState(true); // Estado de carga para las marcas
+  const toastRef = useRef(null);
+
+  const showToast = (type: string, text1: string, text2: string = "") => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+    });
+  };
+
+  const addItemToCart = async (item: Article) => {
+    try {
+      // Lógica para añadir al carrito...
+      showToast("success", "¡Producto añadido al carrito exitosamente!");
+    } catch (error) {
+      showToast("error", "Error al añadir al carrito", "Inténtalo de nuevo.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchMarcas = async () => {
+      try {
+        setLoadingMarcas(true);
+        const co_cat = "defaultCategory"; // Reemplaza con la categoría adecuada o lógica para obtenerla
+        const response = await fetchProductsBrand(co_cat, clienteId); // Pasa ambos argumentos
+        const uniqueBrands = response.results.map((item: any) => ({
+          brand: item.brand,
+          name: item.brand,
+          image: item.highImage || IMAGES.defaultImage, // Imagen por defecto si no hay
+        }));
+        setMarcas(uniqueBrands);
+      } catch (error) {
+        console.error("Error al obtener las marcas:", error);
+      } finally {
+        setLoadingMarcas(false);
+      }
+    };
+
+    if (clienteId) {
+      fetchMarcas();
+    }
+  }, [clienteId]);
 
   // redux
   useEffect(() => {
@@ -120,15 +173,27 @@ const Home = ({ navigation }: HomeScreenProps) => {
     }
   }, [clienteId, page]);
 
-  const navigateToProductDetails = (product) => {
-    navigation.navigate("ProductsDetails", { product });
+  const navigateToProductDetails = (product: {
+    id: number;
+    name: string;
+    price: number;
+    code: string;
+    highImage: string;
+  }) => {
+    navigation.navigate("ProductsDetails", {
+      product, // Pasa el objeto completo del producto aquí
+      productId: product.id, // Agrega la propiedad productId
+    });
   };
 
   const navigateToProductsMarcas = (brand: string, brandName: string) => {
-    navigation.navigate("ProductsMarcas", { brandId: brand, brandName });
+    navigation.navigate("ProductsMarcas", {
+      brandId: brand,
+      brandName,
+      clienteId,
+    });
   };
   // api
-  const dispatch = useDispatch();
 
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -140,6 +205,52 @@ const Home = ({ navigation }: HomeScreenProps) => {
   };
 
   const moresheet2 = useRef<any>(null);
+
+  const [loadingBanners, setLoadingBanners] = useState(true);
+  useEffect(() => {
+    const getBanners = async () => {
+      setLoadingBanners(true);
+      const data = await fetchBanners(); // Llama a la función de bannerApi
+      setBanners(data);
+      setLoadingBanners(false);
+    };
+
+    getBanners();
+  }, []);
+
+  const defaultImages = [
+    require("../../assets/images/carousel/AMERICOLD.png"),
+    require("../../assets/images/carousel/SECOP.png"),
+    require("../../assets/images/carousel/STEINMANN.png"),
+  ];
+
+  const renderImages = () => {
+    if (banners.length > 0) {
+      return banners.map((banner) => (
+        <Image
+          key={banner.id}
+          style={{
+            height: 200,
+            width: "100%",
+            resizeMode: "contain",
+          }}
+          source={{ uri: `${BASE_URL}${banner.banner_image}` }}
+        />
+      ));
+    } else {
+      return defaultImages.map((image, index) => (
+        <Image
+          key={index}
+          style={{
+            height: 200,
+            width: "100%",
+            resizeMode: "contain",
+          }}
+          source={image}
+        />
+      ));
+    }
+  };
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
@@ -187,16 +298,16 @@ const Home = ({ navigation }: HomeScreenProps) => {
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                  <Image
-                    style={{
-                      height: 22,
-                      width: 22,
-                      tintColor: COLORS.card,
-                      resizeMode: "contain",
-                    }}
-                    source={IMAGES.search}
-                  />
-                  </TouchableOpacity> 
+                    <Image
+                      style={{
+                        height: 22,
+                        width: 22,
+                        tintColor: COLORS.card,
+                        resizeMode: "contain",
+                      }}
+                      source={IMAGES.search}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -219,69 +330,49 @@ const Home = ({ navigation }: HomeScreenProps) => {
             }}
             paginationStyle={{ bottom: 10 }}
             showsPagination={Platform.OS === "android" ? true : false}>
-            <Image
-              style={{
-                height: 200,
-                width: "100%",
-                // aspectRatio:1/1,
-                resizeMode: "contain",
-              }}
-              source={require("../../assets/images/carousel/AMERICOLD.png")}
-            />
-            <Image
-              style={{
-                height: 200,
-                width: "100%",
-                //aspectRatio:1/1,
-                resizeMode: "contain",
-              }}
-              source={require("../../assets/images/carousel/SECOP.png")}
-            />
-            <Image
-              style={{
-                height: 200,
-                width: "100%",
-                //aspectRatio:1/1,
-                resizeMode: "contain",
-              }}
-              source={require("../../assets/images/carousel/STEINMANN.png")}
-            />
+            {loadingBanners ? (
+              <ActivityIndicator size="large" color={COLORS.primary} />
+            ) : (
+              renderImages()
+            )}
           </Swiper>
 
-          <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
-            <View style={{ marginHorizontal: 0, marginVertical: 10 }}>
-              <View
-                style={{
-                  borderTopColor: "white",
-                  borderBottomColor: "white",
-                  borderTopWidth: 3,
-                  borderBottomWidth: 3,
-                  flexDirection: "row", // Asegura que las imágenes estén en fila
-                  flexWrap: "wrap", // Permite que las imágenes pasen a la siguiente línea si no caben
-                  justifyContent: "space-between", // Espaciado uniforme entre las imágenes
-                  paddingVertical: 15,
-                }}>
-                {marcas.map((marca, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    // style={{ marginBottom: hp('2%') }} // Margen inferior adaptado al dispositivo
-                    onPress={() =>
-                      navigateToProductsMarcas(marca.brand, marca.name)
-                    }>
-                    <Image
-                      style={{
-                        width: wp("20%"), // Ancho adaptado al 20% del ancho del dispositivo
-                        height: hp("2.5%"), // Alto adaptado al 5% del alto del dispositivo
-                      }}
-                      source={marca.image}
-                      resizeMode="stretch"
-                    />
-                  </TouchableOpacity>
-                ))}
+          {loadingMarcas ? (
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          ) : (
+            <View style={[GlobalStyleSheet.container, { paddingVertical: 0 }]}>
+              <View style={{ marginHorizontal: 0, marginVertical: 10 }}>
+                <View
+                  style={{
+                    borderTopColor: "white",
+                    borderBottomColor: "white",
+                    borderTopWidth: 3,
+                    borderBottomWidth: 3,
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                    paddingVertical: 15,
+                  }}>
+                  {marcas.map((marca, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() =>
+                        navigateToProductsMarcas(marca.brand, marca.name)
+                      }>
+                      <Image
+                        style={{
+                          width: wp("20%"),
+                          height: hp("2.5%"),
+                        }}
+                        source={marca.image}
+                        resizeMode="stretch"
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
             </View>
-          </View>
-
+          )}
           <View style={{ height: 50 }}>
             <View
               style={[
@@ -409,10 +500,10 @@ const Home = ({ navigation }: HomeScreenProps) => {
                   key={article.id || index} // Usa `article.id` o el índice como clave
                 >
                   <Cardstyle1
-                    id={article.id}
+                    id={article.id.toString()}
                     title={article.name}
                     modelo={article.code}
-                    price={article.price}
+                    price={article.price.toString()}
                     hascolor={true}
                     image={{ uri: `${BASE_URL}${article.highImage}` }}
                     onPress={() => navigateToProductDetails(article)}
@@ -423,6 +514,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     quantities={quantities}
                     setQuantities={setQuantities}
                     clienteId={clienteId} // Pasa el clienteId automáticamente
+                    showToast={showToast} // Pasa la función showToast
                   />
                 </View>
               ))}
@@ -432,9 +524,9 @@ const Home = ({ navigation }: HomeScreenProps) => {
             )}
           </View>
         </ScrollView>
-        <BottomSheet2 ref={moresheet2} />
+        {/* <BottomSheet2 ref={moresheet2} /> */}
       </LinearGradient>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast />
     </View>
   );
 };

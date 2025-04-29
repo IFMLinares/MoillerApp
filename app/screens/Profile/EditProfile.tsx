@@ -201,13 +201,7 @@ const EditProfile = () => {
                 delay={600}
                 style={{ color: colors.title, marginBottom: 10 }}>
                 Activo: {userInfo.is_active ? "Sí" : "No"}
-              </Animatable.Text>
-              <Animatable.Text
-                animation="fadeInLeft"
-                delay={700}
-                style={{ color: colors.title, marginBottom: 10 }}>
-                Administrador: {userInfo.is_superuser ? "Sí" : "No"}
-              </Animatable.Text>
+              </Animatable.Text> 
             </View>
           </Animatable.View>
         ) : (

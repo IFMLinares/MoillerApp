@@ -50,3 +50,4 @@ export const fetchProductsBrand = async (co_cat: string, co_cli: string, page: n
     throw error;
   }
 };
+

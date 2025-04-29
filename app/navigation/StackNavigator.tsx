@@ -3,6 +3,9 @@ import {
   createStackNavigator,
   CardStyleInterpolators,
 } from "@react-navigation/stack";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { RootState } from "../redux/store"; // Asegúrate de que este sea el path correcto a tu store
 import { RootStackParamList } from "./RootStackParamList";
 import { StatusBar, View, Text } from "react-native";
 import { useTheme } from "@react-navigation/native";
@@ -46,8 +49,7 @@ import Footers from "../screens/Components/Footers";
 import TabStyle1 from "../components/Footers/FooterStyle1";
 import TabStyle2 from "../components/Footers/FooterStyle2";
 import TabStyle3 from "../components/Footers/FooterStyle3";
-import TabStyle4 from "../components/Footers/FooterStyle4";
-import ListScreen from "../screens/Components/lists";
+import TabStyle4 from "../components/Footers/FooterStyle4"; 
 import Pricings from "../screens/Components/Pricings";
 import DividerElements from "../screens/Components/DividerElements";
 import Snackbars from "../screens/Components/Snackbars";
@@ -73,7 +75,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const StackNavigator = () => {
   const theme = useTheme();
-  const dispatch = useDispatch();
+  const dispatch: ThunkDispatch<RootState, void, AnyAction> = useDispatch();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -89,7 +91,8 @@ const StackNavigator = () => {
     fetchUserInfo();
   }, [dispatch]);
 
-  const [initialRoute, setInitialRoute] = useState<string | null>(null);
+  const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | null>(null);
+
 
   useEffect(() => {
     const checkIfFirstLaunch = async () => {
@@ -158,8 +161,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Singlechat" component={Singlechat} />
         <Stack.Screen name="Call" component={Call} />
         <Stack.Screen name="Catalogo" component={CatalogoScreen} />
-        <Stack.Screen name="SearchArticles" component={SearchArticles} />
-        <Stack.Screen name="ProductDetail" component={ProductDetail} />
+        <Stack.Screen name="SearchArticles" component={SearchArticles} /> 
         <Stack.Screen name="Components" component={Components} />
         <Stack.Screen name="Accordion" component={AccordionScreen} />
         <Stack.Screen name="BottomSheet" component={BottomSheet} />

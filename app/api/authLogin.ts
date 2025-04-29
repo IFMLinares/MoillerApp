@@ -16,7 +16,13 @@ export const authLogin = async (username: string, password: string) => {
     await AsyncStorage.setItem('refreshToken', refresh); // Guardar el token de actualización
     return response.data;
   } catch (error) {
-    console.error('Error al iniciar sesión:', error.response?.data || error.message);
+    if (axios.isAxiosError(error)) {
+      console.error('Error al iniciar sesión:', error.response?.data || error.message);
+    } else if (error instanceof Error) {
+      console.error('Error inesperado:', error.message);
+    } else {
+      console.error('Error desconocido:', error);
+    }
     throw new Error("Error al iniciar sesión. Por favor, inténtelo de nuevo.");
   }
 };
@@ -37,6 +43,13 @@ export const refreshAccessToken = async () => {
     await AsyncStorage.setItem('accessToken', access); // Actualiza el token de acceso
     return access;
   } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error al refrescar el token:', error.response?.data || error.message);
+    } else if (error instanceof Error) {
+      console.error('Error inesperado:', error.message);
+    } else {
+      console.error('Error desconocido:', error);
+    }
     throw new Error('Error al refrescar el token. Por favor, inicie sesión nuevamente.');
   }
 };

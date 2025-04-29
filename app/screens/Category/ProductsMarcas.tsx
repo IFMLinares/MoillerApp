@@ -23,7 +23,6 @@ import BottomSheet2 from "../Components/BottomSheet2";
 import Header from "../../layout/Header";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
 import { useDispatch, useSelector } from "react-redux";
-import data from "../../data/data.json";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
 import { addToCart } from "../../redux/reducer/cartReducer";
@@ -43,13 +42,22 @@ type ProductsScreenProps = StackScreenProps<
   "ProductsMarcas"
 >;
 
+type Article = {
+  id: number;
+  name: string;
+  price: number;
+  code: string;
+  highImage: string;
+  createdAt: string; // Agrega esta propiedad
+};
+
 const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   const { brandId, brandName, clienteId } = route.params; // Recibe los parámetros de la marca
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors } = theme;
   const [show, setShow] = useState(true); // Alternar entre las dos listas
-  const [articles, setArticles] = useState([]);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
   const [page, setPage] = useState(1); // Página actual para la paginación
@@ -57,7 +65,32 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   const [loadingMoreGrid, setLoadingMoreGrid] = useState(false); // Estado para cargar más artículos en la vista de cuadrícula
   const [loadingMoreList, setLoadingMoreList] = useState(false); // Estado para cargar más artículos en la vista de lista
   const [hasMore, setHasMore] = useState(true); // Indica si hay más productos para cargar
-  const [sortCriteria, setSortCriteria] = useState("De la A a la Z"); // Estado para el criterio de ordenación
+  const [sortCriteria, setSortCriteria] = useState<
+    | "De la A a la Z"
+    | "De la Z a la A"
+    | "Precio: menor a mayor"
+    | "Precio: mayor a menor"
+    | "Lo más nuevo primero"
+  >("De la A a la Z");
+  const toastRef = useRef<any>(null); // Define el tipo de `toastRef`
+
+  const showToast = (type: string, text1: string, text2: string = "") => {
+    toastRef.current?.show({
+      type,
+      text1,
+      text2,
+    });
+  };
+
+  const addItemToCart = async (item: Article) => {
+    // Define el tipo de `item`
+    try {
+      // Lógica para añadir al carrito...
+      showToast("success", "¡Producto añadido al carrito exitosamente!");
+    } catch (error) {
+      showToast("error", "Error al añadir al carrito", "Inténtalo de nuevo.");
+    }
+  };
 
   // Cargar productos al montar el componente
   useEffect(() => {
@@ -79,13 +112,21 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
         // Si no hay datos en caché, cargar desde la API
         console.log("Cargando artículos desde la API");
         const fetchedArticles = await fetchProductsBrand(
-          brandId,
-          clienteId,
+          brandId.toString(), // Convierte brandId a string
+          clienteId.toString(), // Convierte clienteId a string
           page
         ); // Filtra por marca y cliente
-        fetchedArticles.results.sort((a, b) => a.name.localeCompare(b.name)); // Orden inicial
+        console.log("Respuesta de la API:", fetchedArticles);
+        fetchedArticles.results.sort((a: Article, b: Article) =>
+          a.name.localeCompare(b.name)
+        );
         if (fetchedArticles.results.length === 0) {
           setHasMore(false); // No hay más productos para cargar
+          Toast.show({
+            type: "info",
+            text1: "Sin productos",
+            text2: `No hay productos disponibles para la marca ${brandName}.`,
+          });
         } else {
           setArticles(fetchedArticles.results);
 
@@ -106,7 +147,14 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   }, [brandId, clienteId, page]); // Escucha cambios en los parámetros y la página
 
   // Función para ordenar los artículos
-  const sortArticles = (criteria) => {
+  const sortArticles = (
+    criteria:
+      | "De la A a la Z"
+      | "De la Z a la A"
+      | "Precio: menor a mayor"
+      | "Precio: mayor a menor"
+      | "Lo más nuevo primero"
+  ) => {
     let sortedArticles = [...articles];
     if (criteria === "De la A a la Z") {
       sortedArticles.sort((a, b) => a.name.localeCompare(b.name));
@@ -118,30 +166,42 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
       sortedArticles.sort((a, b) => b.price - a.price);
     } else if (criteria === "Lo más nuevo primero") {
       sortedArticles.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
     }
     setArticles(sortedArticles);
   };
 
-  // Manejar el cambio de criterio de ordenación
-  const handleSortChange = (criteria) => {
-    setSortCriteria(criteria);
-    sortArticles(criteria);
+  const handleSortChange = (criteria: string) => {
+    const validCriteria = [
+      "De la A a la Z",
+      "De la Z a la A",
+      "Precio: menor a mayor",
+      "Precio: mayor a menor",
+      "Lo más nuevo primero",
+    ] as const;
+  
+    if (validCriteria.includes(criteria as typeof validCriteria[number])) {
+      setSortCriteria(criteria as typeof validCriteria[number]);
+      sortArticles(criteria as typeof validCriteria[number]);
+    } else {
+      console.warn(`Criterio de ordenación no válido: ${criteria}`);
+    }
   };
 
-  const loadMoreArticles = async (listType: "grid" | "list") => {
+  const loadMoreArticles = async () => {
     if (!hasMore) return; // No cargar más si no hay más productos
-    if (listType === "grid" && loadingMoreGrid) return; // Evitar múltiples solicitudes simultáneas para la cuadrícula
-    if (listType === "list" && loadingMoreList) return; // Evitar múltiples solicitudes simultáneas para la lista
+    if (show && loadingMoreGrid) return; // Evitar múltiples solicitudes simultáneas para la cuadrícula
+    if (!show && loadingMoreList) return; // Evitar múltiples solicitudes simultáneas para la lista
 
-    if (listType === "grid") setLoadingMoreGrid(true);
-    if (listType === "list") setLoadingMoreList(true);
+    if (show) setLoadingMoreGrid(true);
+    if (!show) setLoadingMoreList(true);
 
     try {
       const newArticles = await fetchProductsBrand(
-        brandId,
-        clienteId,
+        brandId.toString(),
+        clienteId.toString(), // Convierte clienteId a string
         page + 1
       ); // Filtra por marca y cliente
       if (newArticles.results.length === 0) {
@@ -160,13 +220,13 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
     } catch (error) {
       console.error("Error al cargar más artículos:", error);
     } finally {
-      if (listType === "grid") setLoadingMoreGrid(false);
-      if (listType === "list") setLoadingMoreList(false);
+      if (show) setLoadingMoreGrid(false);
+      if (!show) setLoadingMoreList(false);
     }
   };
 
   // flatlist card1
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: Article }) => (
     <View
       style={[
         GlobalStyleSheet.col50,
@@ -177,40 +237,45 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
         },
       ]}>
       <Cardstyle1
-        id={item.id}
+        id={item.id.toString()}
         title={item.name}
         image={{ uri: `${BASE_URL}${item.highImage}` }}
-        price={item.price}
+        price={item.price.toString()}
         modelo={item.code}
         borderTop
         onPress={() =>
           navigation.navigate("ProductsDetails", {
             product: item, // Pasa el objeto completo del producto aquí
+            productId: item.id, // Agrega la propiedad productId
           })
         }
-        onPress3={() => addItemToWishList(item)}
       />
       <QuantityButton
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
+        showToast={showToast} // Pasa la función showToast
       />
     </View>
   );
   // flatlist card1
   // flatlist card2
-  const renderItem2 = ({ item, index }) => (
+  const renderItem2 = ({ item, index }: { item: Article; index: number }) => (
     <View key={index} style={{ marginBottom: 10 }}>
       <Cardstyle2
         title={item.name}
-        price={item.price}
+        price={item.price.toString()}
         marca={item.code}
         image={{ uri: `${BASE_URL}${item.highImage}` }}
         removebottom
+        delevery={true.toString()} // Agrega esta propiedad
+        quantity={1} // Agrega esta propiedad
+        productId={item.id.toString()} // Agrega esta propiedad
         onPress={() =>
           navigation.navigate("ProductsDetails", {
             product: item, // Pasa el objeto completo del producto aquí
+            productId: item.id, // Agrega la propiedad productId
           })
         }
       />
@@ -220,6 +285,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
+        showToast={showToast} // Pasa la función showToast
       />
     </View>
   );
@@ -279,7 +345,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
               source={IMAGES.list2}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}>
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
               ORDENAR POR
             </Text>
           </TouchableOpacity>
@@ -305,7 +371,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
               source={IMAGES.filter3}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}>
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
               FILTROS
             </Text>
           </TouchableOpacity>
@@ -370,29 +436,25 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
           { paddingTop: 15, paddingHorizontal: 0, marginBottom: 80 },
         ]}>
         <View>
-          {initialLoading ? (
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          ) : (
-            <FlatList
-              data={articles}
-              renderItem={show ? renderItem : renderItem2}
-              keyExtractor={(item) => item.id.toString()}
-              contentContainerStyle={{ paddingBottom: 20 }}
-              numColumns={show ? 2 : 1}
-              key={show ? "grid" : "list"} // Cambia la clave aquí
-              onEndReached={loadMoreArticles} // Cargar más productos al llegar al final
-              onEndReachedThreshold={0.5}
-              ListFooterComponent={
-                hasMore ? (
-                  <ActivityIndicator size="small" color={COLORS.primary} />
-                ) : null
-              }
-            />
-          )}
+          <FlatList
+            data={articles}
+            renderItem={show ? renderItem : renderItem2}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            numColumns={show ? 2 : 1}
+            key={show ? "grid" : "list"} // Cambia la clave aquí
+            onEndReached={loadMoreArticles} // Llama a la función directamente
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              hasMore ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : null
+            }
+          />
         </View>
       </View>
       <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast />
     </View>
   );
 };

@@ -1,5 +1,5 @@
 export const IMAGES = {
-    
+    defaultImage: require("../assets/images/default-image.png"), // Ruta a tu imagen por defecto
     // user : require('../assets/images/user.png'),
     // card : require('../assets/images/card.png'),
     card1 : require('../assets/images/card1.png'),

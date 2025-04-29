@@ -1,10 +1,9 @@
-import { createSlice } from "@reduxjs/toolkit";
-
+ 
 const initialState = {
   clienteId: null, // Valor inicial
 };
 
-const userReducer = (state = initialState, action) => {
+const userReducer = (state = initialState, action: any) => {
   switch (action.type) {
     case "SET_CLIENTE_ID":
       if (!action.payload || action.payload === 1) {

@@ -26,6 +26,7 @@ import Cardstyle1 from "../../components/Card/Cardstyle1";
 import { useDispatch, useSelector} from "react-redux";
 import { addToCart } from "../../redux/reducer/cartReducer";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
+import { RootState } from "../../redux/reducer";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
 import ImageViewer from "react-native-image-zoom-viewer";
@@ -38,25 +39,7 @@ import { addItemToCartApi } from "../../api/addItemApi";
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
 // api articulos
-
-const SelectData = [
-  {
-    title: "Color",
-    text: "Blue",
-  },
-  {
-    title: "Storage",
-    text: "128GB Storage",
-  },
-  {
-    title: "RAM",
-    text: "6GB RAM",
-  },
-  {
-    title: "Size",
-    text: "Medium",
-  },
-];
+ 
 
 const offerData = [
   {
@@ -85,60 +68,7 @@ const offerData = [
   //     text:"Pague con varias tarjetas de crédito",
   // },
 ];
-
-const card2Data = [
-  {
-    id: "20",
-    image: IMAGES.item1,
-    title: "APPLE iPhone 14 (Bluetooth)",
-    price: "$199",
-    discount: "$112",
-    offer: "70% OFF",
-    brand: "Apple",
-    color: false,
-    //hascolor:false
-  },
-  {
-    id: "21",
-    image: IMAGES.item2,
-    title: "APPLE iPhone 11 (Bluetooth)",
-    price: "$149",
-    discount: "$114",
-    offer: "50% OFF",
-    brand: "Apple",
-    color: false,
-    // hascolor:true
-  },
-  {
-    id: "22",
-    image: IMAGES.item1,
-    title: "APPLE iPhone 13 (Bluetooth)",
-    price: "$299",
-    discount: "$116",
-    offer: "70% OFF",
-    color: false,
-    brand: "Apple",
-    //hascolor:true
-  },
-  {
-    id: "23",
-    image: IMAGES.item2,
-    title: "APPLE iPhone 15 (Bluetooth)",
-    price: "$99",
-    discount: "$118",
-    offer: "70% OFF",
-    color: true,
-    brand: "Apple",
-    //hascolor:false
-  },
-];
-
-const ItemImages = [
-  IMAGES.product12,
-  IMAGES.product13,
-  IMAGES.product14,
-  IMAGES.product15,
-];
+ 
 
 type ProductsDetailsScreenProps = StackScreenProps<
   RootStackParamList,
@@ -156,7 +86,9 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [Select, setSelect] = useState(offerData[0]);
-  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
+
 
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -430,7 +362,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
             </Text>
             <Text
               style={[
-                FONTS.fontMediumItalic,
+                FONTS.fontJostMediumItalic, // Cambia a la propiedad correcta
                 { fontSize: 20, color: COLORS.primary, fontWeight: "bold" },
               ]}>
               {product.price} €
@@ -627,7 +559,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
         </View>
       </View>
 
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast />
 
       <Modal visible={isModalVisible} transparent={true}>
         <ImageViewer

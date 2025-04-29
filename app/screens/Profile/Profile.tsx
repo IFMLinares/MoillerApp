@@ -20,10 +20,13 @@ import { COLORS, FONTS, SIZES } from "../../constants/theme";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch } from "react-redux";
-import { openDrawer } from "../../redux/actions/drawerAction";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { RootState } from "../../redux/store"; 
 import AsyncStorage from "@react-native-async-storage/async-storage"; 
 import { setClienteId } from "../../redux/actions/drawerAction";
 import { cerrarSesion } from "../../api/cerrarSesionApi"; // Importar la función cerrarSesion
+import { getUserInfo } from "../../api/editPerfilApi"; // Importa la función de la API
 
 const getListwithiconData = (navigation: any, setShowModal: any) => [
   {
@@ -38,12 +41,7 @@ const getListwithiconData = (navigation: any, setShowModal: any) => [
         icon: IMAGES.chat,
         title: "Preguntas y respuestas",
         navigate: "Questions",
-      },
-      {
-        icon: IMAGES.delete,
-        title: "Eliminar cuenta",
-        navigate: "Questions",
-      },
+      }, 
       {
         icon: IMAGES.logout,
         title: "Cerrar sesión",
@@ -90,10 +88,29 @@ type ProfileScreenProps = StackScreenProps<RootStackParamList, "Profile">;
 
 const Profile = ({ navigation }: ProfileScreenProps) => {
   const [username, setUsername] = useState("");
+  const [userInfo, setUserInfo] = useState<any>(null); // Estado para almacenar la información del usuario
+  const [loading, setLoading] = useState(true); // Estado para manejar la carga
   const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const dispatch = useDispatch();
+  const dispatch: ThunkDispatch<RootState, void, AnyAction> = useDispatch(); // Usa la versión tipada de dispatch
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        setLoading(true); // Mostrar indicador de carga
+        const data = await getUserInfo(); // Llama a la API
+        console.log("Información del usuario:", data);
+        setUserInfo(data); // Almacena los datos en el estado
+      } catch (error) {
+        console.error("Error al obtener la información del usuario:", error);
+      } finally {
+        setLoading(false); // Ocultar indicador de carga
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   useEffect(() => {
     const getUsername = async () => {
@@ -169,22 +186,40 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
             backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
           },
         ]}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-            paddingBottom: 20,
-          }}>
-          <Image
-            style={{ height: 40, width: 40, borderRadius: 50 }}
-            source={IMAGES.write1}
-          />
-          <Text
-            style={{ ...FONTS.fontRegular, fontSize: 20, color: colors.title }}>
-            {username}
+        {loading ? (
+          <Text style={{ color: colors.title, textAlign: "center" }}>
+            Cargando información del usuario...
           </Text>
-        </View>
+        ) : (
+          userInfo && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 10,
+                paddingBottom: 20,
+              }}
+            >
+              <Image
+                style={{ height: 40, width: 40, borderRadius: 50 }}
+                source={
+                  userInfo.image
+                    ? { uri: userInfo.image } // Usa la imagen de la API
+                    : IMAGES.write1 // Imagen predeterminada
+                }
+              />
+              <Text
+                style={{
+                  ...FONTS.fontRegular,
+                  fontSize: 20,
+                  color: colors.title,
+                }}
+              >
+                {userInfo.first_name} {userInfo.last_name} {/* Muestra el nombre y apellido */}
+              </Text>
+            </View>
+          )
+        )}
         <View style={GlobalStyleSheet.row}>
           {/* Botón para Tus pedidos */}
           <View

@@ -37,7 +37,11 @@ export const getUserInfo = async () => {
         });
         return retryResponse.data;
       } catch (refreshError) {
-        console.error('Error al refrescar el token:', refreshError.message);
+        if (refreshError instanceof Error) {
+          console.error('Error al refrescar el token:', refreshError.message);
+        } else {
+          console.error('Error desconocido al refrescar el token:', refreshError);
+        }
         await AsyncStorage.removeItem('accessToken');
         await AsyncStorage.removeItem('refreshToken');
         throw new Error('Sesión expirada. Por favor, inicie sesión nuevamente.');

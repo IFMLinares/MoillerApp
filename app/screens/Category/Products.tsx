@@ -22,8 +22,7 @@ import Cardstyle2 from "../../components/Card/Cardstyle2";
 import BottomSheet2 from "../Components/BottomSheet2";
 import Header from "../../layout/Header";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
-import { useDispatch, useSelector } from "react-redux";
-import data from "../../data/data.json";
+import { useDispatch, useSelector } from "react-redux"; 
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
 import { addToCart } from "../../redux/reducer/cartReducer";
@@ -38,9 +37,16 @@ import QuantityButton from "../Components/QuantityButton";
 import QuantityButton2 from "../Components/QuantityButton2";
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
- 
-
 type ProductsScreenProps = StackScreenProps<RootStackParamList, "Products">;
+
+type Article = {
+  id: number;
+  name: string;
+  price: number;
+  code: string;
+  highImage: string;
+  createdAt: string;
+};
 
 const Products = ({ navigation, route }: ProductsScreenProps) => {
   const { subcategoryId, subcategoryName, clienteId } = route.params;
@@ -48,21 +54,42 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
   const theme = useTheme();
   const { colors } = theme;
   const [show, setShow] = useState(true);
-  const [articles, setArticles] = useState([]);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [quantities, setQuantities] = useState({});
   const sheetRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Estado para el indicador de carga
   const [sortCriteria, setSortCriteria] = useState("De la A a la Z"); // Estado para el criterio de ordenación
   const [currentPage, setCurrentPage] = useState(1); // Estado para la paginación
   const [hasMore, setHasMore] = useState(true); // Controlar si hay más páginas
+  const toastRef = useRef(null);
+
+  const showToast = (type: string, text1: string, text2: string = "") => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+    });
+  };
+
+const addItemToCart = async (item: Article) => {
+  try {
+    showToast("success", "¡Producto añadido al carrito exitosamente!");
+  } catch (error) {
+    showToast("error", "Error al añadir al carrito", "Inténtalo de nuevo.");
+  }
+};
 
   useEffect(() => {
     const loadArticles = async () => {
       try {
         setIsLoading(true);
- await AsyncStorage.clear(); // Limpiar AsyncStorage para pruebas
+        // await AsyncStorage.clear(); // Limpiar AsyncStorage para pruebas
         // Llamar a la API con los parámetros subcategoryId y clienteId
-        const data = await fetchProductsBySubcategory(subcategoryId, clienteId, currentPage);
+        const data = await fetchProductsBySubcategory(
+          subcategoryId.toString(), // Convierte subcategoryId a string
+          clienteId.toString(),
+          currentPage
+        );
 
         // Actualizar los artículos y manejar la paginación
         setArticles((prevArticles) => [...prevArticles, ...data.results]);
@@ -84,8 +111,8 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
     }
   };
 
-   // Función para ordenar los artículos
-   const sortArticles = (criteria) => {
+  // Función para ordenar los artículos
+  const sortArticles = (criteria: "De la A a la Z" | "De la Z a la A" | "Precio: menor a mayor" | "Precio: mayor a menor" | "Lo más nuevo primero") => {
     let sortedArticles = [...articles];
     if (criteria === "De la A a la Z") {
       sortedArticles.sort((a, b) => a.name.localeCompare(b.name));
@@ -96,19 +123,31 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
     } else if (criteria === "Precio: mayor a menor") {
       sortedArticles.sort((a, b) => b.price - a.price);
     } else if (criteria === "Lo más nuevo primero") {
-      sortedArticles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      sortedArticles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
     setArticles(sortedArticles);
   };
 
   // Manejar el cambio de criterio de ordenación
-  const handleSortChange = (criteria) => {
-    setSortCriteria(criteria);
-    sortArticles(criteria);
+  const handleSortChange = (criteria: string) => {
+    const validCriteria = [
+      "De la A a la Z",
+      "De la Z a la A",
+      "Precio: menor a mayor",
+      "Precio: mayor a menor",
+      "Lo más nuevo primero",
+    ] as const;
+  
+    if (validCriteria.includes(criteria as typeof validCriteria[number])) {
+      setSortCriteria(criteria as typeof validCriteria[number]);
+      sortArticles(criteria as typeof validCriteria[number]);
+    } else {
+      console.warn(`Criterio de ordenación no válido: ${criteria}`);
+    }
   };
 
   // flatlist card1
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: Article }) => (
     <View
       style={[
         GlobalStyleSheet.col50,
@@ -119,53 +158,57 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
         },
       ]}>
       <Cardstyle1
-        id={item.id}
+        id={item.id.toString()}
         title={item.name}
         image={{ uri: `${BASE_URL}${item.highImage}` }}
-        price={item.price}
+        price={item.price.toString()}
         modelo={item.code}
         borderTop
         onPress={() =>
           navigation.navigate("ProductsDetails", {
             product: item, // Pasa el objeto completo del producto aquí
+            productId: item.id, // Agrega la propiedad productId
           })
-        }
-        onPress3={() => addItemToWishList(item)}
+        } 
       />
       <QuantityButton
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
-
+        showToast={showToast} // Pasa la función showToast
       />
     </View>
   );
+  console.log("Pasando showToast a QuantityButton:", showToast);
   // flatlist card1
   // flatlist card2
-  const renderItem2 = ({ item, index }) => (
+  const renderItem2 = ({ item, index }: { item: Article; index: number }) => (
     <View key={index} style={{ marginBottom: 10 }}>
       <Cardstyle2
         title={item.name}
-        price={item.price}
+        price={item.price.toString()}
         marca={item.code}
         image={{ uri: `${BASE_URL}${item.highImage}` }}
+        delevery={true.toString()} // Agrega esta propiedad
+        quantity={1} // Agrega esta propiedad
+        productId={item.id.toString()} // Agrega esta propiedad
         removebottom
         onPress={() =>
           navigation.navigate("ProductsDetails", {
-            product: item, // Pasa el objeto completo del producto aquí 
+            product: item, // Pasa el objeto completo del producto aquí
+            productId: item.id, // Agrega la propiedad productId
           })
         }
       />
-      
+
       <QuantityButton2
         item={item}
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
-
+        showToast={showToast} // Pasa la función showToast
       />
-
     </View>
   );
 
@@ -197,8 +240,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
             height: 40,
             width: "100%",
           },
-        ]}
-      >
+        ]}>
         <View
           style={[
             GlobalStyleSheet.container,
@@ -208,8 +250,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               flexDirection: "row",
               alignItems: "center",
             },
-          ]}
-        >
+          ]}>
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={() => sheetRef.current.openSheet("short")}
@@ -219,15 +260,13 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               gap: 5,
               width: "35%",
               justifyContent: "center",
-            }}
-          >
+            }}>
             <Image
               style={{ height: 16, width: 16, resizeMode: "contain" }}
               source={IMAGES.list2}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}
-            >
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
               ORDENAR POR
             </Text>
           </TouchableOpacity>
@@ -247,15 +286,13 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               gap: 5,
               width: "35%",
               justifyContent: "center",
-            }}
-          >
+            }}>
             <Image
               style={{ height: 16, width: 16, resizeMode: "contain" }}
               source={IMAGES.filter3}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.title }]}
-            >
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text}]}>
               FILTROS
             </Text>
           </TouchableOpacity>
@@ -274,8 +311,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               width: "15%",
               justifyContent: "center",
               alignItems: "center",
-            }}
-          >
+            }}>
             <Image
               style={{
                 height: 22,
@@ -301,8 +337,7 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
               width: "15%",
               justifyContent: "center",
               alignItems: "center",
-            }}
-          >
+            }}>
             <Image
               style={{
                 height: 22,
@@ -319,12 +354,11 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
       <View
         style={[
           GlobalStyleSheet.container,
-          { paddingTop: 15, paddingHorizontal: 0, marginBottom: 100,},
-        ]}
-      >
-      {isLoading && currentPage === 1 ? (
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      ) : (
+          { paddingTop: 15, paddingHorizontal: 0, marginBottom: 100 },
+        ]}>
+        {isLoading && currentPage === 1 ? (
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        ) : (
           <FlatList
             data={articles}
             renderItem={show ? renderItem : renderItem2}
@@ -335,13 +369,15 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
             onEndReached={loadMoreArticles} // Cargar más productos al llegar al final
             onEndReachedThreshold={0.5}
             ListFooterComponent={
-              hasMore ? <ActivityIndicator size="small" color={COLORS.primary} /> : null
+              hasMore ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : null
             }
           />
         )}
       </View>
       <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast  />
     </View>
   );
 };

@@ -72,23 +72,48 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
   const [hasMore, setHasMore] = useState(true);
   const flatListRef = useRef(null); // Referencia para FlatList
 
+  const toastRef = useRef(null);
+
+  const showToast = (type: string, text1: string, text2: string = "") => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+    });
+  };
+
+  const addItemToCart = async (item: Article) => {
+    try {
+      // Lógica para añadir al carrito...
+      showToast("success", "¡Producto añadido al carrito exitosamente!");
+    } catch (error) {
+      showToast("error", "Error al añadir al carrito", "Inténtalo de nuevo.");
+    }
+  };
+
   useEffect(() => {
     loadArticles();
   }, [page]);
 
   const loadArticles = async () => {
     if (!hasMore || isLoading) return;
-  
+
     setIsLoading(true);
     try {
-      const { articles: newArticles, next } = await fetchArticles(clienteId, page);
-  
+      const { articles: newArticles, next } = await fetchArticles(
+        clienteId,
+        page
+      );
+
       const articlesWithDefaultPrice = newArticles.map((article: Article) => ({
         ...article,
         price: article.price || 0, // Asigna un precio predeterminado si no está definido
       }));
-  
-      setArticles((prevArticles) => [...prevArticles, ...articlesWithDefaultPrice]);
+
+      setArticles((prevArticles) => [
+        ...prevArticles,
+        ...articlesWithDefaultPrice,
+      ]);
       setHasMore(!!next);
     } catch (error) {
       Toast.show({
@@ -146,6 +171,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
         onPress={() =>
           navigation.navigate("ProductsDetails", {
             product: item, // Pasa el objeto completo del producto aquí
+            productId: item.id, // Agrega la propiedad productId
           })
         }
         // onPress3={() => addItemToWishList(item)}
@@ -155,13 +181,14 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
+        showToast={showToast} // Pasa la función showToast
       />
     </View>
   );
   // flatlist card1
   // flatlist card2
   const renderItem2 = ({ item, index }: { item: Article; index: number }) => (
-    <View key={index} style={{ marginBottom: 10  }}>
+    <View key={index} style={{ marginBottom: 10 }}>
       <Cardstyle2
         title={item.name}
         price={(item.price || 0).toString()} // Proporciona un valor predeterminado si `price` es undefined // Convierte el precio a string si es necesario
@@ -175,6 +202,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
         onPress={() =>
           navigation.navigate("ProductsDetails", {
             product: item, // Pasa el objeto completo del producto aquí
+            productId: item.id, // Agrega la propiedad productId
           })
         }
       />
@@ -184,6 +212,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
         quantities={quantities}
         setQuantities={setQuantities}
         clienteId={clienteId} // Pasa el clienteId automáticamente
+        showToast={showToast} // Pasa la función showToast
       />
     </View>
   );
@@ -242,7 +271,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               source={IMAGES.list2}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text}]}>
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
               ORDENAR POR
             </Text>
           </TouchableOpacity>
@@ -268,7 +297,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               source={IMAGES.filter3}
             />
             <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text}]}>
+              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
               FILTROS
             </Text>
           </TouchableOpacity>
@@ -362,7 +391,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
         />
       </View>
       <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />
-      <Toast />
+      <Toast  />
     </View>
   );
 };
