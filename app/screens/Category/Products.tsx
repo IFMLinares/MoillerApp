@@ -376,7 +376,11 @@ const addItemToCart = async (item: Article) => {
           />
         )}
       </View>
-      <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />
+      <BottomSheet2
+        ref={sheetRef}
+        onSortChange={handleSortChange}
+        activeSortCriteria={sortCriteria} // Pasa el estado actual como prop
+      />
       <Toast  />
     </View>
   );

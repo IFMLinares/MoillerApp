@@ -390,8 +390,12 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
           }}
         />
       </View>
-      <BottomSheet2 ref={sheetRef} onSortChange={handleSortChange} />
-      <Toast  />
+      <BottomSheet2
+        ref={sheetRef}
+        onSortChange={handleSortChange}
+        activeSortCriteria={sortCriteria} // Pasa el estado actual como prop
+      />
+      <Toast />
     </View>
   );
 };

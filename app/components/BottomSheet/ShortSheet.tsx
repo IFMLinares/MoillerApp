@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "@react-navigation/native";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
 import { COLORS, FONTS } from "../../constants/theme";
@@ -8,9 +8,10 @@ import { IMAGES } from "../../constants/Images";
 type Props = {
   shortRef?: any;
   onSortChange: (sortOption: string) => void; // Agregar esta línea
+  activeSortCriteria: string; // Nueva prop para sincronizar el estado inicial
 };
 
-const ShortSheet2 = ({ shortRef, onSortChange}: Props) => {
+const ShortSheet2 = ({ shortRef, onSortChange, activeSortCriteria }: Props) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
 
@@ -22,7 +23,12 @@ const ShortSheet2 = ({ shortRef, onSortChange}: Props) => {
     "Lo más nuevo primero",
   ];
 
-  const [activeSize, setActiveSize] = useState(SortData[0]);
+  const [activeSize, setActiveSize] = useState(activeSortCriteria);
+
+    // Sincroniza el estado inicial con la prop activeSortCriteria
+    useEffect(() => {
+      setActiveSize(activeSortCriteria);
+    }, [activeSortCriteria]);
 
   return (
     <View
@@ -73,15 +79,14 @@ const ShortSheet2 = ({ shortRef, onSortChange}: Props) => {
         {SortData.map((data, index) => {
           return (
             <TouchableOpacity
-            onPress={() => {
-                setActiveSize(data);
-                onSortChange(data); // Notificar al componente padre
-                shortRef.current.close();
+              onPress={() => {
+                setActiveSize(data); // Actualiza el estado con la opción seleccionada
+                onSortChange(data); // Notifica al componente padre
+                shortRef.current.close(); // Cierra el BottomSheet
               }}
               key={index}
               style={[
                 {
-                  //backgroundColor:theme.dark ? 'rgba(255,255,255,0.10)': colors.background,
                   height: 40,
                   width: "100%",
                   alignItems: "center",
@@ -90,25 +95,26 @@ const ShortSheet2 = ({ shortRef, onSortChange}: Props) => {
                   paddingVertical: 5,
                   marginBottom: 5,
                 },
+                activeSize === data && {
+                  backgroundColor: colors.card,
+                },
               ]}>
               <Text
                 style={[
                   { ...FONTS.fontRegular, fontSize: 15, color: colors.title },
+                  activeSize === data && { color: COLORS.primary },
                 ]}>
                 {data}
               </Text>
               <View
                 style={[
                   {
-                    //borderWidth: 1,
                     backgroundColor: COLORS.primaryLight,
                     width: 24,
                     height: 24,
                     borderRadius: 50,
-                    //borderColor: theme.dark ? COLORS.white : colors.borderColor,
                     alignItems: "center",
                     justifyContent: "center",
-                    // flex:1
                   },
                   activeSize === data && {
                     backgroundColor: COLORS.primary,
