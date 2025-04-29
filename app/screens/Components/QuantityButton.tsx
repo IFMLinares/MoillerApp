@@ -43,8 +43,8 @@ const QuantityButton = ({
   showToast,
 }: {
   item: Product; // Aplica el tipo aquí
-  quantities: { [key: number]: number };
-  setQuantities: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>;
+  quantities: { [key: number]: number | undefined }; // Permitir undefined
+  setQuantities: React.Dispatch<React.SetStateAction<{ [key: number]: number | undefined }>>;
   clienteId: number;
   showToast: (type: string, text1: string, text2?: string) => void;
 }) => {
@@ -114,7 +114,7 @@ const addItemToCart = useCallback(
     (id: number) => {
       setQuantities((prevQuantities) => ({
         ...prevQuantities,
-        [id]: prevQuantities[id] > 1 ? prevQuantities[id] - 1 : 1,
+        [id]: (prevQuantities[id] ?? 1) > 1 ? (prevQuantities[id] ?? 1) - 1 : 1,
       }));
     },
     [setQuantities]
@@ -122,12 +122,20 @@ const addItemToCart = useCallback(
   
   const handleQuantityChange = useCallback(
     (id: number, value: string) => {
-      const numericValue = parseInt(value, 10);
-      if (!isNaN(numericValue) && numericValue > 0) {
+      if (value === "") {
+        // Permitir que el campo quede vacío
         setQuantities((prevQuantities) => ({
           ...prevQuantities,
-          [id]: numericValue,
+          [id]: undefined, // O eliminar la clave si prefieres
         }));
+      } else {
+        const numericValue = parseInt(value, 10);
+        if (!isNaN(numericValue) && numericValue > 0) {
+          setQuantities((prevQuantities) => ({
+            ...prevQuantities,
+            [id]: numericValue,
+          }));
+        }
       }
     },
     [setQuantities]
@@ -171,7 +179,8 @@ const addItemToCart = useCallback(
             width: wp("9.0%"),
           }}
           keyboardType="numeric"
-          value={(quantities[item.id] || 1).toString()}
+          value={quantities[item.id]?.toString() || ""}
+          placeholder="1" // Muestra el número 1 como un placeholder
           onChangeText={(value) => handleQuantityChange(item.id, value)}
         />
         <TouchableOpacity

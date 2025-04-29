@@ -29,8 +29,8 @@ type Article = {
 
 type QuantityButton2Props = {
   item: Article; // Define el tipo de `item` como `Article`
-  quantities: { [key: number]: number }; // Define `quantities` como un objeto con claves numéricas y valores numéricos
-  setQuantities: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>; // Define `setQuantities` como una función de React para actualizar el estado
+  quantities: { [key: number]: number | undefined }; // Permitir undefined
+  setQuantities: React.Dispatch<React.SetStateAction<{ [key: number]: number | undefined }>>; // Permitir undefined
   clienteId: number; // Define `clienteId` como un número
   showToast: (type: string, text1: string, text2?: string) => void; // Define `showToast` como una función que muestra un mensaje
 };
@@ -78,36 +78,45 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
 
   const incrementQuantity = useCallback(
     (id: number) => {
-      setQuantities((prevQuantities: { [key: number]: number }) => ({
+      setQuantities((prevQuantities) => ({
         ...prevQuantities,
-        [id]: (prevQuantities[id] || 1) + 1,
+        [id]: (prevQuantities[id] ?? 0) + 1, // Usa 0 como valor predeterminado si es undefined
       }));
     },
     [setQuantities]
   );
-  
-  const decrementQuantity = useCallback(
-    (id: number) => {
-      setQuantities((prevQuantities: { [key: number]: number }) => ({
-        ...prevQuantities,
-        [id]: prevQuantities[id] > 1 ? prevQuantities[id] - 1 : 1,
-      }));
-    },
-    [setQuantities]
-  );
+
+const decrementQuantity = useCallback(
+  (id: number) => {
+    setQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [id]: (prevQuantities[id] ?? 1) > 1 ? (prevQuantities[id] ?? 1) - 1 : 1,
+    }));
+  },
+  [setQuantities]
+)
   
   const handleQuantityChange = useCallback(
     (id: number, value: string) => {
-      const numericValue = parseInt(value, 10);
-      if (!isNaN(numericValue) && numericValue > 0) {
-        setQuantities((prevQuantities: { [key: number]: number }) => ({
+      if (value === "") {
+        // Permitir que el campo quede vacío
+        setQuantities((prevQuantities) => ({
           ...prevQuantities,
-          [id]: numericValue,
+          [id]: undefined, // O eliminar la clave si prefieres
         }));
+      } else {
+        const numericValue = parseInt(value, 10);
+        if (!isNaN(numericValue) && numericValue > 0) {
+          setQuantities((prevQuantities) => ({
+            ...prevQuantities,
+            [id]: numericValue,
+          }));
+        }
       }
     },
     [setQuantities]
   );
+
 
   return (
     <View
@@ -147,7 +156,8 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
             width: wp("4.0%"),
           }}
           keyboardType="numeric"
-          value={(quantities[item.id] || 1).toString()}
+          value={quantities[item.id]?.toString() || ""}
+          placeholder="1" // Muestra el número 1 como un placeholder
           onChangeText={(value) => handleQuantityChange(item.id, value)}
         />
         <TouchableOpacity
