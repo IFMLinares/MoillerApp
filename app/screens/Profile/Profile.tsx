@@ -51,9 +51,6 @@ const getListwithiconData = (navigation: any, setShowModal: any) => [
       },
     ],
   },
-];
-
-const soporteData = [
   {
     title: "Soporte",
     data: [
@@ -83,7 +80,7 @@ const soporteData = [
     ],
   },
 ];
-
+ 
 type ProfileScreenProps = StackScreenProps<RootStackParamList, "Profile">;
 
 const Profile = ({ navigation }: ProfileScreenProps) => {
@@ -263,6 +260,8 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
                     item.action(); // Ejecuta la acción personalizada si existe
                   } else if (item.navigate) {
                     navigation.navigate(item.navigate); // Navega si tiene una ruta definida
+                  } else if (item.link) {
+                    Linking.openURL(item.link); // Abre el enlace si existe
                   }
                 }}
                 style={{
@@ -330,81 +329,7 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
             )}
           />
         </View>
-      </View>
-      <View style={[GlobalStyleSheet.container, { flex: 1, paddingTop: 0 }]}>
-        <View style={{ marginHorizontal: -15, marginTop: 0, flex: 1 }}>
-          <SectionList
-            sections={soporteData}
-            keyExtractor={(item: any, index) => item + index}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => {
-                  if (item.link) {
-                    Linking.openURL(item.link); // Abre el enlace si existe
-                  }
-                }}
-                style={{
-                  flexDirection: "row",
-                  paddingHorizontal: 15,
-                  height: 55,
-                  alignItems: "center",
-                  paddingVertical: 15,
-                  backgroundColor: theme.dark
-                    ? "rgba(255,255,255,.1)"
-                    : colors.card,
-                }}>
-                <View
-                  style={{
-                    height: 30,
-                    width: 30,
-                    borderRadius: 6,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: 10,
-                  }}>
-                  <Image
-                    style={{
-                      height: 20,
-                      width: 20,
-                      tintColor: COLORS.primary,
-                      resizeMode: "contain",
-                    }}
-                    source={item.icon}
-                  />
-                </View>
-                <Text
-                  style={{
-                    ...FONTS.fontRegular,
-                    fontSize: 16,
-                    color: colors.title,
-                    flex: 1,
-                  }}>
-                  {item.title}
-                </Text>
-              </TouchableOpacity>
-            )}
-            renderSectionHeader={({ section: { title } }) => (
-              <Text
-                style={{
-                  ...FONTS.fontMedium,
-                  fontSize: 20,
-                  color: colors.title,
-                  paddingLeft: 20,
-                  paddingVertical: 10,
-                  backgroundColor: theme.dark
-                    ? "rgba(255,255,255,.1)"
-                    : COLORS.white,
-                  borderBottomWidth: 1,
-                  borderBottomColor: COLORS.primaryLight,
-                  marginTop: 10,
-                }}>
-                {title}
-              </Text>
-            )}
-          />
-        </View>
-      </View>
+      </View> 
       {/* Modal de confirmación */}
       <Modal
         transparent={true}
