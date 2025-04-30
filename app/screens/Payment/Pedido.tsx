@@ -80,6 +80,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
   const totalAmount = parseFloat(calculateTotal()); // Monto total calculado
   const remainingAmount = totalAmount - amountPaid; // Monto restante
 
+  
   const handleUploadImage = async () => {
     if (!selectedImage) {
       alert("Por favor, selecciona una imagen antes de enviarla.");
@@ -99,6 +100,10 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
   
       console.log("Respuesta del servidor:", response);
       alert("Imagen enviada exitosamente.");
+  
+      // Actualizar los detalles del carrito después de subir el comprobante
+      const updatedCartDetails = await fetchShoppingCartDetailsApi(order.id);
+      setCartDetails(updatedCartDetails); // Actualiza el estado con los nuevos datos
     } catch (error) {
       console.error("Error al enviar la imagen:", error);
       if (error.response) {
