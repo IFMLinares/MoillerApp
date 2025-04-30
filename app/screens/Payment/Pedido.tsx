@@ -8,6 +8,7 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from "react-native";
 import Header from "../../layout/Header";
 import { IMAGES } from "../../constants/Images";
@@ -25,7 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchShoppingCartDetailsApi } from "../../api/shoppingApi";
 import * as ImagePicker from "expo-image-picker"; // Para Expo
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
-
+import { uploadComprobantePagoApi } from "../../api/comprobanteApi"; // Importar la función de la API
 
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Pedido">;
 
@@ -52,7 +53,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
         console.error("Error al obtener los detalles del carrito:", error);
       }
     };
-  
+
     fetchCartDetails();
   }, [order.id]);
 
@@ -79,9 +80,32 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
   const totalAmount = parseFloat(calculateTotal()); // Monto total calculado
   const remainingAmount = totalAmount - amountPaid; // Monto restante
 
-  const handleAmountChange = (value: string) => {
-    const numericValue = parseFloat(value) || 0; // Convertir el valor ingresado a número
-    setAmountPaid(numericValue);
+  const handleUploadImage = async () => {
+    if (!selectedImage) {
+      alert("Por favor, selecciona una imagen antes de enviarla.");
+      return;
+    }
+  
+    try {
+      const fileType = selectedImage.split(".").pop(); // Obtener la extensión del archivo
+      const mimeType = `image/${fileType}`; // Construir el tipo MIME
+      console.log("Tipo MIME detectado:", mimeType);
+  
+      // Ajustar la URI para Android si es necesario
+      const adjustedUri = Platform.OS === "android" ? selectedImage : selectedImage.replace("file://", "");
+      console.log("URI ajustada:", adjustedUri);
+  
+      const response = await uploadComprobantePagoApi(order.id, adjustedUri, mimeType);
+  
+      console.log("Respuesta del servidor:", response);
+      alert("Imagen enviada exitosamente.");
+    } catch (error) {
+      console.error("Error al enviar la imagen:", error);
+      if (error.response) {
+        console.error("Detalles del error del servidor:", error.response.data);
+      }
+      alert("Hubo un error al enviar la imagen. Inténtalo nuevamente.");
+    }
   };
 
   // Función para abrir la cámara
@@ -128,7 +152,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
     setIsModalVisible(true);
     setTimeout(() => {
       setIsModalVisible(false);
-      navigation.navigate("Myorder", { 
+      navigation.navigate("Myorder", {
         clienteId: cart.clienteId, // Pasar el clienteId
       });
     }, 2000);
@@ -235,17 +259,32 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
 
           {/* Mostrar la imagen seleccionada */}
           {selectedImage && (
-            <Image
-              source={{ uri: selectedImage }}
-              style={{
-                width: "100%",
-                height: 200,
-                borderRadius: 10,
-                marginTop: 10,
-              }}
-            />
+            <>
+              <Image
+                source={{ uri: selectedImage }}
+                style={{
+                  width: "100%",
+                  height: 200,
+                  borderRadius: 10,
+                  marginTop: 10,
+                }}
+              />
+              {/* Botón para enviar la imagen */}
+              <TouchableOpacity
+                style={{
+                  backgroundColor: COLORS.success,
+                  padding: 10,
+                  borderRadius: 5,
+                  alignItems: "center",
+                  marginTop: 10,
+                }}
+                onPress={handleUploadImage}>
+                <Text style={{ color: COLORS.white, fontSize: 16 }}>
+                  Enviar
+                </Text>
+              </TouchableOpacity>
+            </>
           )}
- 
         </View>
         <View
           style={[
@@ -345,8 +384,6 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
                 {totalAmount.toFixed(2)}€
               </Text>
             </View>
- 
- 
           </View>
         </View>
       </ScrollView>

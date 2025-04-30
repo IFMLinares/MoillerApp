@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import {
   View,
   Text,
@@ -82,7 +88,7 @@ type Banner = {
   banner_image: string;
 };
 
-const Home = ({ navigation }: HomeScreenProps) => {
+const Home = forwardRef(({ navigation }: HomeScreenProps, ref) => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]); // Define el tipo del estado
   const [loading, setLoading] = useState(true);
@@ -98,6 +104,13 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const [messageType, setMessageType] = useState<"success" | "error" | null>(
     null
   ); // Tipo de mensaje
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  React.useImperativeHandle(ref, () => ({
+    scrollToTop: () => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    },
+  }));
 
   useFocusEffect(
     React.useCallback(() => {
@@ -194,6 +207,18 @@ const Home = ({ navigation }: HomeScreenProps) => {
   }, [dispatch]);
 
   // api
+  const loadMoreArticles = async () => {
+    try {
+      setLoading(true);
+      const newArticles = await fetchArticles(clienteId!, 12); // Cargar 12 productos más
+      setArticles((prevArticles) => [...prevArticles, ...newArticles]); // Agregar los nuevos productos
+    } catch (error) {
+      console.error("Error al cargar más artículos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const getArticles = async () => {
       try {
@@ -316,7 +341,8 @@ const Home = ({ navigation }: HomeScreenProps) => {
         style={{ height: undefined, width: "100%" }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          nestedScrollEnabled={true}>
+          nestedScrollEnabled={true}
+          ref={scrollViewRef}>
           <View
             style={{
               height: 40,
@@ -562,7 +588,6 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     hascolor={true}
                     image={{ uri: `${BASE_URL}${article.highImage}` }}
                     onPress={() => navigateToProductDetails(article)}
-                    onPress3={() => addItemToWishList(article)}
                   />
                   <QuantityButton
                     item={article}
@@ -578,6 +603,17 @@ const Home = ({ navigation }: HomeScreenProps) => {
             {loading && (
               <ActivityIndicator size="large" color={COLORS.primary} />
             )}
+            <TouchableOpacity
+              style={{
+                backgroundColor: COLORS.primary,
+                padding: 15,
+                borderRadius: 8,
+                alignItems: "center",
+                marginVertical: 20,
+              }}
+              onPress={loadMoreArticles}>
+              <Text style={{ color: COLORS.white }}>Cargar más productos</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
         {/* <BottomSheet2 ref={moresheet2} /> */}
@@ -585,6 +621,6 @@ const Home = ({ navigation }: HomeScreenProps) => {
       {/* <Toast /> */}
     </View>
   );
-};
+});
 
 export default Home;

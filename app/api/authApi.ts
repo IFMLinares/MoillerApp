@@ -44,12 +44,12 @@ export interface Article {
   brand: string;
 }
 
-export const fetchArticles = async (clienteId: number): Promise<Article[]> => {
+export const fetchArticles = async (clienteId: number, limit: number = 12): Promise<Article[]> => {
   try {
     const response = await axios.get<ApiArticle[]>(
       `${BASE_URL}api/core/articles/random`,
       {
-        params: { co_cli: clienteId },
+        params: { co_cli: clienteId, limit },
         headers: { "Content-Type": "application/json" },
       }
     );
