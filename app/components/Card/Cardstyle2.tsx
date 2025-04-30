@@ -8,9 +8,9 @@ import { IMAGES } from "../../constants/Images";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
 import { Feather } from "@expo/vector-icons";
 import {
-    widthPercentageToDP as wp,
-    heightPercentageToDP as hp,
-  } from "react-native-responsive-screen";
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 type Props = {
   title: string;
   //color : any;
@@ -39,6 +39,7 @@ type Props = {
   hideActions?: boolean; // Nueva propiedad para ocultar botones
   quantity: number; // Nueva propiedad
   productId: string; // Nueva propiedad
+  clienteId: number; // Agrega esta propiedad
   removeItemFromCart?: (productId: string) => void; // Nueva propiedad
   //hascolor:any
 };
@@ -67,12 +68,12 @@ const Cardstyle2 = ({
   hideActions = false, // Valor predeterminado: no ocultar botones
   quantity, // Recibe la cantidad
   productId, // Recibe el ID del producto
+  clienteId, // Asegúrate de recibir este valor
   removeItemFromCart, // Recibe la función para eliminar el producto del carrito
 }: Props) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
 
-  
   return (
     <View
       style={{
@@ -95,7 +96,7 @@ const Cardstyle2 = ({
           paddingBottom: 10,
           marginHorizontal: -15,
         }}>
-         <Image
+        <Image
           style={{
             height: undefined,
             width: SIZES.width / 6,
@@ -103,7 +104,7 @@ const Cardstyle2 = ({
             resizeMode: "contain",
           }}
           source={image}
-        /> 
+        />
         <View style={{ flex: 1 }}>
           <Text
             style={[
@@ -192,21 +193,19 @@ const Cardstyle2 = ({
               ]}>
               {offer}
             </Text>
-          </View> 
+          </View>
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               gap: 5,
               marginTop: 10,
-            }}>  
-          </View>
+            }}></View>
         </View>
         {closebtn && !hideActions ? (
           <TouchableOpacity
             onPress={onPress4}
-            style={{ position: "absolute", right: 10, top: 5 }}
-          >
+            style={{ position: "absolute", right: 10, top: 5 }}>
             <Feather size={20} color={colors.title} name={"x"} />
           </TouchableOpacity>
         ) : null}
@@ -219,10 +218,9 @@ const Cardstyle2 = ({
             justifyContent: "space-around",
             flexDirection: "row",
             alignItems: "center",
-          }}
-        >
+          }}>
           <View>
-          <CheckoutItems quantity={quantity} productId={productId} />
+            <CheckoutItems quantity={quantity} productId={productId}  clienteId={clienteId} />
           </View>
           <View
             style={{
@@ -231,30 +229,28 @@ const Cardstyle2 = ({
               backgroundColor: COLORS.primaryLight,
             }}
           />
-<TouchableOpacity
-  onPress={() => removeItemFromCart && removeItemFromCart(productId)} // Verifica que la función exista
-  activeOpacity={0.5}
-  style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
->
-  <Image
-    style={{
-      height: 16,
-      width: 16,
-      resizeMode: "contain",
-      tintColor: COLORS.danger,
-    }}
-    source={IMAGES.delete}
-  />
-  <Text
-    style={{
-      ...FONTS.fontMedium,
-      fontSize: 14,
-      color: COLORS.danger,
-    }}
-  >
-    Eliminar
-  </Text>
-</TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => removeItemFromCart && removeItemFromCart(productId)} // Verifica que la función exista
+            activeOpacity={0.5}
+            style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+            <Image
+              style={{
+                height: 16,
+                width: 16,
+                resizeMode: "contain",
+                tintColor: COLORS.danger,
+              }}
+              source={IMAGES.delete}
+            />
+            <Text
+              style={{
+                ...FONTS.fontMedium,
+                fontSize: 14,
+                color: COLORS.danger,
+              }}>
+              Eliminar
+            </Text>
+          </TouchableOpacity>
         </View>
       ) : null}
     </View>

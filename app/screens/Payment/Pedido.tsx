@@ -25,6 +25,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchShoppingCartDetailsApi } from "../../api/shoppingApi";
 import * as ImagePicker from "expo-image-picker"; // Para Expo
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
+
+
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Pedido">;
 
 const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
@@ -44,12 +46,13 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
     const fetchCartDetails = async () => {
       try {
         const data = await fetchShoppingCartDetailsApi(order.id); // Llama a la API con el cart_id
+        console.log("Detalles del carrito:", data); // Verifica los datos obtenidos
         setCartDetails(data); // Almacena los datos en el estado
       } catch (error) {
         console.error("Error al obtener los detalles del carrito:", error);
       }
     };
-
+  
     fetchCartDetails();
   }, [order.id]);
 
@@ -125,11 +128,8 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
     setIsModalVisible(true);
     setTimeout(() => {
       setIsModalVisible(false);
-      navigation.navigate("Myorder", {
-        updatedOrder: {
-          ...order,
-          paid: amountPaid, // Actualizar el monto abonado
-        },
+      navigation.navigate("Myorder", { 
+        clienteId: cart.clienteId, // Pasar el clienteId
       });
     }, 2000);
   };
@@ -156,7 +156,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
                   <Cardstyle3
                     title={item.articulo.art_des} // Nombre del producto
                     price={parseFloat(item.co_precio).toFixed(2)} // Precio unitario
-                    quantity={parseFloat(item.cantidad).toFixed(2)} // Cantidad
+                    quantity={parseFloat(item.cantidad).toFixed(2)} // Cantidad (asegúrate de que esta propiedad exista en los datos)
                     subtotal={parseFloat(item.subtotal).toFixed(2)} // Subtotal
                     image={{
                       uri: `${BASE_URL}${item.articulo.images[0]?.image}`, // Imagen del producto

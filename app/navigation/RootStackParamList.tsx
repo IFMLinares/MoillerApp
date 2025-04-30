@@ -39,13 +39,10 @@ export type RootStackParamList = {
   SearchArticles: undefined;
   Components: undefined;
   Coupons: undefined;
-  DeliveryAddress: undefined;
-  Checkout: undefined;
-  Pedido: undefined;
+  DeliveryAddress: undefined; 
   Addcard: undefined;
   Payment: undefined;
-  AddDeliveryAddress: undefined;
-  Myorder: undefined;
+  AddDeliveryAddress: undefined; 
   Notification: undefined;
   Accordion: undefined;
   BottomSheet: undefined;
@@ -91,4 +88,13 @@ export type RootStackParamList = {
   };
   // home
   Home: undefined;
+  // mis ordenes
+  Myorder: {
+    order?: Order;
+    updatedOrder?: Order;
+  };
+  Pedido: { order: Order };
+  // mi carrito
+  "Mi Carrito": undefined; // Asegúrate de que este valor exista
+  Checkout: { clienteId: any; cartId: number }; 
 };

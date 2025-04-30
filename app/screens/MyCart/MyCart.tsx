@@ -10,6 +10,7 @@ import Button from "../../components/Button/Button";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/reducer";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
 import { Feather } from "@expo/vector-icons";
 import { getCartItemsApi } from "../../api/cartApi"; // Importa la nueva función
@@ -18,12 +19,21 @@ import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
 type MyCartScreenProps = StackScreenProps<RootStackParamList, "Mi Carrito">;
 
+type Product = {
+  id: number;
+  name: string;
+  price: string;
+  quantity: number;
+  // Agrega más propiedades según sea necesario
+};
+
 const MyCart = ({ navigation }: MyCartScreenProps) => {
   const cart = useSelector((state: any) => state.cart.cart);
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
-  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
   const [cartId, setCartId] = useState<number | null>(null); // Estado para almacenar el cart_id
 
   useEffect(() => {
@@ -40,15 +50,14 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
     fetchCartItems();
   }, [clienteId]);
 
-  const navigateToProductDetails = (product) => {
-    navigation.navigate("ProductsDetails", { product });
+  const navigateToProductDetails = (product: Product) => {
+    navigation.navigate("ProductsDetails", { product, productId: product.id });
   };
 
-  const removeItemFromCart = async (itemId: string) => {
+  const removeItemFromCart = async (itemId: number) => {
     try {
-      await deleteItemFromCartApi(clienteId, itemId); // Llama a la API con itemId
-      dispatch(removeFromCart(itemId)); // Actualiza el estado en Redux
-      console.log("Producto eliminado correctamente.");
+      await deleteItemFromCartApi(clienteId, itemId);
+      dispatch(removeFromCart(itemId));
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
     }
@@ -122,6 +131,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
                   modelo={data.line}
                   quantity={data.quantity} // Pasar la cantidad
                   productId={data.id} // Pasar el ID del producto
+                  clienteId={clienteId} // Asegúrate de que este valor esté definido
                   onPress={() => navigateToProductDetails(data)}
                   removeItemFromCart={(itemId) => removeItemFromCart(itemId)} // Pasar la función
                 />
@@ -158,7 +168,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
               </Text>
               <Text
                 style={[
-                  FONTS.fontMediumItalic,
+                  FONTS.fontJostMediumItalic, // Cambia a la propiedad correcta
                   { fontSize: 16, color: COLORS.success },
                 ]}>
                 {calculateTotal()}€

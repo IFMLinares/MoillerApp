@@ -20,19 +20,31 @@ import { RootStackParamList } from "../../navigation/RootStackParamList";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchShoppingCartsApi } from "../../api/shoppingListApi";
 import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store"; // Asegúrate de que la ruta sea correcta
 
 type MyorderScreenProps = StackScreenProps<RootStackParamList, "Myorder">;
+// Define el tipo para un pedido
+type Order = {
+  id: number;
+  created_at: string;
+  total: string;
+  total_cantidad: number;
+  is_cotizacion: boolean;
+  is_order: boolean;
+  is_invoice: boolean;
+};
 
 const Myorder = ({ navigation, route }: MyorderScreenProps) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
 
   const [activeFilter, setActiveFilter] = useState("all"); // Track active filter
-  const [orders, setOrders] = useState([]); // Estado inicial vacío
-  const [filteredOrders, setFilteredOrders] = useState(orders);
-  const clienteId = useSelector((state) => state.user.clienteId); // Obtén el clienteId desde Redux
+  const [orders, setOrders] = useState<Order[]>([]); // Tipar correctamente
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]); // Tipar correctamente
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Tipar correctamente el estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
 
-  const saveOrders = async (newOrders) => {
+  const saveOrders = async (newOrders: Order[]) => {
     try {
       await AsyncStorage.setItem("orders", JSON.stringify(newOrders));
     } catch (error) {
@@ -105,7 +117,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
 
   const filterData = (filter: string) => {
     setActiveFilter(filter);
-  
+
     if (filter === "Cotizaciones") {
       setFilteredOrders(
         orders.filter(
@@ -147,22 +159,24 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
         }
         const clienteId = parseInt(storedClienteId, 10); // Convierte a número
         const data = await fetchShoppingCartsApi(clienteId); // Llama a la API con clienteId dinámico
-  
+
         // Ordena los datos por fecha de creación (más reciente primero)
         const sortedData = data.sort(
-          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          (a: Order, b: Order) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
-  
+
         setOrders(sortedData); // Almacena los datos ordenados en el estado
         setFilteredOrders(sortedData); // Inicializa los datos filtrados
       } catch (error) {
         console.error("Error al obtener los datos del carrito:", error);
       }
     };
-  
+
     fetchShoppingCarts();
   }, []);
 
+  
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
@@ -260,7 +274,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                     activeFilter === "Órdenes" ? COLORS.primary : colors.title,
                 },
               ]}>
-              Órdenes
+              Ordenes
             </Text>
           </TouchableOpacity>
           <View
@@ -282,7 +296,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                 tintColor:
                   activeFilter === "Completado" ? COLORS.primary : colors.title,
               }}
-              source={IMAGES.savecheck}
+              source={IMAGES.bank}
             />
             <Text
               style={[
@@ -308,7 +322,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
             backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
           }}>
           {/* Cuadro blanco con detalles del pedido */}
-          {filteredOrders.map((order, index) => {
+          {filteredOrders.map((order: Order, index: number) => {
             // Determinar el color según el estado
             const textColor = order.is_invoice
               ? COLORS.success // Verde para facturado
@@ -333,7 +347,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                   borderColor: textColor, // Color del borde según el estado
                 }}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("Pedido", { order })}>
+                  onPress={() => navigation.navigate("Pedido", { order, clienteId })}>
                   {/* ID del carrito */}
                   <Text
                     style={{
@@ -386,7 +400,7 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                     }}>
                     Cantidad de articulos:{" "}
                     <Text style={{ fontWeight: "bold", ...FONTS.fontRegular }}>
-                      {/* {order.cliente?.tip_cli || "No disponible"} */}
+                      {order.total_cantidad || "No disponible"}
                     </Text>
                   </Text>
                 </TouchableOpacity>

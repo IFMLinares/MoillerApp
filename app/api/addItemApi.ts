@@ -13,7 +13,7 @@ export const addItemToCartApi = async (clienteId: number, articulo: number, cant
     try {
       const response = await axios.post(`${BASE_URL}api/cart/add/`, payload);
       return response.data;
-    } catch (error) {
+    } catch (error: any) { // Cambiar el tipo de error a `any`
       console.error("Error al añadir el producto al carrito:", error.response?.data || error.message);
       throw error;
     }

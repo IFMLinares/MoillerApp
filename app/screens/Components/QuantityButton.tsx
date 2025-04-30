@@ -13,6 +13,7 @@ import {
 import { COLORS, FONTS } from "../../constants/theme";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/reducer/cartReducer";
+import { useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message"; 
 import { addItemToCartApi } from "../../api/addItemApi";
@@ -34,6 +35,13 @@ type CartItem = Product & {
   quantity: number;
 };
 
+type Article = {
+  id: number;
+  name: string;
+  price: number;
+  code: string;
+  highImage: string;
+};
 
 const QuantityButton = ({
   item,
@@ -58,46 +66,50 @@ const QuantityButton = ({
   };
 
   const dispatch = useDispatch();
-
+  const cart = useSelector((state: any) => state.cart.cart);
+  
   // Añadir producto al carrito con la cantidad seleccionada y enviar a la API
-const addItemToCart = useCallback(
-  async (item: Product) => {
-    const quantity = quantities[item.id] || 1;
+  const addItemToCart = useCallback(
+    async (item: Article) => {
+      const quantityToAdd = quantities[item.id] || 1; // Cantidad seleccionada en QuantityButton
+  
+      try {
+        // Obtener la cantidad actual del carrito desde Redux
+        const currentQuantity = cart.find((cartItem: any) => cartItem.id === item.id)?.quantity || 0;
+        const newQuantity = currentQuantity + quantityToAdd; // Sumar cantidades
+  
+        // Llamar a la API para actualizar la cantidad total
+        await addItemToCartApi(clienteId, item.id, newQuantity);
+  
+        // Actualizar el estado del carrito en Redux con la cantidad acumulada
+        dispatch(addToCart({ ...item, quantity: newQuantity }));
+  
+        // Mostrar mensaje de éxito
+        Toast.show({
+          type: "success",
+          text1: "¡Producto/s añadido a su carrito exitosamente!",
+        });
+      } catch (error: any) {
+        if (error.response?.status === 409) {
+          const stockDisponible = error.response.data?.message.match(/Stock disponible: (\d+(\.\d+)?)/)?.[1];
+          const stockFormateado = stockDisponible ? parseFloat(stockDisponible) : "cantidad desconocida";
+          Toast.show({
+            type: "error",
+            text1: "Stock insuficiente",
+            text2: `Solo hay ${stockFormateado} unidades disponibles.`,
+          });
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Error al añadir al carrito",
+            text2: "Por favor, inténtelo de nuevo.",
+          });
+        }
+      }
+    },
+    [dispatch, quantities, clienteId, cart]
+  );
 
-    try {
-      console.log("Datos enviados a la API de carrito:", {
-        articulo: item.id,
-        cantidad: quantity,
-        cliente_id: clienteId,
-      });
-
-      const response = await addItemToCartApi(clienteId, item.id, quantity);
-
-      console.log("Respuesta de la API:", response);
-
-      dispatch(
-        addToCart({
-          ...item,
-          quantity,
-        } as CartItem)
-      );
-
-      showToast(
-        "success",
-        `¡Producto añadido al carrito exitosamente!`
-      );
-    } catch (error) {
-      console.error("Error al añadir al carrito:", error);
-
-      showToast(
-        "error",
-        `Error al añadir el producto ${item.id} al carrito`,
-        "Por favor, inténtelo de nuevo."
-      );
-    }
-  },
-  [dispatch, quantities, clienteId, showToast]
-);
 
   // Incrementar la cantidad del producto
   const incrementQuantity = useCallback(

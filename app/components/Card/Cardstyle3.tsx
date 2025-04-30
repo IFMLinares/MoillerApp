@@ -8,9 +8,9 @@ import { IMAGES } from "../../constants/Images";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
 import { Feather } from "@expo/vector-icons";
 import {
-    widthPercentageToDP as wp,
-    heightPercentageToDP as hp,
-  } from "react-native-responsive-screen";
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 type Props = {
   title: string;
   //color : any;
@@ -64,6 +64,7 @@ const Cardstyle3 = ({
   onPress3,
   onPress4,
   hideActions = false, // Valor predeterminado: no ocultar botones
+  quantity, // Agregar aquí la propiedad quantity
 }: Props) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -90,7 +91,7 @@ const Cardstyle3 = ({
           paddingBottom: 10,
           marginHorizontal: -15,
         }}>
-         <Image
+        <Image
           style={{
             height: undefined,
             width: SIZES.width / 6,
@@ -98,7 +99,7 @@ const Cardstyle3 = ({
             resizeMode: "contain",
           }}
           source={image}
-        /> 
+        />
         <View style={{ flex: 1 }}>
           <Text
             style={[
@@ -187,21 +188,46 @@ const Cardstyle3 = ({
               ]}>
               {offer}
             </Text>
-          </View> 
+          </View>
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               gap: 5,
               marginTop: 10,
-            }}>  
+            }}></View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-around", // Alineación más uniforme
+              paddingVertical: 5,
+              paddingHorizontal: 10,
+              borderRadius: 8, // Bordes redondeados
+              marginTop: 10,
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: COLORS.title,
+                fontWeight: "bold", // Texto más destacado
+              }}>
+              Cantidad:
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: COLORS.success, // Color verde para resaltar
+                fontWeight: "bold",
+              }}>
+              {quantity}
+            </Text>
           </View>
         </View>
         {closebtn && !hideActions ? (
           <TouchableOpacity
             onPress={onPress4}
-            style={{ position: "absolute", right: 10, top: 5 }}
-          >
+            style={{ position: "absolute", right: 10, top: 5 }}>
             <Feather size={20} color={colors.title} name={"x"} />
           </TouchableOpacity>
         ) : null}
@@ -214,8 +240,7 @@ const Cardstyle3 = ({
             justifyContent: "space-around",
             flexDirection: "row",
             alignItems: "center",
-          }}
-        >
+          }}>
           <View>
             <CheckoutItems />
           </View>
@@ -229,8 +254,7 @@ const Cardstyle3 = ({
           <TouchableOpacity
             onPress={onPress4}
             activeOpacity={0.5}
-            style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-          >
+            style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
             <Image
               style={{
                 height: 16,
@@ -245,8 +269,7 @@ const Cardstyle3 = ({
                 ...FONTS.fontMedium,
                 fontSize: 14,
                 color: COLORS.danger,
-              }}
-            >
+              }}>
               Eliminar
             </Text>
           </TouchableOpacity>

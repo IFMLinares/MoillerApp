@@ -15,6 +15,7 @@ import { useDispatch } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
 import { addToCart } from "../../redux/reducer/cartReducer";
+import { useSelector } from "react-redux";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
 import { useTheme } from "@react-navigation/native";
 import { addItemToCartApi } from "../../api/addItemApi";
@@ -46,34 +47,48 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
   const theme = useTheme();
   const { colors } = theme;
    
-
+  const cart = useSelector((state: any) => state.cart.cart);
+  
   // Añadir producto al carrito con la cantidad seleccionada y enviar a la API
   const addItemToCart = useCallback(
-    async (item: Article) => { // Define el tipo de `item` como `Article`
-      const quantity = quantities[item.id] || 1; // Obtener la cantidad seleccionada
+    async (item: Article) => {
+      const quantityToAdd = quantities[item.id] || 1; // Cantidad seleccionada en QuantityButton
   
       try {
-        // Llamar a la API para añadir el producto al carrito
-        await addItemToCartApi(clienteId, item.id, quantity);
+        // Obtener la cantidad actual del carrito desde Redux
+        const currentQuantity = cart.find((cartItem: any) => cartItem.id === item.id)?.quantity || 0;
+        const newQuantity = currentQuantity + quantityToAdd; // Sumar cantidades
   
-        // Actualizar el estado del carrito en Redux
-        dispatch(addToCart({ ...item, quantity }));
+        // Llamar a la API para actualizar la cantidad total
+        await addItemToCartApi(clienteId, item.id, newQuantity);
+  
+        // Actualizar el estado del carrito en Redux con la cantidad acumulada
+        dispatch(addToCart({ ...item, quantity: newQuantity }));
   
         // Mostrar mensaje de éxito
         Toast.show({
           type: "success",
           text1: "¡Producto/s añadido a su carrito exitosamente!",
         });
-      } catch (error) {
-        // Manejar errores
-        Toast.show({
-          type: "error",
-          text1: "Error al añadir al carrito",
-          text2: "Por favor, inténtelo de nuevo.",
-        });
+      } catch (error: any) {
+        if (error.response?.status === 409) {
+          const stockDisponible = error.response.data?.message.match(/Stock disponible: (\d+(\.\d+)?)/)?.[1];
+          const stockFormateado = stockDisponible ? parseFloat(stockDisponible) : "cantidad desconocida";
+          Toast.show({
+            type: "error",
+            text1: "Stock insuficiente",
+            text2: `Solo hay ${stockFormateado} unidades disponibles.`,
+          });
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Error al añadir al carrito",
+            text2: "Por favor, inténtelo de nuevo.",
+          });
+        }
       }
     },
-    [dispatch, quantities, clienteId, showToast]
+    [dispatch, quantities, clienteId, cart]
   );
 
   const incrementQuantity = useCallback(

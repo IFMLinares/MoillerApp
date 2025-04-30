@@ -49,6 +49,8 @@ import {
 import { fetchProductsBrand } from "../../api/listMarcasApi"; // Importar la función de la API
 
 // buscador
+import { BackHandler, Alert } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 const marcas = [
   {
@@ -92,6 +94,32 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const [marca, setMarcas] = useState([]); // Estado para las marcas
   const [loadingMarcas, setLoadingMarcas] = useState(true); // Estado de carga para las marcas
   const toastRef = useRef(null);
+  const [message, setMessage] = useState<string | null>(null); // Estado para el mensaje
+  const [messageType, setMessageType] = useState<"success" | "error" | null>(
+    null
+  ); // Tipo de mensaje
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        // Mostrar una alerta para confirmar si el usuario desea salir
+        Alert.alert(
+          "Salir de la aplicación",
+          "¿Estás seguro de que deseas salir?",
+          [
+            { text: "Cancelar", style: "cancel" },
+            { text: "Salir", onPress: () => BackHandler.exitApp() },
+          ]
+        );
+        return true; // Evita que el botón de retroceso funcione
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    }, [])
+  );
 
   const showToast = (type: string, text1: string, text2: string = "") => {
     Toast.show({
@@ -101,12 +129,23 @@ const Home = ({ navigation }: HomeScreenProps) => {
     });
   };
 
+  const showMessage = (type: "success" | "error", text: string) => {
+    console.log(`Mostrando mensaje: ${type} - ${text}`);
+    setMessageType(type);
+    setMessage(text);
+    setTimeout(() => {
+      setMessage(null); // Oculta el mensaje después de 3 segundos
+    }, 3000);
+  };
+
   const addItemToCart = async (item: Article) => {
     try {
+      console.log("Añadiendo al carrito...");
       // Lógica para añadir al carrito...
-      showToast("success", "¡Producto añadido al carrito exitosamente!");
+      showMessage("success", "¡Producto añadido al carrito exitosamente!");
     } catch (error) {
-      showToast("error", "Error al añadir al carrito", "Inténtalo de nuevo.");
+      console.log("Error al añadir al carrito:", error);
+      showMessage("error", "Error al añadir al carrito. Inténtalo de nuevo.");
     }
   };
 
@@ -254,6 +293,22 @@ const Home = ({ navigation }: HomeScreenProps) => {
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
+      {/* Mensaje local */}
+      {message && (
+        <View
+          style={{
+            position: "absolute",
+            top: 10,
+            left: 10,
+            right: 10,
+            padding: 10,
+            backgroundColor: messageType === "success" ? "green" : "red",
+            borderRadius: 5,
+            zIndex: 1000,
+          }}>
+          <Text style={{ color: "white", textAlign: "center" }}>{message}</Text>
+        </View>
+      )}
       <LinearGradient
         start={{ x: 0, y: 1 }}
         end={{ x: 0, y: 0 }}
@@ -514,7 +569,8 @@ const Home = ({ navigation }: HomeScreenProps) => {
                     quantities={quantities}
                     setQuantities={setQuantities}
                     clienteId={clienteId} // Pasa el clienteId automáticamente
-                    showToast={showToast} // Pasa la función showToast
+                    // showToast={showToast} // Pasa la función showToast
+                    // addItemToCart={addItemToCart} // Pasa la función desde Home
                   />
                 </View>
               ))}
@@ -526,7 +582,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
         </ScrollView>
         {/* <BottomSheet2 ref={moresheet2} /> */}
       </LinearGradient>
-      <Toast />
+      {/* <Toast /> */}
     </View>
   );
 };

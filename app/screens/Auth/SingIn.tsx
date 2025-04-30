@@ -92,8 +92,11 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
           console.log("Cliente ID antes de despachar:", data.cliente_id);
           dispatch(setClienteId(data.cliente_id));
   
-          // Redirigir al Home
-          navigation.navigate("DrawerNavigation", { screen: "Home" });
+          // Redirigir al Home y limpiar el historial de navegación
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "DrawerNavigation", params: { screen: "Home" } }],
+          });
         } else {
           setErrorMessage("Error: Cliente ID inválido.");
           console.error("Cliente ID inválido:", data.cliente_id);

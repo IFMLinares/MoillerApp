@@ -36,7 +36,7 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] =
     useState(false);
   const dispatch = useDispatch();
-
+  const [additionalNotes, setAdditionalNotes] = useState(""); // Estado para las notas adicionales
   console.log("Cliente ID recibido en Checkout:", clienteId);
   console.log("Cart ID recibido en Checkout:", cartId);
 
@@ -46,7 +46,6 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
 
   const handleConfirmOrder = async () => {
     setIsConfirmationModalVisible(false);
-    // Esperar 4 segundos antes de mostrar el modal de éxito
     setTimeout(() => {
       setIsModalVisible(true);
     }, 2000);
@@ -59,7 +58,12 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
         throw new Error("El ID del cliente o del carrito no está definido.");
       }
 
-      const response = await convertCartToCotizacion(clienteId, cartId);
+      // Llama a la API con las notas adicionales
+      const response = await convertCartToCotizacion(
+        clienteId,
+        cartId,
+        additionalNotes
+      );
       console.log("Respuesta de la API:", response);
 
       const newOrder = {
@@ -82,7 +86,6 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
         error.response?.data || error.message
       );
 
-      // Manejo de errores específicos
       if (error.response?.data?.message === "Articulo no posee unidad.") {
         alert(
           "Uno de los artículos en el carrito no tiene una unidad asociada. Por favor, verifica los datos."
@@ -179,17 +182,15 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
                 ...FONTS.fontRegular,
                 fontSize: 15,
                 color: colors.title,
-                //paddingVertical: 12,
-                //paddingHorizontal: 15,
                 borderBottomWidth: 2,
                 borderBottomColor: COLORS.primaryLight,
-                //height: 60,
                 paddingBottom: 50,
-                // width: '100%',
               }}
-              placeholder=" Escribe aquí"
+              placeholder="Escribe aquí"
               multiline
               placeholderTextColor={colors.text}
+              value={additionalNotes} // Vincula el estado al input
+              onChangeText={(text) => setAdditionalNotes(text)} // Actualiza el estado al escribir
             />
           </View>
         </View>

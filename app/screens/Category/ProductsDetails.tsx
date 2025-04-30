@@ -95,20 +95,34 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
 
   const onShare = async () => {
     try {
+      const deepLink = `com.w3itexperts.clickcart://product/${product.id}`; // Cambia "myapp" por el esquema de tu aplicación
+      const message = `
+        Nombre del artículo: ${product.name}
+        Precio: ${product.price} €
+        Código del artículo: ${product.code}
+        Marca: ${product.brand}
+        Modelo: ${product.model}
+        Categoría: ${product.line}
+        Subcategoría: ${product.subline}
+        
+        Ver más detalles aquí: ${deepLink}
+      `;
+  
       const result = await Share.share({
-        message: "Share Product link here.",
+        message: message.trim(),
       });
+  
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
-          // shared with activity type of result.activityType
+          // Compartido con un tipo de actividad específico
         } else {
-          // shared
+          // Compartido sin tipo de actividad
         }
       } else if (result.action === Share.dismissedAction) {
-        // dismissed
+        // Compartir fue descartado
       }
     } catch (error: any) {
-      //alert(error.message);
+      console.error("Error al compartir:", error);
     }
   };
 
