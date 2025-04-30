@@ -25,6 +25,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../../redux/reducer/cartReducer";
 import { convertCartToCotizacion } from "../../api/checkoutCotizacionApi";
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
+
+
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Checkout">;
 
 const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
@@ -147,9 +149,10 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
                       marca={data.code}
                       modelo={data.line}
                       quantity={data.quantity} // Pasar la cantidad
+                      clienteId={clienteId} // Asegúrate de que este valor esté definido
                       productId={data.id} // Pasar el ID del producto
                       onPress={() => navigateToProductDetails(data)}
-                      onPress4={() => removeItemFromCart(data)}
+                      removeItemFromCart={(itemId) => removeItemFromCart(itemId)} // Pasar la función
                     />
                   </View>
                 );

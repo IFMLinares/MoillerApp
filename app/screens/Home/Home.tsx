@@ -38,6 +38,7 @@ import { Dimensions } from "react-native";
 import { fetchArticles, Article } from "../../api/authApi";
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 import { fetchBanners } from "../../api/bannerApi"; // Importar la función desde bannerApi
+import { fetchProductsBrand } from "../../api/listMarcasApi"; // Importar la función de la API
 
 // api articulos
 import QuantityButton from "../Components/QuantityButton";
@@ -46,7 +47,6 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 // buscador
-import { fetchProductsBrand } from "../../api/listMarcasApi"; // Importar la función de la API
 
 // buscador
 import { BackHandler, Alert } from "react-native";

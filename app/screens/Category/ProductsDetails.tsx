@@ -24,7 +24,7 @@ import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { ScrollView } from "react-native-gesture-handler";
 import Cardstyle1 from "../../components/Card/Cardstyle1";
 import { useDispatch, useSelector} from "react-redux";
-import { addToCart } from "../../redux/reducer/cartReducer";
+import { addToCart } from "../../redux/reducer/cartReducer"; 
 import { addTowishList } from "../../redux/reducer/wishListReducer";
 import { RootState } from "../../redux/reducer";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
@@ -88,7 +88,8 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   const [Select, setSelect] = useState(offerData[0]);
   const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
   console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
-
+  const cart = useSelector((state: RootState) => state.cart.cart); // Mover useSelector aquí
+ 
 
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -134,29 +135,38 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       quantity, // Incluye la cantidad seleccionada
       clienteId, // Incluye el clienteId
     };
-  
+
     try {
-      console.log("Enviando a la API:", productWithQuantity); // Depuración
-  
-      // Llamada a la API
-      const response = await addItemToCartApi(clienteId, product.id, quantity);
-  
-      console.log("Respuesta de la API:", response); // Verifica la respuesta
-  
-      // Verifica si la respuesta contiene el mensaje exitoso
-      if (response.message === "Artículo añadido o actualizado en el carrito.") {
-        dispatch(addToCart(productWithQuantity)); // Actualiza el estado en Redux
+      // Verificar si el producto ya está en el carrito
+      const existingCartItem = cart.find((cartItem: any) => cartItem.id === product.id);
+
+      let newQuantity = quantity;
+
+      if (existingCartItem) {
+        // Si el producto ya está en el carrito, suma la cantidad
+        newQuantity = existingCartItem.quantity + quantity;
+
+        // Mostrar mensaje con la cantidad total
+        Toast.show({
+          type: "info",
+          text1: "Producto actualizado",
+          text2: `Ahora tienes ${newQuantity} unidades de este producto en tu carrito.`,
+        });
+      } else {
+        // Mostrar mensaje de éxito si es un producto nuevo
         Toast.show({
           type: "success",
           text1: "¡Producto añadido al carrito exitosamente!",
         });
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error al añadir al carrito",
-          text2: response.message || "Inténtalo de nuevo.",
-        });
       }
+
+      // Llamada a la API para actualizar la cantidad total
+      const response = await addItemToCartApi(clienteId, product.id, newQuantity);
+
+      console.log("Respuesta de la API:", response); // Verifica la respuesta
+
+      // Actualizar el estado en Redux
+      dispatch(addToCart({ ...product, quantity: newQuantity }));
     } catch (error) {
       console.error("Error al añadir al carrito:", error); // Depuración de errores
       Toast.show({
@@ -166,10 +176,7 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       });
     }
   };
-
-  const addItemToWishList = (data: any) => {
-    dispatch(addTowishList(data));
-  };
+ 
 
   if (!product) {
     return (

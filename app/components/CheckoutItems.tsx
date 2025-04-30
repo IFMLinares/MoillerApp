@@ -12,10 +12,11 @@ type CheckoutItemsProps = {
   quantity: number; // Cantidad del producto
   productId: number; // ID del producto
   clienteId: number; // ID del cliente
+  availableStock: number; // Stock disponible del producto
 };
 
 
-const CheckoutItems = ({ quantity, productId, clienteId }: CheckoutItemsProps) => {
+const CheckoutItems = ({ quantity, productId, clienteId, availableStock }: CheckoutItemsProps) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
   const dispatch = useDispatch();
@@ -36,45 +37,55 @@ const CheckoutItems = ({ quantity, productId, clienteId }: CheckoutItemsProps) =
           text1: "Cantidad actualizada en el carrito",
         });
       } catch (error: any) {
-        Toast.show({
-          type: "error",
-          text1: "Error al actualizar el carrito",
-          text2: "Por favor, inténtelo de nuevo.",
-        });
+        if (error.response?.status === 409) {
+          // Extraer el mensaje de stock disponible del error
+          const stockDisponible = error.response.data?.message.match(/Stock disponible: (\d+(\.\d+)?)/)?.[1];
+          const stockFormateado = stockDisponible ? parseFloat(stockDisponible) : "desconocido";
+  
+          Toast.show({
+            type: "info",
+            text1: "Stock limitado",
+            text2: `Solo hay ${stockFormateado} una unidad o unidades disponibles, por favor retroceda la cantidad`,
+          });
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Error al actualizar el carrito",
+            text2: "Por favor, inténtelo de nuevo.",
+          });
+        }
       }
     },
     [clienteId, productId]
   );
 
   const handleIncrement = async () => {
-    if (!clienteId || !productId) {
+    if (quantity >= availableStock) {
+      // Mostrar mensaje si ya se alcanzó la cantidad máxima
       Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Debe proporcionar el ID del cliente y el ID del producto.",
+        type: "info",
+        text1: "Cantidad máxima alcanzada",
+        text2: `No puedes añadir más de ${availableStock} unidades de este producto.`,
       });
-      return;
+      return; // No incrementar la cantidad
     }
-
+  
     const newQuantity = quantity + 1;
-    dispatch(incrementQuantity({ id: productId }));
-    await updateCartApi(newQuantity);
+    dispatch(incrementQuantity({ id: productId })); // Actualizar Redux
+    await updateCartApi(newQuantity); // Actualizar en la API
   };
 
   const handleDecrement = async () => {
-    if (!clienteId || !productId) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Debe proporcionar el ID del cliente y el ID del producto.",
-      });
-      return;
-    }
-
     if (quantity > 1) {
       const newQuantity = quantity - 1;
-      dispatch(decrementQuantity({ id: productId }));
-      await updateCartApi(newQuantity);
+      dispatch(decrementQuantity({ id: productId })); // Actualizar Redux
+      await updateCartApi(newQuantity); // Actualizar en la API
+    } else {
+      Toast.show({
+        type: "info",
+        text1: "Cantidad mínima alcanzada",
+        text2: "No puedes reducir más la cantidad.",
+      });
     }
   };
 

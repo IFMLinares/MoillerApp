@@ -48,28 +48,42 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
   const { colors } = theme;
    
   const cart = useSelector((state: any) => state.cart.cart);
-  
+   
   // Añadir producto al carrito con la cantidad seleccionada y enviar a la API
   const addItemToCart = useCallback(
     async (item: Article) => {
       const quantityToAdd = quantities[item.id] || 1; // Cantidad seleccionada en QuantityButton
   
+      // Verificar si el producto ya está en el carrito
+      const existingCartItem = cart.find((cartItem: any) => cartItem.id === item.id);
+  
       try {
-        // Obtener la cantidad actual del carrito desde Redux
-        const currentQuantity = cart.find((cartItem: any) => cartItem.id === item.id)?.quantity || 0;
-        const newQuantity = currentQuantity + quantityToAdd; // Sumar cantidades
+        let newQuantity = quantityToAdd;
+  
+        if (existingCartItem) {
+          // Si el producto ya está en el carrito, suma la cantidad
+          newQuantity = existingCartItem.quantity + quantityToAdd;
+  
+          // Mostrar mensaje con la cantidad total
+          Toast.show({
+            type: "info",
+            text1: "Producto actualizado",
+            text2: `Ahora tienes ${newQuantity} unidades de este producto en tu carrito.`,
+          });
+        } else {
+          // Mostrar mensaje de éxito si es un producto nuevo
+          Toast.show({
+            type: "success",
+            text1: "¡Producto añadido!",
+            text2: "El producto se ha añadido a tu carrito.",
+          });
+        }
   
         // Llamar a la API para actualizar la cantidad total
         await addItemToCartApi(clienteId, item.id, newQuantity);
   
-        // Actualizar el estado del carrito en Redux con la cantidad acumulada
+        // Actualizar el estado del carrito en Redux
         dispatch(addToCart({ ...item, quantity: newQuantity }));
-  
-        // Mostrar mensaje de éxito
-        Toast.show({
-          type: "success",
-          text1: "¡Producto/s añadido a su carrito exitosamente!",
-        });
       } catch (error: any) {
         if (error.response?.status === 409) {
           const stockDisponible = error.response.data?.message.match(/Stock disponible: (\d+(\.\d+)?)/)?.[1];
@@ -90,6 +104,7 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
     },
     [dispatch, quantities, clienteId, cart]
   );
+
 
   const incrementQuantity = useCallback(
     (id: number) => {
