@@ -80,27 +80,33 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
   const totalAmount = parseFloat(calculateTotal()); // Monto total calculado
   const remainingAmount = totalAmount - amountPaid; // Monto restante
 
-  
   const handleUploadImage = async () => {
     if (!selectedImage) {
       alert("Por favor, selecciona una imagen antes de enviarla.");
       return;
     }
-  
+
     try {
       const fileType = selectedImage.split(".").pop(); // Obtener la extensión del archivo
       const mimeType = `image/${fileType}`; // Construir el tipo MIME
       console.log("Tipo MIME detectado:", mimeType);
-  
+
       // Ajustar la URI para Android si es necesario
-      const adjustedUri = Platform.OS === "android" ? selectedImage : selectedImage.replace("file://", "");
+      const adjustedUri =
+        Platform.OS === "android"
+          ? selectedImage
+          : selectedImage.replace("file://", "");
       console.log("URI ajustada:", adjustedUri);
-  
-      const response = await uploadComprobantePagoApi(order.id, adjustedUri, mimeType);
-  
+
+      const response = await uploadComprobantePagoApi(
+        order.id,
+        adjustedUri,
+        mimeType
+      );
+
       console.log("Respuesta del servidor:", response);
       alert("Imagen enviada exitosamente.");
-  
+
       // Actualizar los detalles del carrito después de subir el comprobante
       const updatedCartDetails = await fetchShoppingCartDetailsApi(order.id);
       setCartDetails(updatedCartDetails); // Actualiza el estado con los nuevos datos
@@ -311,23 +317,15 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
               }}>
               Notas adicionales:
             </Text>
-            <TextInput
+            <Text
               style={{
+                marginTop: 10,
                 ...FONTS.fontRegular,
-                fontSize: 15,
-                color: colors.title,
-                //paddingVertical: 12,
-                //paddingHorizontal: 15,
-                borderBottomWidth: 2,
-                borderBottomColor: COLORS.primaryLight,
-                //height: 60,
-                paddingBottom: 50,
-                // width: '100%',
-              }}
-              placeholder=" Escribe aquí"
-              multiline
-              placeholderTextColor={colors.text}
-            />
+                fontSize: 16,
+                color: COLORS.black,
+              }}>
+              {cartDetails?.comentario || "No hay comentarios disponibles."}
+            </Text>
           </View>
         </View>
         <View

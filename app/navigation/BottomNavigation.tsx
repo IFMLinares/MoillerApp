@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef  } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BottomTabParamList } from "./BottomTabParamList";
 import WishlistScreen from "../screens/Wishlist/Wishlist";
@@ -16,6 +16,7 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 const BottomNavigation = () => {
   const [username, setUsername] = useState("");
   const homeScreenRef = useRef<any>(null);
+  const [scrollToTop, setScrollToTop] = useState<() => void | null>(null);
 
   useEffect(() => {
     const getUsername = async () => {
@@ -42,10 +43,14 @@ const BottomNavigation = () => {
         }}
         listeners={{
           tabPress: () => {
-            homeScreenRef.current?.scrollToTop();
+            if (scrollToTop) {
+              scrollToTop();
+            }
           },
         }}>
-        {() => <Home ref={homeScreenRef} />}
+        {(props) => (
+          <Home {...props} onScrollToTop={(fn) => setScrollToTop(() => fn)} />
+        )}
       </Tab.Screen>
       <Tab.Screen name="Categorías" component={CategoryScreen} />
       <Tab.Screen name="Marcas" component={MarcasScreen} />

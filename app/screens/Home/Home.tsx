@@ -81,14 +81,16 @@ const marcas = [
   },
 ];
 
-type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
+type HomeScreenProps = StackScreenProps<RootStackParamList, "Home"> & {
+  onScrollToTop?: () => void;
+};
 
 type Banner = {
   id: number;
   banner_image: string;
 };
 
-const Home = forwardRef(({ navigation }: HomeScreenProps, ref) => {
+const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]); // Define el tipo del estado
   const [loading, setLoading] = useState(true);
