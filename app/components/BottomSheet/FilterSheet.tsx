@@ -15,50 +15,8 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import ButtonOutline from "../Button/ButtonOutline";
 import { fetchCategories, fetchSubcategories } from "../../api/categoryApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const brandData = [
-  {
-    title: "Nike",
-    image: IMAGES.brand1,
-  },
-  {
-    title: "Adidas",
-    image: IMAGES.brand2,
-  },
-  {
-    title: "Reebok",
-    image: IMAGES.brand3,
-  },
-  {
-    title: "Puma",
-    image: IMAGES.brand4,
-  },
-  {
-    title: "Bata",
-    image: IMAGES.brand5,
-  },
-  {
-    title: "Nike",
-    image: IMAGES.brand6,
-  },
-  {
-    title: "Adidas",
-    image: IMAGES.brand7,
-  },
-  {
-    title: "Reebok",
-    image: IMAGES.brand8,
-  },
-  {
-    title: "Puma",
-    image: IMAGES.brand9,
-  },
-  {
-    title: "Bata",
-    image: IMAGES.brand10,
-  },
-];
-
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/reducer";
 type Props = {
   sheetRef?: any;
 };
@@ -66,7 +24,8 @@ type Props = {
 const FilterSheet2 = ({ sheetRef }: Props) => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
-
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
   const navigation = useNavigation();
 
   // const brandData = ["Adidas", "Reebok", "Zara", "Gucci", "Vogue"];
@@ -90,29 +49,20 @@ const FilterSheet2 = ({ sheetRef }: Props) => {
         setIsLoadingCategories(true);
 
         // Verificar si las categorías están en AsyncStorage
-        const cachedCategories = await AsyncStorage.getItem(
-          "filter_categories"
-        );
+        const cachedCategories = await AsyncStorage.getItem("categories");
 
         if (cachedCategories) {
           setCategories(JSON.parse(cachedCategories));
         } else {
           const fetchedCategories = await fetchCategories();
 
-          // Filtrar las categorías necesarias
-          const filteredCategories = fetchedCategories.filter(
-            (category) =>
-              category.name.toLowerCase() !== "consumo" &&
-              category.name.toLowerCase() !== "servicios"
-          );
-
           // Guardar en AsyncStorage
           await AsyncStorage.setItem(
-            "filter_categories",
-            JSON.stringify(filteredCategories)
+            "categories",
+            JSON.stringify(fetchedCategories)
           );
 
-          setCategories(filteredCategories);
+          setCategories(fetchedCategories);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -132,7 +82,7 @@ const FilterSheet2 = ({ sheetRef }: Props) => {
 
           // Verificar si las subcategorías están en AsyncStorage
           const cachedSubcategories = await AsyncStorage.getItem(
-            `filter_subcategories_${selectedCategory}`
+            `subcategories_${selectedCategory}`
           );
 
           if (cachedSubcategories) {
@@ -144,7 +94,7 @@ const FilterSheet2 = ({ sheetRef }: Props) => {
 
             // Guardar en AsyncStorage
             await AsyncStorage.setItem(
-              `filter_subcategories_${selectedCategory}`,
+              `subcategories_${selectedCategory}`,
               JSON.stringify(fetchedSubcategories)
             );
 
@@ -375,8 +325,9 @@ const FilterSheet2 = ({ sheetRef }: Props) => {
                     key={index}
                     onPress={() => {
                       navigation.navigate("Products", {
-                        subcategoryId: subcategory.id,
+                        subcategoryId: subcategory.id, // co_subl
                         subcategoryName: subcategory.name,
+                        clienteId: clienteId, // co_cli
                       });
                       sheetRef.current.close();
                     }}
