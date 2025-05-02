@@ -67,7 +67,7 @@ import CatalogoScreen from "../screens/Category/Catalogo";
 import NuevoScreen from "../screens/Category/Nuevo";
 import PedidoScreen from "../screens/Payment/Pedido";
 import MasVendidoScreen from "../screens/Category/MasVendido";
-
+import OfertasScreen from "../screens/Category/Ofertas";
 import { useDispatch } from "react-redux";
 import { getUserInfo } from "../api/editPerfilApi";
 import { setClienteId } from "../redux/actions/drawerAction";
@@ -164,6 +164,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Catalogo" component={CatalogoScreen} />
         <Stack.Screen name="Nuevo" component={NuevoScreen} />
         <Stack.Screen name="MasVendido" component={MasVendidoScreen} />
+        <Stack.Screen name="Ofertas" component={OfertasScreen} />
         <Stack.Screen name="SearchArticles" component={SearchArticles} /> 
         <Stack.Screen name="Components" component={Components} />
         <Stack.Screen name="Accordion" component={AccordionScreen} />

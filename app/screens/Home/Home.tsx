@@ -475,24 +475,20 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     }}>
                     <TouchableOpacity
                       style={{
+                        backgroundColor: COLORS.primary,
+                        padding: 15,
+                        borderRadius: 8,
                         alignItems: "center",
-                        justifyContent: "center",
-                        paddingBottom: 5,
-                      }}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: 5,
-                        }}>
-                        <Text
-                          style={[
-                            FONTS.fontBold,
-                            { fontSize: 13, color: "white" },
-                          ]}>
-                          Ofertas
-                        </Text>
-                      </View>
+                      }}
+                      onPress={() =>
+                        navigation.navigate("Ofertas", {
+                          subcategoryId: "Ofertas",
+                          subcategoryName: "Ofertas",
+                        })
+                      }>
+                      <Text style={[FONTS.fontBold, { color: COLORS.white }]}>
+                        Ofertas
+                      </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{

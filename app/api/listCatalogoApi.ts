@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from './globalUrlApi'; // Importar la URL base
+import { BASE_URL } from "./globalUrlApi"; // Importar la URL base
 
 interface ApiArticle {
   id: number;
@@ -26,7 +26,8 @@ export const fetchArticles = async (
   clienteId: number,
   page: number = 1,
   mostSold: boolean = false,
-  orderBy: string = "fecha" // Nuevo parámetro opcional con valor predeterminado "fecha"
+  orderBy: string = "fecha", // Nuevo parámetro opcional con valor predeterminado "fecha"
+  offer: boolean = false // Nuevo parámetro para filtrar por ofertas
 ) => {
   try {
     const params: any = { co_cli: clienteId, page, page_size: 10 };
@@ -37,6 +38,9 @@ export const fetchArticles = async (
       params.order_by_name = true; // Agrega este parámetro para ordenar alfabéticamente
     } else if (orderBy === "fecha") {
       params.order_by_fecha = true; // Ordena por fecha (valor predeterminado)
+    }
+    if (offer) {
+      params.oferta = true; // Filtrar por ofertas
     }
 
     const response = await axios.get(
