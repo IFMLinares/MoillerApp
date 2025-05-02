@@ -64,6 +64,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   const [initialLoading, setInitialLoading] = useState(false); // Estado para la carga inicial
   const [loadingMoreGrid, setLoadingMoreGrid] = useState(false); // Estado para cargar más artículos en la vista de cuadrícula
   const [loadingMoreList, setLoadingMoreList] = useState(false); // Estado para cargar más artículos en la vista de lista
+  const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true); // Indica si hay más productos para cargar
   const [sortCriteria, setSortCriteria] = useState<
     | "De la A a la Z"
@@ -93,59 +94,50 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
   };
 
   // Cargar productos al montar el componente
-  useEffect(() => {
-    const loadArticles = async () => {
-      try {
-        setInitialLoading(true); // Inicia el indicador de carga inicial
-
-        // Verificar si los productos ya están en AsyncStorage
-        const cachedArticles = await AsyncStorage.getItem(
-          `articles_${brandId}`
+  const loadArticles = async (isInitialLoad = false) => {
+    try {
+      const fetchedArticles = await fetchProductsBrand(
+        brandId.toString(),
+        clienteId.toString(),
+        page
+      );
+    
+      if (fetchedArticles.results.length === 0) {
+        setHasMore(false); // No hay más productos para cargar
+      } else {
+        const updatedArticles = isInitialLoad
+          ? fetchedArticles.results
+          : [...articles, ...fetchedArticles.results];
+        setArticles(updatedArticles);
+    
+        // Guardar los productos en AsyncStorage
+        await AsyncStorage.setItem(
+          `articles_${brandId}`,
+          JSON.stringify(updatedArticles)
         );
-        if (cachedArticles) {
-          console.log("Cargando artículos desde AsyncStorage");
-          setArticles(JSON.parse(cachedArticles));
-          setHasMore(false); // No hay más productos para cargar
-          return; // Salir si los datos están en caché
+    
+        if (!isInitialLoad) {
+          setPage((prevPage) => prevPage + 1); // Incrementa la página
         }
-
-        // Si no hay datos en caché, cargar desde la API
-        console.log("Cargando artículos desde la API");
-        const fetchedArticles = await fetchProductsBrand(
-          brandId.toString(), // Convierte brandId a string
-          clienteId.toString(), // Convierte clienteId a string
-          page
-        ); // Filtra por marca y cliente
-        console.log("Respuesta de la API:", fetchedArticles);
-        fetchedArticles.results.sort((a: Article, b: Article) =>
-          a.name.localeCompare(b.name)
-        );
-        if (fetchedArticles.results.length === 0) {
-          setHasMore(false); // No hay más productos para cargar
-          Toast.show({
-            type: "info",
-            text1: "Sin productos",
-            text2: `No hay productos disponibles para la marca ${brandName}.`,
-          });
-        } else {
-          setArticles(fetchedArticles.results);
-
-          // Guardar los productos en AsyncStorage
-          await AsyncStorage.setItem(
-            `articles_${brandId}`,
-            JSON.stringify(fetchedArticles.results)
-          );
-        }
-      } catch (error) {
-        console.error("Error al cargar los artículos:", error);
-      } finally {
-        setInitialLoading(false); // Detén el indicador de carga inicial
       }
-    };
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        setHasMore(false); // Detén la carga si la API devuelve 404
+      } else {
+        console.error("Error al cargar los artículos:", error);
+      }
+    } finally {
+      if (isInitialLoad) {
+        setInitialLoading(false);
+      } else {
+        setLoadingMore(false);
+      }
+    }
+  };
 
-    loadArticles();
-  }, [brandId, clienteId, page]); // Escucha cambios en los parámetros y la página
-
+  useEffect(() => {
+    loadArticles(true); // Carga inicial
+  }, [brandId, clienteId]);
   // Función para ordenar los artículos
   const sortArticles = (
     criteria:
@@ -436,21 +428,25 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
           { paddingTop: 15, paddingHorizontal: 0, marginBottom: 80 },
         ]}>
         <View>
-          <FlatList
-            data={articles}
-            renderItem={show ? renderItem : renderItem2}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            numColumns={show ? 2 : 1}
-            key={show ? "grid" : "list"} // Cambia la clave aquí
-            onEndReached={loadMoreArticles} // Llama a la función directamente
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={
-              hasMore ? (
-                <ActivityIndicator size="small" color={COLORS.primary} />
-              ) : null
-            }
-          />
+        <FlatList
+  data={articles}
+  renderItem={show ? renderItem : renderItem2}
+  keyExtractor={(item) => item.id.toString()}
+  contentContainerStyle={{ paddingBottom: 20 }}
+  numColumns={show ? 2 : 1}
+  key={show ? "grid" : "list"} // Cambia la clave aquí
+  onEndReached={() => {
+    if (hasMore && !loadingMore) {
+      loadArticles(); // Cargar más productos
+    }
+  }}
+  onEndReachedThreshold={0.5} // Umbral para disparar la carga
+  ListFooterComponent={
+    loadingMore ? (
+      <ActivityIndicator size="small" color={COLORS.primary} />
+    ) : null
+  }
+/> 
         </View>
       </View>
       <BottomSheet2
