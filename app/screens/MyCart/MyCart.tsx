@@ -11,7 +11,10 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/reducer";
-import { removeFromCart } from "../../redux/reducer/cartReducer";
+import {
+  removeFromCart,
+  initializeCart,
+} from "../../redux/reducer/cartReducer";
 import { Feather } from "@expo/vector-icons";
 import { getCartItemsApi } from "../../api/cartApi"; // Importa la nueva función
 import { deleteItemFromCartApi } from "../../api/deleteItemApi"; // Importa la función correctamente
@@ -29,8 +32,8 @@ type Product = {
 };
 
 const MyCart = ({ navigation }: MyCartScreenProps) => {
-  // const cart = useSelector((state: any) => state.cart.cart);
-  const [cart, setCart] = useState<Product[]>([]); // Cambia el carrito a un estado local
+  const cart = useSelector((state: any) => state.cart.cart);
+  // const [cart, setCart] = useState<Product[]>([]); // Cambia el carrito a un estado local
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
@@ -56,61 +59,60 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
     navigation.navigate("ProductsDetails", { product, productId: product.id });
   };
 
-    // Recuperar el carrito desde AsyncStorage al iniciar la pantalla
-    useEffect(() => {
-      const loadCartFromStorage = async () => {
-        try {
-          const storedCart = await AsyncStorage.getItem("cart");
-          if (storedCart) {
-            setCart(JSON.parse(storedCart)); // Actualiza el estado del carrito con los datos almacenados
-          } else {
-            // Si no hay datos en AsyncStorage, llama a la API
-            const cartData = await getCartItemsApi(clienteId);
-            const mappedCartItems = cartData.items.map((item: any) => ({
-              id: item.articulo.id,
-              name: item.articulo.art_des.trim(),
-              price: parseFloat(item.co_precio),
-              quantity: parseInt(item.cantidad),
-              highImage: `${BASE_URL}${item.articulo.images.find((img: any) => img.quality === "high")?.image || ""}`,
-              line: item.articulo.co_lin.lin_des.trim(),
-              subline: item.articulo.co_subl.subl_des.trim(),
-              model: item.articulo.modelo?.trim() || "",
-            }));
-            setCart(mappedCartItems);
-            setCartId(cartData.id);
-          }
-        } catch (error) {
-          console.error("Error al cargar el carrito desde AsyncStorage:", error);
-        }
-      };
-    
-      loadCartFromStorage();
-    }, [clienteId]);
-  
-    // Guardar el carrito en AsyncStorage cada vez que cambie
-    useEffect(() => {
-      const saveCartToStorage = async () => {
-        try {
-          await AsyncStorage.setItem("cart", JSON.stringify(cart));
-        } catch (error) {
-          console.error("Error al guardar el carrito en AsyncStorage:", error);
-        }
-      };
-  
-      saveCartToStorage();
-    }, [cart]);
-
-    
-    const removeItemFromCart = async (itemId: number) => {
+  // Recuperar el carrito desde AsyncStorage al iniciar la pantalla
+  useEffect(() => {
+    const loadCartFromStorage = async () => {
       try {
-        const updatedCart = cart.filter((item) => item.id !== itemId);
-        setCart(updatedCart); // Actualiza el estado local del carrito
-        await deleteItemFromCartApi(clienteId, itemId); // Llama a la API para eliminar el producto
-        dispatch(removeFromCart(itemId)); // Actualiza el estado global si es necesario
+        const storedCart = await AsyncStorage.getItem("cart");
+        if (storedCart) {
+          dispatch(initializeCart(JSON.parse(storedCart)));
+        } else {
+          const cartData = await getCartItemsApi(clienteId);
+          const mappedCartItems = cartData.items.map((item: any) => ({
+            id: item.articulo.id,
+            name: item.articulo.art_des.trim(),
+            price: parseFloat(item.co_precio),
+            quantity: parseInt(item.cantidad),
+            highImage: `${BASE_URL}${
+              item.articulo.images.find((img: any) => img.quality === "high")
+                ?.image || ""
+            }`,
+            line: item.articulo.co_lin.lin_des.trim(),
+            subline: item.articulo.co_subl.subl_des.trim(),
+            model: item.articulo.modelo?.trim() || "",
+          }));
+          dispatch(initializeCart(mappedCartItems));
+          setCartId(cartData.id);
+        }
       } catch (error) {
-        console.error("Error al eliminar el producto:", error);
+        console.error("Error al cargar el carrito desde AsyncStorage:", error);
       }
     };
+
+    loadCartFromStorage();
+  }, [clienteId, dispatch]);
+
+  // Guardar el carrito en AsyncStorage cada vez que cambie
+  useEffect(() => {
+    const saveCartToStorage = async () => {
+      try {
+        await AsyncStorage.setItem("cart", JSON.stringify(cart));
+      } catch (error) {
+        console.error("Error al guardar el carrito en AsyncStorage:", error);
+      }
+    };
+
+    saveCartToStorage();
+  }, [cart]);
+
+  const removeItemFromCart = async (itemId: number) => {
+    try {
+      await deleteItemFromCartApi(clienteId, itemId);
+      dispatch(removeFromCart(itemId));
+    } catch (error) {
+      console.error("Error al eliminar el producto:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -148,23 +150,28 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
         righttitle2
         rightIcon5={"search"}
       />
- 
+
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}>
         <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
           {cart.map((data: any, index: any) => {
-  if (!data.price || !data.quantity) {
-    console.warn(`Producto con datos incompletos: ${JSON.stringify(data)}`);
-    return null; // No renderiza productos con datos incompletos
-  }
+            if (!data.price || !data.quantity) {
+              console.warn(
+                `Producto con datos incompletos: ${JSON.stringify(data)}`
+              );
+              return null; // No renderiza productos con datos incompletos
+            }
 
-  const totalPricePerProduct =
-  parseFloat(
-    (typeof data.price === "string" ? data.price : data.price?.toString() || "0")
-      .replace(/[^0-9.-]+/g, "")
-      .replace(",", ".")
-  ) * (data.quantity || 0);
+            const totalPricePerProduct =
+              parseFloat(
+                (typeof data.price === "string"
+                  ? data.price
+                  : data.price?.toString() || "0"
+                )
+                  .replace(/[^0-9.-]+/g, "")
+                  .replace(",", ".")
+              ) * (data.quantity || 0);
 
             return (
               <View key={index} style={{ marginBottom: 10 }}>
@@ -182,7 +189,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
                   productId={data.id} // Pasar el ID del producto
                   clienteId={clienteId} // Asegúrate de que este valor esté definido
                   onPress={() => navigateToProductDetails(data)}
-                  removeItemFromCart={(itemId) => removeItemFromCart(itemId)} // Pasar la función
+                  removeItemFromCart={() => removeItemFromCart(data.id)} // Asegúrate de que `data.id` sea un número
                 />
               </View>
             );
@@ -192,21 +199,21 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
       <View
         style={[
           GlobalStyleSheet.container,
-          { 
-            backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card, 
-            padding:0,
-            paddingTop:3,
-            margin:0,
+          {
+            backgroundColor: theme.dark ? "rgba(255,255,255,.1)" : colors.card,
+            padding: 0,
+            paddingTop: 3,
+            margin: 0,
           },
         ]}>
-        <View >
+        <View>
           <View>
             <View
-              style={{ 
+              style={{
                 paddingHorizontal: 15,
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "space-between", 
+                justifyContent: "space-between",
               }}>
               <Text
                 style={[

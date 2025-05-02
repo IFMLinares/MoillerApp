@@ -8,8 +8,12 @@ export const getCartItemsApi = async (clienteId: number) => {
     });
     console.log("Productos en el carrito:", response.data); // Muestra los datos en la consola
     return response.data;
-  } catch (error) {
-    console.error("Error al obtener los productos del carrito:", error.response?.data || error.message);
+  } catch (error: unknown) { // Declara el tipo de error como "unknown"
+    if (axios.isAxiosError(error)) { // Verifica si el error es de Axios
+      console.error("Error al obtener los productos del carrito:", error.response?.data || error.message);
+    } else {
+      console.error("Error desconocido:", error);
+    }
     throw error;
   }
 };
