@@ -68,7 +68,7 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
           Toast.show({
             type: "info",
             text1: "Producto actualizado",
-            text2: `Ahora tienes ${newQuantity} unidades de este producto en tu carrito.`,
+            text2: `Ahora tienes unidades de este producto en tu carrito.`,
           });
         } else {
           // Mostrar mensaje de éxito si es un producto nuevo
@@ -86,14 +86,13 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
         dispatch(addToCart({ ...item, quantity: newQuantity }));
       } catch (error: any) {
         if (error.response?.status === 409) {
-          const stockDisponible = error.response.data?.message.match(/Stock disponible: (\d+(\.\d+)?)/)?.[1];
-          const stockFormateado = stockDisponible ? parseFloat(stockDisponible) : "cantidad desconocida";
+          // Mostrar solo el mensaje de stock insuficiente
           Toast.show({
             type: "error",
             text1: "Stock insuficiente",
-            text2: `Solo hay ${stockFormateado} unidades disponibles.`,
+            text2: "No hay suficiente stock para este producto.",
           });
-        } else {
+        }  else {
           Toast.show({
             type: "error",
             text1: "Error al añadir al carrito",

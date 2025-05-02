@@ -64,8 +64,9 @@ import Category from "../screens/Category/Category"; // Importa la pantalla Cate
 import SearchArticles from "../screens/Components/SearchArticles";
 import ProductDetail from "../screens/Components/ProductDetail";
 import CatalogoScreen from "../screens/Category/Catalogo";
+import NuevoScreen from "../screens/Category/Nuevo";
 import PedidoScreen from "../screens/Payment/Pedido";
-
+import MasVendidoScreen from "../screens/Category/MasVendido";
 
 import { useDispatch } from "react-redux";
 import { getUserInfo } from "../api/editPerfilApi";
@@ -161,6 +162,8 @@ const StackNavigator = () => {
         <Stack.Screen name="Singlechat" component={Singlechat} />
         <Stack.Screen name="Call" component={Call} />
         <Stack.Screen name="Catalogo" component={CatalogoScreen} />
+        <Stack.Screen name="Nuevo" component={NuevoScreen} />
+        <Stack.Screen name="MasVendido" component={MasVendidoScreen} />
         <Stack.Screen name="SearchArticles" component={SearchArticles} /> 
         <Stack.Screen name="Components" component={Components} />
         <Stack.Screen name="Accordion" component={AccordionScreen} />

@@ -105,12 +105,11 @@ const QuantityButton = ({
         dispatch(addToCart({ ...item, quantity: newQuantity }));
       } catch (error: any) {
         if (error.response?.status === 409) {
-          const stockDisponible = error.response.data?.message.match(/Stock disponible: (\d+(\.\d+)?)/)?.[1];
-          const stockFormateado = stockDisponible ? parseFloat(stockDisponible) : "cantidad desconocida";
+          // Mostrar solo el mensaje de stock insuficiente
           Toast.show({
             type: "error",
             text1: "Stock insuficiente",
-            text2: `Solo hay ${stockFormateado} unidades disponibles.`,
+            text2: "No hay suficiente stock para este producto.",
           });
         } else {
           Toast.show({

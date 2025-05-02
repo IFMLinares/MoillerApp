@@ -97,19 +97,21 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
 
   const loadArticles = async () => {
     if (!hasMore || isLoading) return;
-
+  
     setIsLoading(true);
     try {
       const { articles: newArticles, next } = await fetchArticles(
         clienteId,
-        page
+        page,
+        false, // No es necesario most_sold
+        "alfabetico" // Ordenar alfabéticamente
       );
-
+  
       const articlesWithDefaultPrice = newArticles.map((article: Article) => ({
         ...article,
-        price: article.price || 0, // Asigna un precio predeterminado si no está definido
+        price: article.price || 0,
       }));
-
+  
       setArticles((prevArticles) => [
         ...prevArticles,
         ...articlesWithDefaultPrice,
@@ -298,7 +300,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
             />
             <Text
               style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
-              FILTROS
+              CATEGORÍAS
             </Text>
           </TouchableOpacity>
           <View

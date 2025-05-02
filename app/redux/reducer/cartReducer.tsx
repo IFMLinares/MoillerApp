@@ -48,10 +48,13 @@ export const cartSlice = createSlice({
       // Vaciar el carrito
       state.cart = [];
     },
+    initializeCart: (state, action) => {
+      state.cart = action.payload; // Inicializa el carrito con los datos de AsyncStorage
+    },
   },
   
 });
 
-export const { addToCart, removeFromCart, incrementQuantity, decrementQuantity, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, incrementQuantity, decrementQuantity, clearCart , initializeCart } = cartSlice.actions;
 
 export default cartSlice.reducer;

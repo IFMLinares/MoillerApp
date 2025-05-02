@@ -283,7 +283,7 @@ const Header = ({
             />
             <Text
               style={[FONTS.fontMedium, { fontSize: 15, color: COLORS.card }]}>
-              FILTROS
+              CATEGORÍAS
             </Text>
             <BottomSheet2 ref={sheetRef} />
             <Toast ref={(ref) => Toast.setRef(ref)} />

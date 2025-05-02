@@ -496,45 +496,37 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{
+                        backgroundColor: COLORS.primary,
+                        padding: 15,
+                        borderRadius: 8,
                         alignItems: "center",
-                        justifyContent: "center",
-                        paddingBottom: 5,
-                      }}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: 5,
-                        }}>
-                        <Text
-                          style={[
-                            FONTS.fontBold,
-                            { fontSize: 13, color: "white" },
-                          ]}>
-                          Más vendidos
-                        </Text>
-                      </View>
+                      }}
+                      onPress={() =>
+                        navigation.navigate("MasVendido", {
+                          subcategoryId: "MasVendido",
+                          subcategoryName: "Más Vendido",
+                        })
+                      }>
+                      <Text style={[FONTS.fontBold, { color: COLORS.white }]}>
+                        Más Vendido
+                      </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{
+                        backgroundColor: COLORS.primary,
+                        padding: 15,
+                        borderRadius: 8,
                         alignItems: "center",
-                        justifyContent: "center",
-                        paddingBottom: 5,
-                      }}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: 5,
-                        }}>
-                        <Text
-                          style={[
-                            FONTS.fontBold,
-                            { fontSize: 13, color: "white" },
-                          ]}>
-                          Nuevo
-                        </Text>
-                      </View>
+                      }}
+                      onPress={() =>
+                        navigation.navigate("Nuevo", {
+                          subcategoryId: "Nuevo",
+                          subcategoryName: "Nuevo",
+                        })
+                      }>
+                      <Text style={[FONTS.fontBold, { color: COLORS.white }]}>
+                        Nuevo
+                      </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{

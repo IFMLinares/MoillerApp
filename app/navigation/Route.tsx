@@ -8,6 +8,8 @@ import { RootState } from "../redux/store"; // Asegúrate de que este sea el pat
 import { setClienteId } from "../redux/actions/drawerAction";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import { initializeCart } from "../redux/reducer/cartReducer"; // Asegúrate de que este sea el path correcto a tu reducer
+
 
 const Route = () => {
   const dispatch: ThunkDispatch<RootState, void, AnyAction> = useDispatch();
@@ -35,6 +37,22 @@ const Route = () => {
 
     loadClienteId();
   }, [dispatch]);
+
+  useEffect(() => {
+    const loadCartFromStorage = async () => {
+      try {
+        const storedCart = await AsyncStorage.getItem("cart");
+        if (storedCart) {
+          dispatch(initializeCart(JSON.parse(storedCart))); // Inicializa el carrito en Redux
+        }
+      } catch (error) {
+        console.error("Error al cargar el carrito desde AsyncStorage:", error);
+      }
+    };
+
+    loadCartFromStorage();
+  }, [dispatch]);
+
 
   const checkClienteId = async () => {
     const storedClienteId = await AsyncStorage.getItem("clienteId");

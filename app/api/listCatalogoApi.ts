@@ -22,12 +22,27 @@ interface ApiArticle {
   co_cat: { cat_des: string };
 }
 
-export const fetchArticles = async (clienteId: number, page: number = 1) => {
+export const fetchArticles = async (
+  clienteId: number,
+  page: number = 1,
+  mostSold: boolean = false,
+  orderBy: string = "fecha" // Nuevo parámetro opcional con valor predeterminado "fecha"
+) => {
   try {
+    const params: any = { co_cli: clienteId, page, page_size: 10 };
+    if (mostSold) {
+      params.most_sold = true;
+    }
+    if (orderBy === "alfabetico") {
+      params.order_by_name = true; // Agrega este parámetro para ordenar alfabéticamente
+    } else if (orderBy === "fecha") {
+      params.order_by_fecha = true; // Ordena por fecha (valor predeterminado)
+    }
+
     const response = await axios.get(
       `${BASE_URL}api/core/articles/list-by-cliente`,
       {
-        params: { co_cli: clienteId, page, page_size: 10 },
+        params,
         headers: {
           "Content-Type": "application/json",
         },
@@ -36,7 +51,6 @@ export const fetchArticles = async (clienteId: number, page: number = 1) => {
 
     const { results, next } = response.data;
 
-    // Mapea los artículos
     const articles = results.map((article: ApiArticle) => ({
       id: article.id,
       code: article.co_art.trim(),

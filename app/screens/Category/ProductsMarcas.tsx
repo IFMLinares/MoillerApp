@@ -372,7 +372,7 @@ const ProductsMarcas = ({ navigation, route }: ProductsScreenProps) => {
             />
             <Text
               style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
-              FILTROS
+              CATEGORÍAS
             </Text>
           </TouchableOpacity>
           <View
