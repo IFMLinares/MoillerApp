@@ -52,21 +52,29 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
     const loadCategories = async () => {
       try {
         setIsLoading(true); // Mostrar el indicador de carga
-
-        // Verificar si las categorías están en AsyncStorage
+  
+        // Obtener las categorías desde la API
+        const categoriesFromServer = await fetchCategories();
+  
+        // Obtener las categorías almacenadas en AsyncStorage
         const cachedCategories = await AsyncStorage.getItem("categories");
-
+  
         if (cachedCategories) {
-          // Si están en caché, cargarlas desde AsyncStorage
-          setCategories(JSON.parse(cachedCategories));
+          const parsedCachedCategories = JSON.parse(cachedCategories);
+  
+          // Comparar los datos del servidor con los datos en caché
+          if (JSON.stringify(parsedCachedCategories) !== JSON.stringify(categoriesFromServer)) {
+            // Si los datos son diferentes, actualizar el caché
+            await AsyncStorage.setItem("categories", JSON.stringify(categoriesFromServer));
+            setCategories(categoriesFromServer);
+          } else {
+            // Si los datos son iguales, usar los datos en caché
+            setCategories(parsedCachedCategories);
+          }
         } else {
-          // Si no están en caché, obtenerlas de la API
-          const categories = await fetchCategories();
-
-          // Guardar en AsyncStorage para futuras solicitudes
-          await AsyncStorage.setItem("categories", JSON.stringify(categories));
-
-          setCategories(categories);
+          // Si no hay datos en caché, usar los datos del servidor
+          await AsyncStorage.setItem("categories", JSON.stringify(categoriesFromServer));
+          setCategories(categoriesFromServer);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -74,7 +82,7 @@ const Category = ({ navigation, route }: CategoryScreenProps) => {
         setIsLoading(false); // Ocultar el indicador de carga
       }
     };
-
+  
     loadCategories();
   }, []);
 

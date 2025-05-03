@@ -25,12 +25,12 @@ export interface Article {
   co_cat: { cat_des: string };
 }
 
-export const searchArticles = async (query: string): Promise<Article[]> => {
-  console.log("Iniciando búsqueda de artículos con query:", query); // Log inicial
+export const searchArticles = async (query: string, page: number = 1): Promise<Article[]> => {
+  console.log("Iniciando búsqueda de artículos con query:", query, "y página:", page); // Log inicial
 
   try {
     const response = await axios.get(`${BASE_URL}api/core/articles/search/`, {
-      params: { q: query },
+      params: { q: query, page },
       headers: {
         "Content-Type": "application/json",
       },

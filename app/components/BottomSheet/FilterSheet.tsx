@@ -48,21 +48,37 @@ const FilterSheet2 = ({ sheetRef }: Props) => {
       try {
         setIsLoadingCategories(true);
 
-        // Verificar si las categorías están en AsyncStorage
+        // Obtener las categorías desde la API
+        const categoriesFromServer = await fetchCategories();
+
+        // Obtener las categorías almacenadas en AsyncStorage
         const cachedCategories = await AsyncStorage.getItem("categories");
 
         if (cachedCategories) {
-          setCategories(JSON.parse(cachedCategories));
-        } else {
-          const fetchedCategories = await fetchCategories();
+          const parsedCachedCategories = JSON.parse(cachedCategories);
 
-          // Guardar en AsyncStorage
+          // Comparar los datos del servidor con los datos en caché
+          if (
+            JSON.stringify(parsedCachedCategories) !==
+            JSON.stringify(categoriesFromServer)
+          ) {
+            // Si los datos son diferentes, actualizar el caché
+            await AsyncStorage.setItem(
+              "categories",
+              JSON.stringify(categoriesFromServer)
+            );
+            setCategories(categoriesFromServer);
+          } else {
+            // Si los datos son iguales, usar los datos en caché
+            setCategories(parsedCachedCategories);
+          }
+        } else {
+          // Si no hay datos en caché, usar los datos del servidor
           await AsyncStorage.setItem(
             "categories",
-            JSON.stringify(fetchedCategories)
+            JSON.stringify(categoriesFromServer)
           );
-
-          setCategories(fetchedCategories);
+          setCategories(categoriesFromServer);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -250,7 +266,9 @@ const FilterSheet2 = ({ sheetRef }: Props) => {
                           borderRadius: 30,
                         }}
                         source={
-                          IMAGES[category.name.toLowerCase()] || IMAGES.default
+                          category.imageUrl
+                            ? { uri: category.imageUrl } // Usa la URL de la imagen si está disponible
+                            : IMAGES.defaultImage // Usa una imagen predeterminada si no hay imagen
                         }
                       />
                     </View>

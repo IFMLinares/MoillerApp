@@ -15,8 +15,7 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 const BottomNavigation = () => {
   const [username, setUsername] = useState("");
-  const homeScreenRef = useRef<any>(null);
-  const [scrollToTop, setScrollToTop] = useState<() => void | null>(null);
+  const homeScreenRef = useRef<{ scrollToTop: () => void } | null>(null);
 
   useEffect(() => {
     const getUsername = async () => {
@@ -37,19 +36,19 @@ const BottomNavigation = () => {
       }}
       tabBar={(props: any) => <BottomMenu {...props} />}>
       <Tab.Screen
-        name="Inicio"
+        name="Home"
         options={{
           tabBarLabel: "Inicio",
         }}
         listeners={{
           tabPress: () => {
-            if (scrollToTop) {
-              scrollToTop();
+            if (homeScreenRef.current) {
+              homeScreenRef.current.scrollToTop(); // Llama a scrollToTop
             }
           },
         }}>
-        {(props) => (
-          <Home {...props} onScrollToTop={(fn) => setScrollToTop(() => fn)} />
+        {({ navigation, route }) => (
+          <Home ref={homeScreenRef} navigation={navigation} route={route} />
         )}
       </Tab.Screen>
       <Tab.Screen name="Categorías" component={CategoryScreen} />
