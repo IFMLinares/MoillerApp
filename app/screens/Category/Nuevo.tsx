@@ -254,6 +254,7 @@ const Nuevo = ({ navigation, route }: ProductsScreenProps) => {
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
+              width: "100%",
             },
           ]}>
           <TouchableOpacity
@@ -263,7 +264,7 @@ const Nuevo = ({ navigation, route }: ProductsScreenProps) => {
               flexDirection: "row",
               alignItems: "center",
               gap: 5,
-              width: "35%",
+              width: "70%",
               justifyContent: "center",
             }}>
             <Image
@@ -281,26 +282,7 @@ const Nuevo = ({ navigation, route }: ProductsScreenProps) => {
               height: 40,
               backgroundColor: COLORS.primaryLight,
             }}
-          />
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => sheetRef.current.openSheet("filter")}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 5,
-              width: "35%",
-              justifyContent: "center",
-            }}>
-            <Image
-              style={{ height: 16, width: 16, resizeMode: "contain" }}
-              source={IMAGES.filter3}
-            />
-            <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
-              CATEGORÍAS
-            </Text>
-          </TouchableOpacity>
+          /> 
           <View
             style={{
               width: 1,

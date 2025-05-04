@@ -27,6 +27,7 @@ import { fetchShoppingCartDetailsApi } from "../../api/shoppingApi";
 import * as ImagePicker from "expo-image-picker"; // Para Expo
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 import { uploadComprobantePagoApi } from "../../api/comprobanteApi"; // Importar la función de la API
+import ImageViewer from "react-native-image-zoom-viewer"; // Importar ImageViewer
 
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, "Pedido">;
 
@@ -42,6 +43,7 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
   const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = useState(null); // Estado para almacenar la imagen seleccionada
   const [amountPaid, setAmountPaid] = useState(0); // Estado para el monto abonado
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false); // Estado para controlar el modal de la imagen
 
   useEffect(() => {
     const fetchCartDetails = async () => {
@@ -105,11 +107,15 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
       );
 
       console.log("Respuesta del servidor:", response);
-      alert("Imagen enviada exitosamente.");
 
-      // Actualizar los detalles del carrito después de subir el comprobante
+      // Realizar una segunda llamada para obtener los detalles del carrito
       const updatedCartDetails = await fetchShoppingCartDetailsApi(order.id);
-      setCartDetails(updatedCartDetails); // Actualiza el estado con los nuevos datos
+      console.log("Detalles del carrito actualizados:", updatedCartDetails);
+
+      // Actualiza el estado con los nuevos datos
+      setCartDetails(updatedCartDetails);
+
+      alert("Imagen enviada exitosamente.");
     } catch (error) {
       console.error("Error al enviar la imagen:", error);
       if (error.response) {
@@ -175,6 +181,16 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
 
   const handleCancelOrder = () => {
     setIsConfirmationModalVisible(false);
+  };
+
+  // Función para abrir el modal de la imagen
+  const handleOpenImageModal = () => {
+    setIsImageModalVisible(true);
+  };
+
+  // Función para cerrar el modal de la imagen
+  const handleCloseImageModal = () => {
+    setIsImageModalVisible(false);
   };
 
   return (
@@ -269,10 +285,11 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
           </View>
 
           {/* Mostrar la imagen seleccionada */}
-          {selectedImage && (
-            <>
+          {cartDetails?.comprobante_pago ? (
+            // Mostrar la imagen guardada del comprobante
+            <TouchableOpacity onPress={handleOpenImageModal}>
               <Image
-                source={{ uri: selectedImage }}
+                source={{ uri: `${BASE_URL}${cartDetails.comprobante_pago}` }}
                 style={{
                   width: "100%",
                   height: 200,
@@ -280,6 +297,21 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
                   marginTop: 10,
                 }}
               />
+            </TouchableOpacity>
+          ) : selectedImage ? (
+            // Mostrar la imagen seleccionada por el usuario
+            <>
+              <TouchableOpacity onPress={handleOpenImageModal}>
+                <Image
+                  source={{ uri: selectedImage }}
+                  style={{
+                    width: "100%",
+                    height: 200,
+                    borderRadius: 10,
+                    marginTop: 10,
+                  }}
+                />
+              </TouchableOpacity>
               {/* Botón para enviar la imagen */}
               <TouchableOpacity
                 style={{
@@ -295,6 +327,11 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
                 </Text>
               </TouchableOpacity>
             </>
+          ) : (
+            // Mostrar opciones para seleccionar una imagen
+            <Text style={{ color: COLORS.gray, marginTop: 10 }}>
+              No se ha seleccionado ningún comprobante.
+            </Text>
           )}
         </View>
         <View
@@ -524,6 +561,34 @@ const Pedido = ({ navigation, route }: CheckoutScreenProps) => {
             </Text>
           </View>
         </View>
+      </Modal>
+
+      {/* Modal para visualizar la imagen */}
+      <Modal
+        visible={isImageModalVisible}
+        transparent={true}
+        onRequestClose={handleCloseImageModal}>
+        <ImageViewer
+          imageUrls={[
+            {
+              url: cartDetails?.comprobante_pago
+                ? `${BASE_URL}${cartDetails.comprobante_pago}`
+                : selectedImage,
+            },
+          ]}
+          enableSwipeDown={true}
+          onSwipeDown={handleCloseImageModal}
+        />
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            top: 40,
+            right: 20,
+            zIndex: 1,
+          }}
+          onPress={handleCloseImageModal}>
+          <Ionicons name="close-circle" size={30} color="#fff" />
+        </TouchableOpacity>
       </Modal>
     </View>
   );

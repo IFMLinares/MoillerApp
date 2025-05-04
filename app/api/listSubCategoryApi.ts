@@ -1,9 +1,14 @@
 import axios from "axios";
-import { BASE_URL } from './globalUrlApi'; // Importar la URL base
+import { BASE_URL } from "./globalUrlApi"; // Importar la URL base
 
-export const fetchProductsBySubcategory = async (co_subl: string, co_cli: string, page: number = 1) => {
+export const fetchProductsBySubcategory = async (
+  co_subl: string,
+  co_cli: string,
+  page: number = 1,
+  orderBy: string = "name"
+) => {
   try {
-    console.log("Llamando a la API con:", { co_subl, co_cli, page }); // Depuración
+    console.log("Llamando a la API con:", { co_subl, co_cli, page, orderBy }); // Depuración
     const response = await axios.get(
       `${BASE_URL}api/core/articles/list-by-cliente`,
       {
@@ -11,6 +16,7 @@ export const fetchProductsBySubcategory = async (co_subl: string, co_cli: string
           co_cli: co_cli, // Cliente ID
           co_subl: co_subl, // Subcategoría ID (actualizado)
           page: page, // Página para la paginación
+          order_by: orderBy, // Ordenar por nombre
         },
         headers: {
           "Content-Type": "application/json",
@@ -42,6 +48,8 @@ export const fetchProductsBySubcategory = async (co_subl: string, co_cli: string
         weight: article.peso?.trim() || "",
         warranty: article.garantia?.trim() || "",
         brand: article.co_cat.cat_des?.trim() || "",
+        video: article.video?.trim() || "",
+        fichaTecnica: article.ficha_tecnica?.trim() || "",
         precio_cliente: article.precio_cliente || 0,
       })),
     };

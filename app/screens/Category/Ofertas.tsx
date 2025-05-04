@@ -97,7 +97,7 @@ const Ofertas = ({ navigation, route }: ProductsScreenProps) => {
 
   const loadArticles = async () => {
     if (!hasMore || isLoading) return;
-  
+
     setIsLoading(true);
     try {
       const { articles: newArticles, next } = await fetchArticles(
@@ -107,12 +107,12 @@ const Ofertas = ({ navigation, route }: ProductsScreenProps) => {
         "fecha", // Ordenar por fecha
         true // Filtrar por ofertas
       );
-  
+
       const articlesWithDefaultPrice = newArticles.map((article: Article) => ({
         ...article,
         price: article.price || 0,
       }));
-  
+
       setArticles((prevArticles) => [
         ...prevArticles,
         ...articlesWithDefaultPrice,
@@ -257,6 +257,7 @@ const Ofertas = ({ navigation, route }: ProductsScreenProps) => {
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
+              width: "100%",
             },
           ]}>
           <TouchableOpacity
@@ -266,7 +267,7 @@ const Ofertas = ({ navigation, route }: ProductsScreenProps) => {
               flexDirection: "row",
               alignItems: "center",
               gap: 5,
-              width: "35%",
+              width: "70%",
               justifyContent: "center",
             }}>
             <Image
@@ -285,25 +286,6 @@ const Ofertas = ({ navigation, route }: ProductsScreenProps) => {
               backgroundColor: COLORS.primaryLight,
             }}
           />
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => sheetRef.current.openSheet("filter")}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 5,
-              width: "35%",
-              justifyContent: "center",
-            }}>
-            <Image
-              style={{ height: 16, width: 16, resizeMode: "contain" }}
-              source={IMAGES.filter3}
-            />
-            <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
-              CATEGORÍAS
-            </Text>
-          </TouchableOpacity>
           <View
             style={{
               width: 1,

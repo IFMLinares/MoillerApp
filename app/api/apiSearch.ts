@@ -23,6 +23,8 @@ export interface Article {
   peso?: string;
   garantia?: string;
   co_cat: { cat_des: string };
+  video?: string;
+  ficha_tecnica?: string;
 }
 
 export const searchArticles = async (query: string, page: number = 1): Promise<Article[]> => {
@@ -59,6 +61,8 @@ export const searchArticles = async (query: string, page: number = 1): Promise<A
       weight: article.peso?.trim() || "",
       warranty: article.garantia?.trim() || "",
       brand: article.co_cat.cat_des?.trim() || "",
+      video: article.video?.trim() || "",
+      fichaTecnica: article.ficha_tecnica?.trim() || "",
     }));
   } catch (error) {
     console.error("Error al buscar artículos por query:", error); // Log de error

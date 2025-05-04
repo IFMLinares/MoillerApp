@@ -40,6 +40,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
   console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
   const [cartId, setCartId] = useState<number | null>(null); // Estado para almacenar el cart_id
+  console.log("Datos del carrito:", cart);
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -131,14 +132,19 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   const calculateTotal = () => {
     return cart
       .reduce((total: number, item: any) => {
+        // Validar y asignar un valor predeterminado para item.price
         const price = parseFloat(
-          (typeof item.price === "string" ? item.price : "0")
+          (typeof item.price === "string" ? item.price : item.price?.toString() || "0")
             .replace(/[^0-9.-]+/g, "")
             .replace(",", ".")
         );
-        return total + price * (item.quantity || 0); // Multiplica el precio por la cantidad
+  
+        // Validar y asignar un valor predeterminado para item.quantity
+        const quantity = item.quantity || 0;
+  
+        return total + price * quantity; // Multiplica el precio por la cantidad
       }, 0)
-      .toFixed(2);
+      .toFixed(2); // Redondear a 2 decimales
   };
 
   return (
@@ -156,44 +162,44 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
         showsVerticalScrollIndicator={false}>
         <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
           {cart.map((data: any, index: any) => {
-            if (!data.price || !data.quantity) {
-              console.warn(
-                `Producto con datos incompletos: ${JSON.stringify(data)}`
-              );
-              return null; // No renderiza productos con datos incompletos
-            }
+  // Validar y asignar valores predeterminados si faltan datos
+  const price =
+    typeof data.price === "string"
+      ? data.price
+      : data.price?.toString() || "0"; // Asignar "0" si price es undefined
+  const quantity = data.quantity || 0; // Asignar 0 si quantity es undefined
 
-            const totalPricePerProduct =
-              parseFloat(
-                (typeof data.price === "string"
-                  ? data.price
-                  : data.price?.toString() || "0"
-                )
-                  .replace(/[^0-9.-]+/g, "")
-                  .replace(",", ".")
-              ) * (data.quantity || 0);
+  if (!price || quantity === 0) {
+    console.warn(`Producto con datos incompletos: ${JSON.stringify(data)}`);
+    return null; // No renderiza productos con datos incompletos
+  }
 
-            return (
-              <View key={index} style={{ marginBottom: 10 }}>
-                <Cardstyle2
-                  title={data.name}
-                  price={data.price}
-                  discount={data.discount}
-                  delevery={data.delevery}
-                  image={{ uri: `${BASE_URL}${data.highImage}` }} // Usa la URL de la imagen de baja calidad
-                  offer={data.offer}
-                  brand={data.brand}
-                  marca={data.code}
-                  modelo={data.line}
-                  quantity={data.quantity} // Pasar la cantidad
-                  productId={data.id} // Pasar el ID del producto
-                  clienteId={clienteId} // Asegúrate de que este valor esté definido
-                  onPress={() => navigateToProductDetails(data)}
-                  removeItemFromCart={() => removeItemFromCart(data.id)} // Asegúrate de que `data.id` sea un número
-                />
-              </View>
-            );
-          })}
+  // Calcular el precio total por producto
+  const totalPricePerProduct = parseFloat(
+    price.replace(/[^0-9.-]+/g, "").replace(",", ".")
+  ) * quantity;
+
+  return (
+    <View key={index} style={{ marginBottom: 10 }}>
+      <Cardstyle2
+        title={data.name}
+        price={data.price}
+        discount={data.discount}
+        delevery={data.delevery}
+        image={{ uri: `${BASE_URL}${data.highImage}` }}
+        offer={data.offer}
+        brand={data.brand}
+        marca={data.code}
+        modelo={data.line}
+        quantity={data.quantity}
+        productId={data.id}
+        clienteId={clienteId}
+        onPress={() => navigateToProductDetails(data)}
+        removeItemFromCart={() => removeItemFromCart(data.id)}
+      />
+    </View>
+  );
+})}
         </View>
       </ScrollView>
       <View
@@ -225,7 +231,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
               <Text
                 style={[
                   FONTS.fontJostMediumItalic, // Cambia a la propiedad correcta
-                  { fontSize: 16, color: COLORS.success },
+                  { fontSize: 20, color: COLORS.success, fontWeight: "bold" },
                 ]}>
                 {calculateTotal()}€
               </Text>

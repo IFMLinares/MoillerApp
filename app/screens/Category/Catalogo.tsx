@@ -97,7 +97,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
 
   const loadArticles = async () => {
     if (!hasMore || isLoading) return;
-  
+
     setIsLoading(true);
     try {
       const { articles: newArticles, next } = await fetchArticles(
@@ -106,12 +106,12 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
         false, // No es necesario most_sold
         "alfabetico" // Ordenar alfabéticamente
       );
-  
+
       const articlesWithDefaultPrice = newArticles.map((article: Article) => ({
         ...article,
         price: article.price || 0,
       }));
-  
+
       setArticles((prevArticles) => [
         ...prevArticles,
         ...articlesWithDefaultPrice,
@@ -255,6 +255,8 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               padding: 0,
               justifyContent: "space-between",
               flexDirection: "row",
+              width: "100%",
+
               alignItems: "center",
             },
           ]}>
@@ -265,7 +267,7 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               flexDirection: "row",
               alignItems: "center",
               gap: 5,
-              width: "35%",
+              width: "70%",
               justifyContent: "center",
             }}>
             <Image
@@ -284,25 +286,6 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
               backgroundColor: COLORS.primaryLight,
             }}
           />
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => sheetRef.current.openSheet("filter")}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 5,
-              width: "35%",
-              justifyContent: "center",
-            }}>
-            <Image
-              style={{ height: 16, width: 16, resizeMode: "contain" }}
-              source={IMAGES.filter3}
-            />
-            <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text }]}>
-              CATEGORÍAS
-            </Text>
-          </TouchableOpacity>
           <View
             style={{
               width: 1,

@@ -8,6 +8,7 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import Header from "../../layout/Header";
 import { IMAGES } from "../../constants/Images";
@@ -41,16 +42,15 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
   const [additionalNotes, setAdditionalNotes] = useState(""); // Estado para las notas adicionales
   console.log("Cliente ID recibido en Checkout:", clienteId);
   console.log("Cart ID recibido en Checkout:", cartId);
-
+  const [isProcessing, setIsProcessing] = useState(false); // Estado para bloquear la pantalla
+  
   const navigateToProductDetails = (product) => {
     navigation.navigate("ProductsDetails", { product });
   };
 
   const handleConfirmOrder = async () => {
     setIsConfirmationModalVisible(false);
-    setTimeout(() => {
-      setIsModalVisible(true);
-    }, 2000);
+    setIsProcessing(true); // Bloquea la pantalla
 
     try {
       const totalPrice = calculateTotal(); // Precio total
@@ -78,9 +78,13 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
       };
 
       setTimeout(() => {
-        setIsModalVisible(false);
-        navigation.navigate("Myorder", { order: newOrder });
-        dispatch(clearCart());
+        setIsProcessing(false); // Desbloquea la pantalla
+        setIsModalVisible(true); // Muestra el modal de éxito
+        setTimeout(() => {
+          setIsModalVisible(false);
+          navigation.navigate("Myorder", { order: newOrder });
+          dispatch(clearCart());
+        }, 2000);
       }, 2000);
     } catch (error) {
       console.error(
@@ -98,7 +102,7 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
         );
       }
 
-      setIsModalVisible(false);
+      setIsProcessing(false); // Desbloquea la pantalla en caso de error
     }
   };
 
@@ -114,12 +118,19 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
   const calculateTotal = () => {
     return cart
       .reduce((total: number, item: any) => {
+        // Validar y asignar un valor predeterminado para item.price
         const price = parseFloat(
-          item.price.replace(/[^0-9.-]+/g, "").replace(",", ".")
+          (typeof item.price === "string" ? item.price : item.price?.toString() || "0")
+            .replace(/[^0-9.-]+/g, "")
+            .replace(",", ".")
         );
-        return total + price * item.quantity; // Multiplica el precio por la cantidad
+  
+        // Validar y asignar un valor predeterminado para item.quantity
+        const quantity = item.quantity || 0;
+  
+        return total + price * quantity; // Multiplica el precio por la cantidad
       }, 0)
-      .toFixed(2);
+      .toFixed(2); // Redondear a 2 decimales
   };
 
   const removeItemFromCart = (product) => {
@@ -303,7 +314,7 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
               <Text
                 style={[
                   FONTS.fontMediumItalic,
-                  { fontSize: 16, color: COLORS.success, fontWeight: "bold" },
+                  { fontSize: 20, color: COLORS.success, fontWeight: "bold" },
                 ]}>
                 {calculateTotal()}€
               </Text>
@@ -412,6 +423,34 @@ const Checkout = ({ navigation, route }: CheckoutScreenProps) => {
         </View>
       </Modal>
 
+      {/* Modal de bloqueo mientras se procesa el pedido */}
+      <Modal
+        visible={isProcessing}
+        transparent={true}
+        animationType="none"
+        onRequestClose={() => {}}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text
+            style={{
+              marginTop: 20,
+              color: COLORS.white,
+              fontSize: 16,
+              ...FONTS.fontMedium,
+            }}
+          >
+            Procesando pedido, por favor espera...
+          </Text>
+        </View>
+      </Modal>
       {/* Modal de éxito */}
       <Modal
         visible={isModalVisible}

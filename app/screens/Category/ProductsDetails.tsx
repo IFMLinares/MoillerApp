@@ -23,8 +23,8 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { ScrollView } from "react-native-gesture-handler";
 import Cardstyle1 from "../../components/Card/Cardstyle1";
-import { useDispatch, useSelector} from "react-redux";
-import { addToCart } from "../../redux/reducer/cartReducer"; 
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../../redux/reducer/cartReducer";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
 import { RootState } from "../../redux/reducer";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
@@ -34,12 +34,16 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import * as Linking from "expo-linking"; // Importar Linking para abrir URLs
+import { Video } from "expo-av";
+import * as FileSystem from "expo-file-system"; // Importar FileSystem
+import * as Sharing from "expo-sharing"; // Importar Sharing para compartir el archivo descargado
+
 // api articulos
 import { addItemToCartApi } from "../../api/addItemApi";
 import { BASE_URL } from "../../api/globalUrlApi"; // Importar la URL base
 
 // api articulos
- 
 
 const offerData = [
   {
@@ -68,7 +72,6 @@ const offerData = [
   //     text:"Pague con varias tarjetas de crédito",
   // },
 ];
- 
 
 type ProductsDetailsScreenProps = StackScreenProps<
   RootStackParamList,
@@ -78,7 +81,7 @@ type ProductsDetailsScreenProps = StackScreenProps<
 const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   // api
 
-  const { product, productId  } = route.params;
+  const { product, productId } = route.params;
 
   // api
 
@@ -89,10 +92,36 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
   console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
   const cart = useSelector((state: RootState) => state.cart.cart); // Mover useSelector aquí
- 
 
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
+
+  const downloadAndOpenPDF = async () => {
+    try {
+      const fileUri = `${FileSystem.documentDirectory}ficha_tecnica.pdf`; // Ruta donde se guardará el archivo
+      const downloadResumable = FileSystem.createDownloadResumable(
+        product.fichaTecnica, // URL del PDF
+        fileUri
+      );
+
+      const { uri } = await downloadResumable.downloadAsync();
+      console.log("Archivo descargado en:", uri);
+
+      // Verificar si el archivo se puede compartir/abrir
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri);
+      } else {
+        alert(
+          "El archivo se descargó, pero no se puede abrir automáticamente."
+        );
+      }
+    } catch (error) {
+      console.error("Error al descargar el archivo:", error);
+      alert(
+        "Hubo un error al descargar el archivo. Por favor, inténtalo de nuevo."
+      );
+    }
+  };
 
   const onShare = async () => {
     try {
@@ -108,11 +137,11 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
         
         Ver más detalles aquí: ${deepLink}
       `;
-  
+
       const result = await Share.share({
         message: message.trim(),
       });
-  
+
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
           // Compartido con un tipo de actividad específico
@@ -138,7 +167,9 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
 
     try {
       // Verificar si el producto ya está en el carrito
-      const existingCartItem = cart.find((cartItem: any) => cartItem.id === product.id);
+      const existingCartItem = cart.find(
+        (cartItem: any) => cartItem.id === product.id
+      );
 
       let newQuantity = quantity;
 
@@ -161,7 +192,11 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       }
 
       // Llamada a la API para actualizar la cantidad total
-      const response = await addItemToCartApi(clienteId, product.id, newQuantity);
+      const response = await addItemToCartApi(
+        clienteId,
+        product.id,
+        newQuantity
+      );
 
       console.log("Respuesta de la API:", response); // Verifica la respuesta
 
@@ -176,7 +211,6 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
       });
     }
   };
- 
 
   if (!product) {
     return (
@@ -197,30 +231,12 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
   const incrementQuantity = () => {
     setQuantity(quantity + 1);
   };
-  
+
   const decrementQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
   };
-
-  // const addItemToCart = () => {
-  //     dispatch(addToCart({
-  //         id:"0",
-  //         image:IMAGES.item1,
-  //         title:"APPLE iPhone 14 (Bluetooth)",
-  //         price:"$199",
-  //         discount:"$112",
-  //         offer:"70% OFF",
-  //         brand:"Apple",
-  //         color:false,
-  //         hascolor:true
-  //     } as any ));
-  // }
-
-  // const addItemToWishList = (data: any) => {
-  //     dispatch(addTowishList(data));
-  //     }
 
   const ListwithiconData = [
     {
@@ -290,12 +306,26 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
               <TouchableOpacity onPress={() => openModal(0)}>
                 <Image
                   style={{
-                    height: 300,
-                    width: "100%",
+                    height: hp("30%"),
+                    width: wp("100%"),
                     resizeMode: "contain",
                   }}
-                  source={{ uri: `${BASE_URL}${product.highImage}` }} // Mostrar imagen de alta calidad
+                  source={{ uri: `${BASE_URL}${product.highImage}` }}
                 />
+              </TouchableOpacity>
+            )}
+            {product.video && (
+              <TouchableOpacity onPress={() => openModal(1)}>
+                <View
+                  style={{
+                    height: hp("30%"),
+                    width: wp("100%"),
+                    backgroundColor: "black",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}>
+                  <Feather name="play-circle" size={50} color="white" />
+                </View>
               </TouchableOpacity>
             )}
           </Swiper>
@@ -309,21 +339,9 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
               paddingLeft: 10,
               paddingVertical: 10,
               flexDirection: "row",
-              //alignItems:'center',
               justifyContent: "space-between",
             }}>
-            <View style={{}}>
-              {/* <View
-                                style={{
-                                    marginTop:10,
-                                    backgroundColor:COLORS.success,
-                                    paddingHorizontal:5,
-                                    paddingVertical:2
-                                }}
-                            >
-                                <Text style={[FONTS.fontSemiBold,{fontSize:12,color:COLORS.card}]}>70% OFF</Text>
-                            </View> */}
-            </View>
+            <View style={{}}></View>
             <View>
               <TouchableOpacity
                 style={{
@@ -335,7 +353,6 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                 }}
                 onPress={onShare}>
                 <Feather size={22} color={colors.text} name={"share-2"} />
-                {/* <FeatherIcon size={20} color={COLORS.white} name="share-2" /> */}
               </TouchableOpacity>
             </View>
           </View>
@@ -409,10 +426,23 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
             ]}>
             Código del artículo: {product.code}
           </Text>
-          <Text
-            style={[FONTS.fontRegular, { fontSize: 16, color: colors.title }]}>
-            Todas las especificaciones
-          </Text>
+          <TouchableOpacity
+            onPress={downloadAndOpenPDF} // Llama a la función para descargar y abrir el PDF
+            style={{
+              marginTop: 10,
+              padding: 10,
+              backgroundColor: COLORS.primary,
+              borderRadius: 5,
+            }}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: COLORS.white,
+                textAlign: "center",
+              }}>
+              Todas las especificaciones
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={[GlobalStyleSheet.container, { flex: 1, paddingTop: 0 }]}>
           <View style={{ marginHorizontal: -15, marginTop: 0, flex: 1 }}>
@@ -576,19 +606,40 @@ const ProductsDetails = ({ route, navigation }: ProductsDetailsScreenProps) => {
                 Agregar al carrito
               </Text>
             </TouchableOpacity>
-          </View> 
+          </View>
         </View>
       </View>
 
       <Toast />
 
       <Modal visible={isModalVisible} transparent={true}>
-        <ImageViewer
-          imageUrls={[{ url: `${BASE_URL}${product.highImage}` }]}
-          index={selectedImageIndex}
-          onSwipeDown={closeModal}
-          enableSwipeDown={true}
-        />
+        {selectedImageIndex === 0 ? (
+          <ImageViewer
+            imageUrls={[{ url: `${BASE_URL}${product.highImage}` }]}
+            index={selectedImageIndex}
+            onSwipeDown={closeModal}
+            enableSwipeDown={true}
+          />
+        ) : selectedImageIndex === 1 ? (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "black",
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
+            <Video
+              source={{ uri: product.video }} // URL del video
+              style={{ width: "100%", height: "100%" }}
+              useNativeControls // Habilita los controles nativos
+              resizeMode="contain" // Ajusta el tamaño del video
+              shouldPlay // Reproduce automáticamente
+              onError={(error) =>
+                console.error("Error al reproducir el video:", error)
+              } // Maneja errores
+            />
+          </View>
+        ) : null}
         <TouchableOpacity
           style={{
             position: "absolute",

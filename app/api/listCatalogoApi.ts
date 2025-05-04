@@ -20,6 +20,8 @@ interface ApiArticle {
   peso?: string;
   garantia?: string;
   co_cat: { cat_des: string };
+  video?: string;
+  ficha_tecnica?: string;
 }
 
 export const fetchArticles = async (
@@ -71,10 +73,13 @@ export const fetchArticles = async (
       lowImage: article.low_images[0]?.image || "",
       highImage: article.high_images[0]?.image || "",
       model: article.modelo?.trim() || "",
+      brand: article.co_cat.cat_des?.trim() || "",
       volume: article.volumen?.trim() || "",
       weight: article.peso?.trim() || "",
       warranty: article.garantia?.trim() || "",
       category: article.co_cat.cat_des?.trim() || "",
+      video: article.video?.trim() || "",
+      fichaTecnica: article.ficha_tecnica?.trim() || "",
     }));
 
     return { articles, next };

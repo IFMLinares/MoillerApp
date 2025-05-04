@@ -42,7 +42,10 @@ export const fetchProductsBrand = async (co_cat: string, co_cli: string, page: n
         weight: article.peso?.trim() || "",
         warranty: article.garantia?.trim() || "",
         brand: article.co_cat.cat_des?.trim() || "",
+        video: article.video?.trim() || "",
+        fichaTecnica: article.ficha_tecnica?.trim() || "",
         precio_cliente: article.precio_cliente || 0,
+        
       })),
     };
   } catch (error) {

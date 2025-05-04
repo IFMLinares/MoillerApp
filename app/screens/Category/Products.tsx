@@ -22,7 +22,7 @@ import Cardstyle2 from "../../components/Card/Cardstyle2";
 import BottomSheet2 from "../Components/BottomSheet2";
 import Header from "../../layout/Header";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
-import { useDispatch, useSelector } from "react-redux"; 
+import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import Toast from "react-native-toast-message";
 import { addToCart } from "../../redux/reducer/cartReducer";
@@ -71,13 +71,13 @@ const Products = ({ navigation, route }: ProductsScreenProps) => {
     });
   };
 
-const addItemToCart = async (item: Article) => {
-  try {
-    showToast("success", "¡Producto añadido al carrito exitosamente!");
-  } catch (error) {
-    showToast("error", "Error al añadir al carrito", "Inténtalo de nuevo.");
-  }
-};
+  const addItemToCart = async (item: Article) => {
+    try {
+      showToast("success", "¡Producto añadido al carrito exitosamente!");
+    } catch (error) {
+      showToast("error", "Error al añadir al carrito", "Inténtalo de nuevo.");
+    }
+  };
 
   useEffect(() => {
     const loadArticles = async () => {
@@ -112,7 +112,14 @@ const addItemToCart = async (item: Article) => {
   };
 
   // Función para ordenar los artículos
-  const sortArticles = (criteria: "De la A a la Z" | "De la Z a la A" | "Precio: menor a mayor" | "Precio: mayor a menor" | "Lo más nuevo primero") => {
+  const sortArticles = (
+    criteria:
+      | "De la A a la Z"
+      | "De la Z a la A"
+      | "Precio: menor a mayor"
+      | "Precio: mayor a menor"
+      | "Lo más nuevo primero"
+  ) => {
     let sortedArticles = [...articles];
     if (criteria === "De la A a la Z") {
       sortedArticles.sort((a, b) => a.name.localeCompare(b.name));
@@ -123,7 +130,10 @@ const addItemToCart = async (item: Article) => {
     } else if (criteria === "Precio: mayor a menor") {
       sortedArticles.sort((a, b) => b.price - a.price);
     } else if (criteria === "Lo más nuevo primero") {
-      sortedArticles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      sortedArticles.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     }
     setArticles(sortedArticles);
   };
@@ -137,10 +147,10 @@ const addItemToCart = async (item: Article) => {
       "Precio: mayor a menor",
       "Lo más nuevo primero",
     ] as const;
-  
-    if (validCriteria.includes(criteria as typeof validCriteria[number])) {
-      setSortCriteria(criteria as typeof validCriteria[number]);
-      sortArticles(criteria as typeof validCriteria[number]);
+
+    if (validCriteria.includes(criteria as (typeof validCriteria)[number])) {
+      setSortCriteria(criteria as (typeof validCriteria)[number]);
+      sortArticles(criteria as (typeof validCriteria)[number]);
     } else {
       console.warn(`Criterio de ordenación no válido: ${criteria}`);
     }
@@ -169,7 +179,7 @@ const addItemToCart = async (item: Article) => {
             product: item, // Pasa el objeto completo del producto aquí
             productId: item.id, // Agrega la propiedad productId
           })
-        } 
+        }
       />
       <QuantityButton
         item={item}
@@ -249,6 +259,7 @@ const addItemToCart = async (item: Article) => {
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
+              width: "100%",
             },
           ]}>
           <TouchableOpacity
@@ -258,7 +269,7 @@ const addItemToCart = async (item: Article) => {
               flexDirection: "row",
               alignItems: "center",
               gap: 5,
-              width: "35%",
+              width: "70%",
               justifyContent: "center",
             }}>
             <Image
@@ -277,25 +288,6 @@ const addItemToCart = async (item: Article) => {
               backgroundColor: COLORS.primaryLight,
             }}
           />
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => sheetRef.current.openSheet("filter")}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 5,
-              width: "35%",
-              justifyContent: "center",
-            }}>
-            <Image
-              style={{ height: 16, width: 16, resizeMode: "contain" }}
-              source={IMAGES.filter3}
-            />
-            <Text
-              style={[FONTS.fontMedium, { fontSize: 15, color: colors.text}]}>
-              CATEGORÍAS
-            </Text>
-          </TouchableOpacity>
           <View
             style={{
               width: 1,
@@ -381,7 +373,7 @@ const addItemToCart = async (item: Article) => {
         onSortChange={handleSortChange}
         activeSortCriteria={sortCriteria} // Pasa el estado actual como prop
       />
-      <Toast  />
+      <Toast />
     </View>
   );
 };

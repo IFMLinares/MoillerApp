@@ -71,7 +71,7 @@ import OfertasScreen from "../screens/Category/Ofertas";
 import { useDispatch } from "react-redux";
 import { getUserInfo } from "../api/editPerfilApi";
 import { setClienteId } from "../redux/actions/drawerAction";
-
+// import OfferScreen from "../components/Notificaciones/OffertNotification";
 const Stack = createStackNavigator<RootStackParamList>();
 
 const StackNavigator = () => {
@@ -130,7 +130,7 @@ const StackNavigator = () => {
         }}> 
 		{/* <Stack.Screen name="Demo" component={Demo} /> */}
         {/* <Stack.Screen name="ChooseLanguage" component={ChooseLanguage} /> */}
-		    {/* <Stack.Screen name="SplashScreen" component={SplashScreen}   /> */}
+		    <Stack.Screen name="SplashScreen" component={SplashScreen}   />
         <Stack.Screen name="SingIn" component={SingIn} />
         {/* <Stack.Screen name="SignUp" component={SignUp} />  */}
         {/* <Stack.Screen name="OTPAuthentication" component={OTPAuthentication} /> */}
@@ -189,6 +189,9 @@ const StackNavigator = () => {
         <Stack.Screen name="Tabs" component={Tabs} />
         <Stack.Screen name="Tables" component={Tables} />
         <Stack.Screen name="Toggles" component={Toggles} />
+
+        {/* notificaciones */}
+        {/* <Stack.Screen name="OffertNotification" component={OfferScreen} /> */}
       </Stack.Navigator>
     </View>
   );

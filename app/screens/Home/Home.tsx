@@ -90,7 +90,7 @@ type Banner = {
   banner_image: string;
 };
 
-const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
+const Home = forwardRef(({ navigation }: HomeScreenProps, ref) => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]); // Define el tipo del estado
   const [loading, setLoading] = useState(true);
@@ -370,7 +370,16 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     source={IMAGES.appname}
                   />
                 </View>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: 'center', }}>
+                  <Text
+                    style={{
+                      fontSize: 18, // Tamaño de fuente más grande
+                      fontWeight: "bold", // Negrita para destacar
+                      color: COLORS.white, // Color llamativo
+                      marginRight: 0, // Espaciado entre el texto y el ícono 
+                    }}>
+                    Buscar
+                  </Text>
                   <TouchableOpacity
                     onPress={() => navigation.navigate("Search")}
                     style={{
@@ -383,8 +392,8 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     }}>
                     <Image
                       style={{
-                        height: 22,
-                        width: 22,
+                        height: 25,
+                        width: 25,
                         tintColor: COLORS.card,
                         resizeMode: "contain",
                       }}
@@ -456,7 +465,7 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
               </View>
             </View>
           )}
-          <View style={{ height: 50 }}>
+          <View style={{ height: hp("6%") }}>
             <View
               style={[
                 GlobalStyleSheet.container,
@@ -465,7 +474,10 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
               <View style={{}}>
                 <ScrollView
                   // horizontal
-                  contentContainerStyle={{ paddingHorizontal: 20, flexGrow: 1 }}
+                  contentContainerStyle={{
+                    paddingHorizontal: wp("5%"),
+                    flexGrow: 1,
+                  }}
                   showsHorizontalScrollIndicator={true}>
                   <View
                     style={{
@@ -475,9 +487,10 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     }}>
                     <TouchableOpacity
                       style={{
-                        backgroundColor: COLORS.primary,
-                        padding: 15,
-                        borderRadius: 8,
+                        paddingVertical: hp("1.5%"),
+                        paddingHorizontal: wp("2%"),
+                        borderBottomWidth: 2, // Línea debajo del botón
+                        borderBottomColor: COLORS.white, // Color de la línea
                         alignItems: "center",
                       }}
                       onPress={() =>
@@ -492,9 +505,10 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{
-                        backgroundColor: COLORS.primary,
-                        padding: 15,
-                        borderRadius: 8,
+                        paddingVertical: hp("1.5%"),
+                        paddingHorizontal: wp("2%"),
+                        borderBottomWidth: 2, // Línea debajo del botón
+                        borderBottomColor: COLORS.white, // Color de la línea
                         alignItems: "center",
                       }}
                       onPress={() =>
@@ -509,9 +523,10 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{
-                        backgroundColor: COLORS.primary,
-                        padding: 15,
-                        borderRadius: 8,
+                        paddingVertical: hp("1.5%"),
+                        paddingHorizontal: wp("2%"),
+                        borderBottomWidth: 2, // Línea debajo del botón
+                        borderBottomColor: COLORS.white, // Color de la línea
                         alignItems: "center",
                       }}
                       onPress={() =>
@@ -526,9 +541,10 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{
-                        backgroundColor: COLORS.primary,
-                        padding: 15,
-                        borderRadius: 8,
+                        paddingVertical: hp("1.5%"),
+                        paddingHorizontal: wp("2%"),
+                        borderBottomWidth: 2, // Línea debajo del botón
+                        borderBottomColor: COLORS.white, // Color de la línea
                         alignItems: "center",
                       }}
                       onPress={() =>
@@ -584,8 +600,6 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref)  => {
                     quantities={quantities}
                     setQuantities={setQuantities}
                     clienteId={clienteId} // Pasa el clienteId automáticamente
-                    // showToast={showToast} // Pasa la función showToast
-                    // addItemToCart={addItemToCart} // Pasa la función desde Home
                   />
                 </View>
               ))}

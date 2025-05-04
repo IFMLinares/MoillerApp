@@ -139,7 +139,7 @@ const Cardstyle1 = ({
                 fontSize: wp("2.3%"),
                 color: COLORS.red,
                 fontWeight: "bold",
-                width: "55%",
+                width: "45%",
                 paddingRight: 10,
               },
             ]}>
@@ -156,7 +156,7 @@ const Cardstyle1 = ({
                 paddingVertical: 1,
                 backgroundColor: COLORS.primary,
                 fontWeight: "bold",
-                width: "45%",
+                width: "55%",
                 textAlign: "center",
               },
             ]}>

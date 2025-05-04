@@ -20,6 +20,8 @@ interface ApiArticle {
   peso?: string;
   garantia?: string;
   co_cat: { cat_des: string };
+  video?: string;
+  ficha_tecnica?: string;
 }
 
 export interface Article {
@@ -42,6 +44,8 @@ export interface Article {
   weight: string;
   warranty: string;
   brand: string;
+  video: string;
+  fichaTecnica: string;
 }
 
 export const fetchArticles = async (clienteId: number, limit: number = 12): Promise<Article[]> => {
@@ -75,6 +79,8 @@ export const fetchArticles = async (clienteId: number, limit: number = 12): Prom
       weight: article.peso?.trim() || "",
       warranty: article.garantia?.trim() || "",
       brand: article.co_cat.cat_des?.trim() || "",
+      video: article.video?.trim() || "",
+      fichaTecnica: article.ficha_tecnica?.trim() || "",
     }));
   } catch (error) {
     if (axios.isAxiosError(error)) {
