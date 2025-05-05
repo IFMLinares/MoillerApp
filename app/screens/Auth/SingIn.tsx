@@ -221,7 +221,7 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                     borderRadius: 10,
                     width: "100%",
                   }}>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => navigation.navigate("ForgetPassword")}>
                     <Text
                       style={[
                         FONTS.fontRegular,
@@ -232,7 +232,7 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                           fontFamily: "RalewayBold",
                         },
                       ]}>
-                      {/* ¿Se le olvido su contraseña? */}
+                      ¿Se le olvido su contraseña?
                     </Text>
                   </TouchableOpacity>
                 </View>

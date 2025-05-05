@@ -19,8 +19,7 @@ const ShortSheet2 = ({ shortRef, onSortChange, activeSortCriteria }: Props) => {
     "De la A a la Z",
     "De la Z a la A",
     "Precio: menor a mayor",
-    "Precio: mayor a menor",
-    "Lo más nuevo primero",
+    "Precio: mayor a menor",  
   ];
 
   const [activeSize, setActiveSize] = useState(activeSortCriteria);
@@ -32,15 +31,22 @@ const ShortSheet2 = ({ shortRef, onSortChange, activeSortCriteria }: Props) => {
 
   return (
     <View
-      style={[
-        GlobalStyleSheet.container,
-        {
-          paddingTop: 0,
-          backgroundColor: theme.dark ? colors.background : colors.card,
-        },
-      ]}>
+    style={{ 
+      backgroundColor: theme.dark ? colors.background : colors.card,
+      borderTopLeftRadius: 15, // Opcional: bordes redondeados en la parte superior
+      borderTopRightRadius: 15,
+      paddingHorizontal: 15,
+      paddingVertical: 10,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      elevation: 5, // Sombra para Android
+    }}
+  >
       <View
-        style={{
+        style={{ 
+          
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
@@ -87,7 +93,7 @@ const ShortSheet2 = ({ shortRef, onSortChange, activeSortCriteria }: Props) => {
               key={index}
               style={[
                 {
-                  height: 40,
+                  height: 50,
                   width: "100%",
                   alignItems: "center",
                   flexDirection: "row",

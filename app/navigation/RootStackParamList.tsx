@@ -7,12 +7,14 @@ export type RootStackParamList = {
   ChooseLanguage: undefined;
   SplashScreen: undefined;
   SignUp: undefined;
+  ForgetPassword: undefined;
   SingIn: undefined;
   OnBoarding: undefined;
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  OTPAuthentication: undefined;
+  NewPassword: undefined;
+  OTPAuthentication: { email: string, otpCode: string, }; // Define que OTPAuthentication recibe un parámetro email
   ResetPassword: undefined;
   Settings: undefined;
   ChangePassword: undefined;

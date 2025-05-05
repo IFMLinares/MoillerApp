@@ -72,6 +72,8 @@ import { useDispatch } from "react-redux";
 import { getUserInfo } from "../api/editPerfilApi";
 import { setClienteId } from "../redux/actions/drawerAction";
 // import OfferScreen from "../components/Notificaciones/OffertNotification";
+import ForgetPasswordScreen from "../screens/Auth/ForgetPassword";
+import NewPasswordScreen from "../screens/Auth/NewPassword";
 const Stack = createStackNavigator<RootStackParamList>();
 
 const StackNavigator = () => {
@@ -132,39 +134,43 @@ const StackNavigator = () => {
         {/* <Stack.Screen name="ChooseLanguage" component={ChooseLanguage} /> */}
 		    <Stack.Screen name="SplashScreen" component={SplashScreen}   />
         <Stack.Screen name="SingIn" component={SingIn} />
-        {/* <Stack.Screen name="SignUp" component={SignUp} />  */}
-        {/* <Stack.Screen name="OTPAuthentication" component={OTPAuthentication} /> */}
+
+        <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} /> 
+        <Stack.Screen name="NewPassword" component={NewPasswordScreen} /> 
+
+        <Stack.Screen name="OTPAuthentication" component={OTPAuthentication} />
         <Stack.Screen name="BottomNavigation" component={BottomNavigation} />
         <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
         <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name="Notification" component={Notification} />
         <Stack.Screen name="DeliveryAddress" component={DeliveryAddress} />
+        <Stack.Screen name="Catalogo" component={CatalogoScreen} />
+        <Stack.Screen name="Nuevo" component={NuevoScreen} />
+        <Stack.Screen name="MasVendido" component={MasVendidoScreen} />
+        <Stack.Screen name="Ofertas" component={OfertasScreen} />
+        <Stack.Screen name="Products" component={Products} />
+        <Stack.Screen name="Pedido" component={PedidoScreen} />
+        <Stack.Screen name="ProductsDetails" component={ProductsDetails} />
+        <Stack.Screen name="ProductsMarcas" component={ProductsMarcas} />
+        <Stack.Screen name="Checkout" component={Checkout} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen name="Myorder" component={Myorder} />
+        <Stack.Screen name="Category" component={Category} />
+        
         <Stack.Screen
           name="AddDeliveryAddress"
           component={AddDeliveryAddress}
         />
-        <Stack.Screen name="Category" component={Category} />
         <Stack.Screen name="Payment" component={Payment} />
         <Stack.Screen name="Addcard" component={Addcard} />
-        <Stack.Screen name="Checkout" component={Checkout} />
-        <Stack.Screen name="Myorder" component={Myorder} />
         <Stack.Screen name="Trackorder" component={Trackorder} />
         <Stack.Screen name="Writereview" component={Writereview} />
-        <Stack.Screen name="Products" component={Products} />
-        <Stack.Screen name="Pedido" component={PedidoScreen} />
-        <Stack.Screen name="ProductsMarcas" component={ProductsMarcas} />
-        <Stack.Screen name="ProductsDetails" component={ProductsDetails} />
         <Stack.Screen name="Coupons" component={Coupons} />
-        <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Language" component={Language} />
         <Stack.Screen name="Questions" component={Questions} />
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="Singlechat" component={Singlechat} />
         <Stack.Screen name="Call" component={Call} />
-        <Stack.Screen name="Catalogo" component={CatalogoScreen} />
-        <Stack.Screen name="Nuevo" component={NuevoScreen} />
-        <Stack.Screen name="MasVendido" component={MasVendidoScreen} />
-        <Stack.Screen name="Ofertas" component={OfertasScreen} />
         <Stack.Screen name="SearchArticles" component={SearchArticles} /> 
         <Stack.Screen name="Components" component={Components} />
         <Stack.Screen name="Accordion" component={AccordionScreen} />
