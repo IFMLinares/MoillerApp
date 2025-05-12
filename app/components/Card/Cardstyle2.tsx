@@ -6,7 +6,7 @@ import LikeBtn from "../LikeBtn";
 import CheckoutItems from "../CheckoutItems";
 import { IMAGES } from "../../constants/Images";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,

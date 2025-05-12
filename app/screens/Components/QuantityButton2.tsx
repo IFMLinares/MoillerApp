@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import { addTowishList } from "../../redux/reducer/wishListReducer";
 import { useTheme } from "@react-navigation/native";
 import { addItemToCartApi } from "../../api/addItemApi";
-
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 type Article = {
   id: number;
   name: string;
@@ -51,6 +51,8 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
 
   const cart = useSelector((state: any) => state.cart.cart);
   const [addedToCart, setAddedToCart] = React.useState(false); // Estado para controlar si el producto fue añadido
+  // Verificar si el producto ya está en el carrito
+  const isInCart = cart.some((cartItem: any) => cartItem.id === item.id);
 
   // Añadir producto al carrito con la cantidad seleccionada y enviar a la API
   const addItemToCart = useCallback(
@@ -180,6 +182,15 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
           height: hp("4.0%"),
           marginBottom: 10,
         }}>
+        {/* Mostrar el ícono solo si el producto está en el carrito */}
+        {isInCart && (
+          <MaterialIcons
+            name="shopping-cart-checkout" // Nombre del ícono
+            size={24} // Tamaño del ícono
+            color={COLORS.success} // Color verde
+            style={{ marginLeft: 10 }}
+          />
+        )}
         <TouchableOpacity
           onPress={() => decrementQuantity(item.id)}
           style={{ paddingHorizontal: wp("2.10%") }}>

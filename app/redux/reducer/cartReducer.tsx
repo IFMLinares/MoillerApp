@@ -20,11 +20,11 @@ export const cartSlice = createSlice({
         (item) => item.id === action.payload.id
       );
       if (itemInCart) {
-        // Actualizar la cantidad directamente en lugar de sumarla
         itemInCart.quantity = action.payload.quantity;
       } else {
         state.cart.push({ ...action.payload });
       }
+      console.log("Estado del carrito actualizado:", state.cart);
     },
     removeFromCart: (state, action: { payload: number }) => {
       state.cart = state.cart.filter((item) => item.id !== action.payload);

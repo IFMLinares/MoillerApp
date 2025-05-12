@@ -9,9 +9,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { addToCart } from "../../redux/reducer/cartReducer";
 
 type Props = {
-  id: string;
+  id: number;
   title: string;
   // color: any;
   //style ?: object;
@@ -58,15 +60,9 @@ const Cardstyle1 = ({
 
   const [show, setshow] = useState(false);
 
-  const wishList = useSelector((state: any) => state.wishList.wishList);
-
-  const inWishlist = () => {
-    var temp = [] as any;
-    wishList.forEach((data: any) => {
-      temp.push(data.id);
-    });
-    return temp;
-  };
+  const cart = useSelector((state: any) => state.cart.cart);
+  // Verificar si el producto está en el carrito
+const isInCart = cart.some((cartItem: any) => Number(cartItem.id) === Number(id));
 
   const removeItemFromWishList = () => {
     dispatch(removeFromwishList(id as any));
@@ -104,7 +100,25 @@ const Cardstyle1 = ({
           }}
           source={image}
         />
-      </View> 
+        {/* Ícono en la esquina superior derecha */}
+        {isInCart && (
+          <View
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              borderRadius: 20,
+              padding: 5,
+            }}>
+            <MaterialIcons
+              name="shopping-cart-checkout"
+              size={24}
+              color={COLORS.success}
+            />
+          </View>
+        )}
+      </View>
       <View
         style={{
           paddingHorizontal: hascolor ? 20 : 20,
