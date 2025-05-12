@@ -9,12 +9,18 @@ import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { COLORS, FONTS } from "../../constants/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUserInfo } from "../../api/editPerfilApi";
+
+import { getClientDetail } from "../../api/ClientDetailApi"; // Importa la nueva API
+
 import * as Animatable from "react-native-animatable"; // Importar Animatable
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/reducer";
+
 const EditProfile = () => {
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
-
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
   const navigation = useNavigation<any>();
 
   const [isFocused, setisFocused] = useState(false);
@@ -26,37 +32,45 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const fetchClientDetail = async () => {
       try {
         setLoading(true); // Mostrar indicador de carga
-        const data = await getUserInfo();
-        console.log('Información del usuario:', data);
+
+        // Obtén el clienteId desde AsyncStorage
+        const clienteId = await AsyncStorage.getItem("clienteId");
+        if (!clienteId) {
+          throw new Error("Cliente ID no encontrado.");
+        }
+
+        // Llama a la API para obtener los detalles del cliente
+        const data = await getClientDetail(Number(clienteId));
+        console.log("Detalles del cliente:", data);
         setUserInfo(data);
       } catch (error: any) {
-        console.error('Error al obtener la información del usuario:', error.message);
-  
+        console.error("Error al obtener los detalles del cliente:", error.message);
+
         // Si la sesión ha expirado, redirige al inicio de sesión
-        if (error.message === 'Sesión expirada. Por favor, inicie sesión nuevamente.') {
+        if (error.message === "Sesión expirada. Por favor, inicie sesión nuevamente.") {
           Alert.alert(
-            'Sesión expirada',
-            'Por favor, inicie sesión nuevamente.',
+            "Sesión expirada",
+            "Por favor, inicie sesión nuevamente.",
             [
               {
-                text: 'Iniciar sesión',
-                onPress: () => navigation.navigate('SignIn'),
+                text: "Iniciar sesión",
+                onPress: () => navigation.navigate("SignIn"),
               },
             ],
             { cancelable: false }
           );
         } else {
-          Alert.alert('Error', error.message);
+          Alert.alert("Error", error.message);
         }
       } finally {
         setLoading(false); // Ocultar indicador de carga
       }
     };
-  
-    fetchUserInfo();
+
+    fetchClientDetail();
   }, []);
 
   return (
@@ -88,8 +102,8 @@ const EditProfile = () => {
                 style={{
                   borderWidth: 2,
                   borderColor: COLORS.primary,
-                  height: 90,
-                  width: 90,
+                  height: 120,
+                  width: 120,
                   borderRadius: 50,
                   alignItems: "center",
                   justifyContent: "center",
@@ -99,17 +113,16 @@ const EditProfile = () => {
                   duration={1000}
                   style={{
                     height: 100,
-                    width: 100,
-                    borderRadius: 50,
-                    borderWidth: 2,
+                    width: 100, 
                     borderColor: COLORS.primary,
+                    resizeMode: "contain",
                   }}
                   source={
                     userInfo?.image ? { uri: userInfo.image } : IMAGES.write1 // Imagen predeterminada
                   }
                 />
               </View>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 activeOpacity={0.9}
                 style={{
                   height: 42,
@@ -143,7 +156,7 @@ const EditProfile = () => {
                     source={IMAGES.write}
                   />
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
 
             {/* Información del usuario */}
@@ -173,6 +186,36 @@ const EditProfile = () => {
 
             {/* Detalles adicionales */}
             <View style={{ marginTop: 20 }}>
+            <Animatable.Text
+                animation="fadeInLeft"
+                delay={300}
+                style={{ color: colors.title, marginBottom: 10 }}>
+                Nombre: {userInfo.cli_des}
+              </Animatable.Text>
+            <Animatable.Text
+                animation="fadeInLeft"
+                delay={300}
+                style={{ color: colors.title, marginBottom: 10 }}>
+                Nombre de usuario: {userInfo.username}
+              </Animatable.Text>
+              <Animatable.Text
+                animation="fadeInLeft"
+                delay={300}
+                style={{ color: colors.title, marginBottom: 10 }}>
+                Nro° de teléfono: {userInfo.telefonos}
+              </Animatable.Text>
+              <Animatable.Text
+                animation="fadeInLeft"
+                delay={300}
+                style={{ color: colors.title, marginBottom: 10 }}>
+                Dirección: {userInfo.direc1}
+              </Animatable.Text>
+              <Animatable.Text
+                animation="fadeInLeft"
+                delay={300}
+                style={{ color: colors.title, marginBottom: 10 }}>
+                Ciudad: {userInfo.ciudad}
+              </Animatable.Text>
               <Animatable.Text
                 animation="fadeInLeft"
                 delay={300}
@@ -189,18 +232,12 @@ const EditProfile = () => {
                   month: "2-digit",
                   year: "numeric",
                 })}
-              </Animatable.Text>
-              <Animatable.Text
-                animation="fadeInLeft"
-                delay={500}
-                style={{ color: colors.title, marginBottom: 10 }}>
-                Rol: {userInfo.role}
-              </Animatable.Text>
+              </Animatable.Text> 
               <Animatable.Text
                 animation="fadeInLeft"
                 delay={600}
                 style={{ color: colors.title, marginBottom: 10 }}>
-                Activo: {userInfo.is_active ? "Sí" : "No"}
+                Activo: {userInfo.is_user ? "Sí" : "No"}
               </Animatable.Text> 
             </View>
           </Animatable.View>

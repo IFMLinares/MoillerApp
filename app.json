@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Mollier",
+    "name": "MollierApp",
     "slug": "mollierapp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -27,7 +27,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.w3itexperts.clickcart"
+      "package": "com.danorex27.mollierapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -38,5 +38,7 @@
       }
     },
     "owner": "danorex27"
+      
+
   }
 }

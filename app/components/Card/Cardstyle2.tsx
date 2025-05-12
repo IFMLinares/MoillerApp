@@ -220,7 +220,11 @@ const Cardstyle2 = ({
             alignItems: "center",
           }}>
           <View>
-            <CheckoutItems quantity={quantity} productId={productId}  clienteId={clienteId} />
+            <CheckoutItems
+              quantity={quantity}
+              productId={productId}
+              clienteId={clienteId}
+            />
           </View>
           <View
             style={{

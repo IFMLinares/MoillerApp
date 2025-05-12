@@ -68,11 +68,7 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
   
     loadSubcategories();
   }, [categoryId]);
-
-  const displayedSubcategories = showAll
-    ? subcategories
-    : subcategories.slice(0, 3);
-
+ 
   return (
     <ScrollView>
       <View
@@ -101,7 +97,7 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
               justifyContent: "center",
               gap: 10,
             }}>
-            {displayedSubcategories.map((subcategory, index) => (
+             {subcategories.map((subcategory, index) => (
               <TouchableOpacity
                 key={index}
                 style={{ alignItems: "center" }}
@@ -137,32 +133,7 @@ const CategoryCart = ({ categoryId, categoryTitle }) => {
                 </View>
               </TouchableOpacity>
             ))}
-            {subcategories.length > 3 && !showAll && (
-              <TouchableOpacity
-                style={{ alignItems: "center" }}
-                activeOpacity={0.5}
-                onPress={() => setShowAll(true)}>
-                <View
-                  style={[
-                    {
-                      height: 40,
-                      width: "100%",
-                      paddingHorizontal: 10,
-                      backgroundColor: COLORS.blue,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    },
-                  ]}>
-                  <Text
-                    style={[
-                      FONTS.fontRegular,
-                      { fontSize: 13, color: COLORS.white },
-                    ]}>
-                    Mostrar más
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
+             
           </View>
         )}
       </View>

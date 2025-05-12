@@ -95,37 +95,38 @@ const Catalogo = ({ navigation, route }: ProductsScreenProps) => {
     loadArticles();
   }, [page]);
 
-  const loadArticles = async () => {
-    if (!hasMore || isLoading) return;
+const loadArticles = async () => {
+  if (!hasMore || isLoading) return;
 
-    setIsLoading(true);
-    try {
-      const { articles: newArticles, next } = await fetchArticles(
-        clienteId,
-        page,
-        false, // No es necesario most_sold
-        "alfabetico" // Ordenar alfabéticamente
-      );
+  setIsLoading(true);
+  try {
+    const { articles: newArticles, next } = await fetchArticles(
+      clienteId,
+      page,
+      false, // No es necesario most_sold
+      "alfabetico" // Ordenar alfabéticamente
+    );
 
-      const articlesWithDefaultPrice = newArticles.map((article: Article) => ({
-        ...article,
-        price: article.price || 0,
-      }));
+    const articlesWithDefaultPrice = newArticles.map((article: Article) => ({
+      ...article,
+      price: article.price || 0, // Proporciona un valor predeterminado si `price` es undefined
+    }));
 
-      setArticles((prevArticles) => [
-        ...prevArticles,
-        ...articlesWithDefaultPrice,
-      ]);
-      setHasMore(!!next);
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error al cargar los productos",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setArticles((prevArticles) => [
+      ...prevArticles,
+      ...articlesWithDefaultPrice,
+    ]);
+    setHasMore(!!next);
+  } catch (error) {
+    console.error("Error al cargar los productos:", error);
+    Toast.show({
+      type: "error",
+      text1: "Error al cargar los productos",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // Función para ordenar los artículos
   const sortArticles = (criteria: SortCriteria) => {

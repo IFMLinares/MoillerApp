@@ -30,6 +30,9 @@ const Button = ({
                 },size === 'sm' && {
                     height:36,
                     paddingHorizontal:10
+                },size === 'md' && {
+                    height:45,
+                    paddingHorizontal:20
                 },size === 'lg' && {
                     height:55,
                     paddingHorizontal:30,
@@ -60,6 +63,7 @@ const styles = StyleSheet.create({
         fontSize:18,
         color : '#000',
         lineHeight:24,
+        fontWeight:'bold',
     }
 });
 

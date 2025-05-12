@@ -19,14 +19,14 @@ import { COLORS, FONTS, SIZES } from "../../constants/theme";
 //import { Ionicons } from '@expo/vector-icons';
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
-import { RootState } from "../../redux/store"; 
-import AsyncStorage from "@react-native-async-storage/async-storage"; 
+import { RootState } from "../../redux/reducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setClienteId } from "../../redux/actions/drawerAction";
 import { cerrarSesion } from "../../api/cerrarSesionApi"; // Importar la función cerrarSesion
-import { getUserInfo } from "../../api/editPerfilApi"; // Importa la función de la API
+import { getClientDetail } from "../../api/ClientDetailApi"; // Importa la nueva API
 
 const getListwithiconData = (navigation: any, setShowModal: any) => [
   {
@@ -41,7 +41,7 @@ const getListwithiconData = (navigation: any, setShowModal: any) => [
         icon: IMAGES.chat,
         title: "Preguntas y respuestas",
         navigate: "Questions",
-      }, 
+      },
       {
         icon: IMAGES.logout,
         title: "Cerrar sesión",
@@ -57,10 +57,16 @@ const getListwithiconData = (navigation: any, setShowModal: any) => [
       {
         icon: IMAGES.gmail,
         title: "ventas@mollierca.com",
+        action: () => {
+          Linking.openURL("mailto:ventas@mollierca.com"); // Abre la app de correo
+        },
       },
       {
         icon: IMAGES.call,
         title: "+58 424-3789402",
+        action: () => {
+          Linking.openURL("tel:+584243789402"); // Realiza una llamada
+        },
       },
       {
         icon: IMAGES.whatsapp,
@@ -80,7 +86,7 @@ const getListwithiconData = (navigation: any, setShowModal: any) => [
     ],
   },
 ];
- 
+
 type ProfileScreenProps = StackScreenProps<RootStackParamList, "Profile">;
 
 const Profile = ({ navigation }: ProfileScreenProps) => {
@@ -91,22 +97,35 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
   const dispatch: ThunkDispatch<RootState, void, AnyAction> = useDispatch(); // Usa la versión tipada de dispatch
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
+  const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
+  console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const fetchClientDetail = async () => {
       try {
-        setLoading(true); // Mostrar indicador de carga
-        const data = await getUserInfo(); // Llama a la API
-        console.log("Información del usuario:", data);
-        setUserInfo(data); // Almacena los datos en el estado
-      } catch (error) {
-        console.error("Error al obtener la información del usuario:", error);
+        setLoading(true);
+
+        const clienteId = await AsyncStorage.getItem("clienteId");
+        console.log("Cliente ID obtenido de AsyncStorage:", clienteId);
+
+        if (!clienteId) {
+          throw new Error("Cliente ID no encontrado.");
+        }
+
+        const data = await getClientDetail(Number(clienteId)); // Asegúrate de convertir a número
+        console.log("Detalles del cliente obtenidos de la API:", data);
+        setUserInfo(data);
+      } catch (error: any) {
+        console.error(
+          "Error al obtener los detalles del cliente:",
+          error.response?.data || error.message
+        );
       } finally {
-        setLoading(false); // Ocultar indicador de carga
+        setLoading(false);
       }
     };
 
-    fetchUserInfo();
+    fetchClientDetail();
   }, []);
 
   useEffect(() => {
@@ -120,38 +139,55 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
     getUsername();
   }, []);
 
-    // redux
-    useEffect(() => {
-      const restoreClienteId = async () => {
-        try {
-          const storedClienteId = await AsyncStorage.getItem("clienteId");
-          if (storedClienteId) {
-            console.log("Cliente ID restaurado desde AsyncStorage:", storedClienteId);
-            dispatch(setClienteId(parseInt(storedClienteId, 10))); // Restaura el clienteId en Redux
-          }
-        } catch (error) {
-          console.error("Error al restaurar el clienteId:", error);
-        }
-      };
-  
-      restoreClienteId();
-    }, []);
-
-    const handleLogout = async () => {
+  // redux
+  useEffect(() => {
+    const restoreClienteId = async () => {
       try {
-        // Llamar a la función cerrarSesion
-        await cerrarSesion();
-  
-        // Eliminar clienteId de AsyncStorage y Redux
-        await AsyncStorage.removeItem("clienteId");
-        dispatch(setClienteId(null));
-  
-        // Navegar a la pantalla de inicio de sesión
-        navigation.navigate("SingIn");
+        const storedClienteId = await AsyncStorage.getItem("clienteId");
+        if (storedClienteId) {
+          console.log(
+            "Cliente ID restaurado desde AsyncStorage:",
+            storedClienteId
+          );
+          dispatch(setClienteId(parseInt(storedClienteId, 10))); // Restaura el clienteId en Redux
+        }
       } catch (error) {
-        console.error("Error al cerrar sesión:", error);
+        console.error("Error al restaurar el clienteId:", error);
       }
     };
+
+    restoreClienteId();
+  }, []); // Asegúrate de que no dependa de estados que cambian durante el cierre de sesión
+
+  const cerrarSesionApi = async () => {
+    try {
+      console.log("Cerrando sesión...");
+
+      // Llamar a la API de cierre de sesión
+      await cerrarSesion(); // Renombrar para evitar conflicto con la función local
+      console.log("API de cierre de sesión llamada exitosamente.");
+
+      // Limpiar AsyncStorage
+      await AsyncStorage.clear();
+      console.log("AsyncStorage limpiado.");
+
+      // Limpiar el estado de Redux
+      dispatch(setClienteId(null));
+      console.log("Estado de Redux actualizado.");
+
+      // Cerrar el modal antes de navegar
+      setShowModal(false);
+
+      // Navegar a la pantalla de inicio de sesión
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "SingIn" }],
+      });
+      console.log("Navegación a SingIn realizada.");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error.message);
+    }
+  };
 
   // Pasa `setShowModal` como argumento a `getListwithiconData`
   const listWithIconData = getListwithiconData(navigation, setShowModal);
@@ -195,10 +231,14 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
                 alignItems: "center",
                 gap: 10,
                 paddingBottom: 20,
-              }}
-            >
+              }}>
               <Image
-                style={{ height: 40, width: 40, borderRadius: 50 }}
+                style={{
+                  height: 90,
+                  width: 90,
+                  borderRadius: 50,
+                  resizeMode: "contain",
+                }}
                 source={
                   userInfo.image
                     ? { uri: userInfo.image } // Usa la imagen de la API
@@ -210,9 +250,9 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
                   ...FONTS.fontRegular,
                   fontSize: 20,
                   color: colors.title,
-                }}
-              >
-                {userInfo.first_name} {userInfo.last_name} {/* Muestra el nombre y apellido */}
+                }}>
+                {userInfo.first_name} {userInfo.last_name}{" "}
+                {/* Muestra el nombre y apellido */}
               </Text>
             </View>
           )
@@ -329,14 +369,13 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
             )}
           />
         </View>
-      </View> 
+      </View>
       {/* Modal de confirmación */}
       <Modal
         transparent={true}
         visible={showModal}
         animationType="fade"
-        onRequestClose={() => setShowModal(false)}
-      >
+        onRequestClose={() => setShowModal(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>
@@ -348,17 +387,15 @@ const Profile = ({ navigation }: ProfileScreenProps) => {
                   styles.modalButton,
                   { backgroundColor: COLORS.primary },
                 ]}
-                onPress={() => {
+                onPress={async () => {
                   setShowModal(false); // Cierra el modal
-                  handleLogout(); // Llama a la función handleLogout
-                }}
-              >
+                  await cerrarSesionApi(); // Llama a la función cerrarSesion
+                }}>
                 <Text style={styles.modalButtonText}>Sí</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, { backgroundColor: COLORS.red }]}
-                onPress={() => setShowModal(false)}
-              >
+                onPress={() => setShowModal(false)}>
                 <Text style={styles.modalButtonText}>No</Text>
               </TouchableOpacity>
             </View>

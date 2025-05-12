@@ -16,7 +16,9 @@ export const cartSlice = createSlice({
   },
   reducers: {
     addToCart: (state, action: { payload: CartItem }) => {
-      const itemInCart = state.cart.find((item) => item.id === action.payload.id);
+      const itemInCart = state.cart.find(
+        (item) => item.id === action.payload.id
+      );
       if (itemInCart) {
         // Actualizar la cantidad directamente en lugar de sumarla
         itemInCart.quantity = action.payload.quantity;
@@ -24,21 +26,26 @@ export const cartSlice = createSlice({
         state.cart.push({ ...action.payload });
       }
     },
-    removeFromCart: (state: any, action: any) => {
-      // Filtra los productos que no coincidan con el ID proporcionado
-      state.cart = state.cart.filter((item: any) => item.id !== action.payload);
+    removeFromCart: (state, action: { payload: number }) => {
+      state.cart = state.cart.filter((item) => item.id !== action.payload);
     },
     incrementQuantity: (state: any, action: any) => {
-      const itemInCart = state.cart.find((item: any) => item.id === action.payload.id);
+      const itemInCart = state.cart.find(
+        (item: any) => item.id === action.payload.id
+      );
       if (itemInCart) {
         itemInCart.quantity++;
       }
     },
     decrementQuantity: (state: any, action: any) => {
-      const itemInCart = state.cart.find((item: any) => item.id === action.payload.id);
+      const itemInCart = state.cart.find(
+        (item: any) => item.id === action.payload.id
+      );
       if (itemInCart) {
         if (itemInCart.quantity === 1) {
-          state.cart = state.cart.filter((item: any) => item.id !== action.payload.id);
+          state.cart = state.cart.filter(
+            (item: any) => item.id !== action.payload.id
+          );
         } else {
           itemInCart.quantity--;
         }
@@ -52,9 +59,15 @@ export const cartSlice = createSlice({
       state.cart = action.payload; // Inicializa el carrito con los datos de AsyncStorage
     },
   },
-  
 });
 
-export const { addToCart, removeFromCart, incrementQuantity, decrementQuantity, clearCart , initializeCart } = cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  incrementQuantity,
+  decrementQuantity,
+  clearCart,
+  initializeCart,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;

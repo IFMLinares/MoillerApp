@@ -1,6 +1,6 @@
 import { useTheme } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Image } from "react-native";
+import { View, Text, ScrollView, Image, RefreshControl } from "react-native";
 import Header from "../../layout/Header";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
 import { IMAGES } from "../../constants/Images";
@@ -11,6 +11,8 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/reducer";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
 import {
   removeFromCart,
   initializeCart,
@@ -33,14 +35,14 @@ type Product = {
 
 const MyCart = ({ navigation }: MyCartScreenProps) => {
   const cart = useSelector((state: any) => state.cart.cart);
-  // const [cart, setCart] = useState<Product[]>([]); // Cambia el carrito a un estado local
-  const dispatch = useDispatch();
+  const dispatch: ThunkDispatch<RootState, void, AnyAction> = useDispatch();
   const theme = useTheme();
   const { colors }: { colors: any } = theme;
   const clienteId = useSelector((state: RootState) => state.user.clienteId); // Especifica el tipo del estado
   console.log("clienteId desde Redux:", clienteId); // Verifica el valor del clienteId
   const [cartId, setCartId] = useState<number | null>(null); // Estado para almacenar el cart_id
   console.log("Datos del carrito:", cart);
+  const [refreshing, setRefreshing] = useState(false); // Estado para manejar la recarga
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -56,11 +58,59 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
     fetchCartItems();
   }, [clienteId]);
 
-  const navigateToProductDetails = (product: Product) => {
-    navigation.navigate("ProductsDetails", { product, productId: product.id });
+  const navigateToProductDetails = (product: any) => {
+    navigation.navigate("ProductsDetails", {
+      product, // Pasa el objeto completo del producto
+      productId: product.id, // Pasa el ID del producto
+    });
+  };
+
+  // Función para normalizar URLs y evitar barras duplicadas
+  const normalizeUrl = (baseUrl: string, path: string) => {
+    if (!baseUrl.endsWith("/")) {
+      baseUrl += "/";
+    }
+    if (path.startsWith("/")) {
+      path = path.substring(1);
+    }
+    return baseUrl + path;
   };
 
   // Recuperar el carrito desde AsyncStorage al iniciar la pantalla
+  // Mapeo de los datos del carrito
+  const mapCartItems = (items: any[]) => {
+    console.log("Datos del carrito antes de mapear:", items); // Verifica los datos originales
+
+    return items.map((item: any) => {
+      const highImage =
+        item.articulo.images?.find((img: any) => img.quality === "high")
+          ?.image || IMAGES.defaultImage;
+      const lowImage =
+        item.articulo.images?.find((img: any) => img.quality === "low")
+          ?.image || IMAGES.defaultImage;
+      console.log(
+        "URL de la imagen de alta calidad:",
+        normalizeUrl(BASE_URL, highImage)
+      );
+      console.log(
+        "URL de la imagen de baja calidad:",
+        normalizeUrl(BASE_URL, lowImage)
+      );
+      return {
+        id: item.articulo.id,
+        name: item.articulo.art_des?.trim() || "Sin nombre",
+        code: item.articulo.co_art?.trim() || "Sin código",
+        price: parseFloat(item.co_precio) || 0,
+        quantity: parseInt(item.cantidad) || 0,
+        highImage: normalizeUrl(BASE_URL, highImage), // Normaliza la URL de la imagen de alta calidad
+        lowImage: normalizeUrl(BASE_URL, lowImage), // Normaliza la URL de la imagen de baja calidad
+        line: item.articulo.co_lin?.lin_des?.trim() || "Sin línea",
+        subline: item.articulo.co_subl?.subl_des?.trim() || "Sin sublínea",
+        model: item.articulo.modelo?.trim() || "Sin modelo",
+      };
+    });
+  };
+
   useEffect(() => {
     const loadCartFromStorage = async () => {
       try {
@@ -69,19 +119,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
           dispatch(initializeCart(JSON.parse(storedCart)));
         } else {
           const cartData = await getCartItemsApi(clienteId);
-          const mappedCartItems = cartData.items.map((item: any) => ({
-            id: item.articulo.id,
-            name: item.articulo.art_des.trim(),
-            price: parseFloat(item.co_precio),
-            quantity: parseInt(item.cantidad),
-            highImage: `${BASE_URL}${
-              item.articulo.images.find((img: any) => img.quality === "high")
-                ?.image || ""
-            }`,
-            line: item.articulo.co_lin.lin_des.trim(),
-            subline: item.articulo.co_subl.subl_des.trim(),
-            model: item.articulo.modelo?.trim() || "",
-          }));
+          const mappedCartItems = mapCartItems(cartData.items);
           dispatch(initializeCart(mappedCartItems));
           setCartId(cartData.id);
         }
@@ -109,7 +147,7 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
   const removeItemFromCart = async (itemId: number) => {
     try {
       await deleteItemFromCartApi(clienteId, itemId);
-      dispatch(removeFromCart(itemId));
+      dispatch(removeFromCart(itemId)); // Aquí se despacha la acción
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
     }
@@ -134,17 +172,44 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
       .reduce((total: number, item: any) => {
         // Validar y asignar un valor predeterminado para item.price
         const price = parseFloat(
-          (typeof item.price === "string" ? item.price : item.price?.toString() || "0")
+          (typeof item.price === "string"
+            ? item.price
+            : item.price?.toString() || "0"
+          )
             .replace(/[^0-9.-]+/g, "")
             .replace(",", ".")
         );
-  
+
         // Validar y asignar un valor predeterminado para item.quantity
         const quantity = item.quantity || 0;
-  
+
         return total + price * quantity; // Multiplica el precio por la cantidad
       }, 0)
       .toFixed(2); // Redondear a 2 decimales
+  };
+
+  // Función para recargar el carrito
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const cartData = await getCartItemsApi(clienteId);
+      const mappedCartItems = mapCartItems(cartData.items);
+      dispatch(initializeCart(mappedCartItems));
+      setCartId(cartData.id);
+    } catch (error) {
+      console.error("Error al recargar el carrito:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith("http")) {
+      // Si la URL ya es absoluta, devuélvela tal cual
+      return imagePath;
+    }
+    // Si la URL es relativa, concaténala con BASE_URL
+    return `${BASE_URL}${imagePath}`;
   };
 
   return (
@@ -159,47 +224,54 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <View style={[GlobalStyleSheet.container, { padding: 0 }]}>
           {cart.map((data: any, index: any) => {
-  // Validar y asignar valores predeterminados si faltan datos
-  const price =
-    typeof data.price === "string"
-      ? data.price
-      : data.price?.toString() || "0"; // Asignar "0" si price es undefined
-  const quantity = data.quantity || 0; // Asignar 0 si quantity es undefined
+            // Validar y asignar valores predeterminados si faltan datos
+            const price =
+              typeof data.price === "string"
+                ? data.price
+                : data.price?.toString() || "0"; // Asignar "0" si price es undefined
+            const quantity = data.quantity || 0; // Asignar 0 si quantity es undefined
 
-  if (!price || quantity === 0) {
-    console.warn(`Producto con datos incompletos: ${JSON.stringify(data)}`);
-    return null; // No renderiza productos con datos incompletos
-  }
+            if (!price || quantity === 0) {
+              console.warn(
+                `Producto con datos incompletos: ${JSON.stringify(data)}`
+              );
+              return null; // No renderiza productos con datos incompletos
+            }
 
-  // Calcular el precio total por producto
-  const totalPricePerProduct = parseFloat(
-    price.replace(/[^0-9.-]+/g, "").replace(",", ".")
-  ) * quantity;
+            // Calcular el precio total por producto
+            const totalPricePerProduct =
+              parseFloat(price.replace(/[^0-9.-]+/g, "").replace(",", ".")) *
+              quantity;
 
-  return (
-    <View key={index} style={{ marginBottom: 10 }}>
-      <Cardstyle2
-        title={data.name}
-        price={data.price}
-        discount={data.discount}
-        delevery={data.delevery}
-        image={{ uri: `${BASE_URL}${data.highImage}` }}
-        offer={data.offer}
-        brand={data.brand}
-        marca={data.code}
-        modelo={data.line}
-        quantity={data.quantity}
-        productId={data.id}
-        clienteId={clienteId}
-        onPress={() => navigateToProductDetails(data)}
-        removeItemFromCart={() => removeItemFromCart(data.id)}
-      />
-    </View>
-  );
-})}
+            return (
+              <View key={index} style={{ marginBottom: 10 }}>
+                <Cardstyle2
+                  title={data.name}
+                  price={data.price}
+                  discount={data.discount}
+                  delevery={data.delevery}
+                  image={{
+                    uri: getImageUrl(data.lowImage), // Usa la función para construir la URL
+                  }} // Imagen de baja calidad
+                  offer={data.offer}
+                  brand={data.line} // Línea del producto
+                  marca={data.code} // Código del artículo
+                  modelo={data.model} // Modelo del producto
+                  quantity={data.quantity}
+                  productId={data.id}
+                  clienteId={clienteId}
+                  onPress={() => navigateToProductDetails(data)}
+                  removeItemFromCart={() => removeItemFromCart(data.id)}
+                />
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
       <View
@@ -252,7 +324,8 @@ const MyCart = ({ navigation }: MyCartScreenProps) => {
           <Button
             title="REALIZAR PEDIDO"
             color={COLORS.primary}
-            text={COLORS.white}
+            text={COLORS.white} 
+            size="md" // Cambia el tamaño del botón a grande
             onPress={() => {
               if (cartId) {
                 navigation.navigate("Checkout", { clienteId, cartId }); // Pasa el cartId

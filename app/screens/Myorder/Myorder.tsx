@@ -216,17 +216,28 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
               backgroundColor: COLORS.primaryLight,
             }}
           />
+          
           <TouchableOpacity
             onPress={() => filterData("Cotizaciones")}
             activeOpacity={0.5}
-            style={styles.TopbarCenterLine}>
+            style={[
+              styles.TopbarCenterLine,
+              {
+                backgroundColor:
+                  activeFilter === "Cotizaciones" ? COLORS.warning : "transparent", // Amarillo si está activo
+                borderRadius: 5,
+                height: 40, 
+                width: "30%",
+              },
+            ]}
+          >
             <Image
               style={{
-                height: 16,
-                width: 16,
-                resizeMode: "contain",
+                height: 20,
+                width: 20,
+                resizeMode: "contain", 
                 tintColor:
-                  activeFilter === "Pendiente" ? COLORS.primary : colors.title,
+                  activeFilter === "Cotizaciones" ? COLORS.white : colors.title,
               }}
               source={IMAGES.budget}
             />
@@ -237,8 +248,9 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                   fontSize: 15,
                   color:
                     activeFilter === "Cotizaciones"
-                      ? COLORS.primary
+                      ? COLORS.white
                       : colors.title,
+                      fontWeight: activeFilter === "Cotizaciones" ? "bold" : "normal",
                 },
               ]}>
               Cotizaciones
@@ -254,14 +266,24 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
           <TouchableOpacity
             onPress={() => filterData("Órdenes")}
             activeOpacity={0.5}
-            style={styles.TopbarCenterLine}>
+            style={[
+              styles.TopbarCenterLine,
+              {
+                backgroundColor:
+                  activeFilter === "Órdenes" ? COLORS.primary : "transparent", // Azul si está activo
+                  borderRadius: 5,
+                  height: 40, 
+                  width: "30%",
+              },
+            ]}
+          >
             <Image
               style={{
-                height: 16,
-                width: 16,
+                height: 20,
+                width: 20,
                 resizeMode: "contain",
                 tintColor:
-                  activeFilter === "Completado" ? COLORS.primary : colors.title,
+                  activeFilter === "Órdenes" ? COLORS.white : colors.title,
               }}
               source={IMAGES.savecheck}
             />
@@ -271,7 +293,8 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                 {
                   fontSize: 15,
                   color:
-                    activeFilter === "Órdenes" ? COLORS.primary : colors.title,
+                    activeFilter === "Órdenes" ? COLORS.white : colors.title,
+                    fontWeight: activeFilter === "Órdenes" ? "bold" : "normal",
                 },
               ]}>
               Ordenes
@@ -287,14 +310,24 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
           <TouchableOpacity
             onPress={() => filterData("Facturado")}
             activeOpacity={0.5}
-            style={styles.TopbarCenterLine}>
+            style={[
+              styles.TopbarCenterLine,
+              {
+                backgroundColor:
+                  activeFilter === "Facturado" ? COLORS.success : "transparent", // Verde si está activo
+                  borderRadius: 5,
+                  height: 40, 
+                  width: "30%",
+              },
+            ]}
+          >
             <Image
               style={{
-                height: 16,
-                width: 16,
+                height: 20,
+                width: 20,
                 resizeMode: "contain",
                 tintColor:
-                  activeFilter === "Completado" ? COLORS.primary : colors.title,
+                  activeFilter === "Facturado" ? COLORS.white : colors.title,
               }}
               source={IMAGES.bank}
             />
@@ -305,8 +338,9 @@ const Myorder = ({ navigation, route }: MyorderScreenProps) => {
                   fontSize: 15,
                   color:
                     activeFilter === "Facturado"
-                      ? COLORS.primary
+                      ? COLORS.white
                       : colors.title,
+                      fontWeight: activeFilter === "Facturado" ? "bold" : "normal",
                 },
               ]}>
               Facturado

@@ -14,7 +14,7 @@ export type RootStackParamList = {
   Register: undefined;
   ForgotPassword: undefined;
   NewPassword: undefined;
-  OTPAuthentication: { email: string, otpCode: string, }; // Define que OTPAuthentication recibe un parámetro email
+  OTPAuthentication: { email: string; otpCode: string }; // Define que OTPAuthentication recibe un parámetro email
   ResetPassword: undefined;
   Settings: undefined;
   ChangePassword: undefined;
@@ -41,10 +41,10 @@ export type RootStackParamList = {
   SearchArticles: undefined;
   Components: undefined;
   Coupons: undefined;
-  DeliveryAddress: undefined; 
+  DeliveryAddress: undefined;
   Addcard: undefined;
   Payment: undefined;
-  AddDeliveryAddress: undefined; 
+  AddDeliveryAddress: undefined;
   Notification: undefined;
   Accordion: undefined;
   BottomSheet: undefined;
@@ -92,11 +92,17 @@ export type RootStackParamList = {
   Home: undefined;
   // mis ordenes
   Myorder: {
-    order?: Order;
-    updatedOrder?: Order;
+    Order: { orderId: string }; // Agregar esta línea si Order es una pantalla válida
+    updatedOrder?: { orderId: string }; // Agregar esta línea si Order es una pantalla válida
   };
-  Pedido: { order: Order };
+  Pedido: { orderId: string }; // Agregar esta línea si Order es una pantalla válida
   // mi carrito
   "Mi Carrito": undefined; // Asegúrate de que este valor exista
-  Checkout: { clienteId: any; cartId: number }; 
+  Checkout: { clienteId: any; cartId: number };
+
+  Ofertas: { subcategoryId: string; subcategoryName: string }; // Agregar esta línea
+
+  MasVendido: { subcategoryId: string; subcategoryName: string }; // Agregar esta línea
+
+  Nuevo: { subcategoryId: string; subcategoryName: string }; // Agregar esta línea
 };

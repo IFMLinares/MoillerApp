@@ -31,7 +31,9 @@ type Article = {
 type QuantityButton2Props = {
   item: Article; // Define el tipo de `item` como `Article`
   quantities: { [key: number]: number | undefined }; // Permitir undefined
-  setQuantities: React.Dispatch<React.SetStateAction<{ [key: number]: number | undefined }>>; // Permitir undefined
+  setQuantities: React.Dispatch<
+    React.SetStateAction<{ [key: number]: number | undefined }>
+  >; // Permitir undefined
   clienteId: number; // Define `clienteId` como un número
   showToast: (type: string, text1: string, text2?: string) => void; // Define `showToast` como una función que muestra un mensaje
 };
@@ -46,29 +48,32 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colors } = theme;
-   
+
   const cart = useSelector((state: any) => state.cart.cart);
-   
+  const [addedToCart, setAddedToCart] = React.useState(false); // Estado para controlar si el producto fue añadido
+
   // Añadir producto al carrito con la cantidad seleccionada y enviar a la API
   const addItemToCart = useCallback(
     async (item: Article) => {
       const quantityToAdd = quantities[item.id] || 1; // Cantidad seleccionada en QuantityButton
-  
+
       // Verificar si el producto ya está en el carrito
-      const existingCartItem = cart.find((cartItem: any) => cartItem.id === item.id);
-  
+      const existingCartItem = cart.find(
+        (cartItem: any) => cartItem.id === item.id
+      );
+
       try {
         let newQuantity = quantityToAdd;
-  
+
         if (existingCartItem) {
           // Si el producto ya está en el carrito, suma la cantidad
           newQuantity = existingCartItem.quantity + quantityToAdd;
-  
+
           // Mostrar mensaje con la cantidad total
           Toast.show({
             type: "info",
             text1: "Producto actualizado",
-            text2: `Ahora tienes unidades de este producto en tu carrito.`,
+            text2: `Ahora tienes ${newQuantity} unidades de este producto en tu carrito.`,
           });
         } else {
           // Mostrar mensaje de éxito si es un producto nuevo
@@ -78,12 +83,18 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
             text2: "El producto se ha añadido a tu carrito.",
           });
         }
-  
+
         // Llamar a la API para actualizar la cantidad total
         await addItemToCartApi(clienteId, item.id, newQuantity);
-  
+
         // Actualizar el estado del carrito en Redux
         dispatch(addToCart({ ...item, quantity: newQuantity }));
+
+        // Cambiar el estado para mostrar el check verde
+        setAddedToCart(true);
+
+        // Restablecer el estado después de 3 segundos
+        setTimeout(() => setAddedToCart(false), 3000);
       } catch (error: any) {
         if (error.response?.status === 409) {
           // Mostrar solo el mensaje de stock insuficiente
@@ -92,7 +103,7 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
             text1: "Stock insuficiente",
             text2: "No hay suficiente stock para este producto.",
           });
-        }  else {
+        } else {
           Toast.show({
             type: "error",
             text1: "Error al añadir al carrito",
@@ -104,7 +115,6 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
     [dispatch, quantities, clienteId, cart]
   );
 
-
   const incrementQuantity = useCallback(
     (id: number) => {
       setQuantities((prevQuantities) => ({
@@ -115,16 +125,16 @@ const QuantityButton2: React.FC<QuantityButton2Props> = ({
     [setQuantities]
   );
 
-const decrementQuantity = useCallback(
-  (id: number) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [id]: (prevQuantities[id] ?? 1) > 1 ? (prevQuantities[id] ?? 1) - 1 : 1,
-    }));
-  },
-  [setQuantities]
-)
-  
+  const decrementQuantity = useCallback(
+    (id: number) => {
+      setQuantities((prevQuantities) => ({
+        ...prevQuantities,
+        [id]: (prevQuantities[id] ?? 1) > 1 ? (prevQuantities[id] ?? 1) - 1 : 1,
+      }));
+    },
+    [setQuantities]
+  );
+
   const handleQuantityChange = useCallback(
     (id: number, value: string) => {
       if (value === "") {
@@ -145,7 +155,6 @@ const decrementQuantity = useCallback(
     },
     [setQuantities]
   );
-
 
   return (
     <View
@@ -201,41 +210,74 @@ const decrementQuantity = useCallback(
           alignItems: "center",
           justifyContent: "center",
           marginBottom: 10,
-
         }}>
-        <TouchableOpacity
-          onPress={() => addItemToCart(item)}
-          style={{
-            marginLeft: wp("2.0%"),
-            marginRight: wp("2.0%"),
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#001A44",
-            padding: hp("0.625%"),
-            borderRadius: 10,
-            paddingHorizontal: wp("2.5%"),
-            height: hp("4.0%"),
-          }}>
-          <FontAwesome
-            name="cart-shopping"
-            size={hp("1.8%")}
-            color={COLORS.white}
-            style={{ marginRight: wp("2.5%") }}
-          />
-          <Text
-            style={[
-              FONTS.fontMedium,
-              {
-                fontSize: hp("1.9%"),
-                color: "white",
-                position: "relative",
-                top: -2,
-              },
-            ]}>
-            Añadir
-          </Text>
-        </TouchableOpacity>
+        {addedToCart ? (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: COLORS.success, // Fondo verde
+              padding: hp("0.625%"),
+              borderRadius: 10,
+              marginHorizontal: wp("2.0%"),
+              paddingHorizontal: wp("2%"),
+              height: hp("4.0%"),
+            }}>
+            <FontAwesome
+              name="check"
+              size={hp("1.8%")}
+              color={COLORS.white}
+              style={{ marginRight: wp("2.5%") }}
+            />
+            <Text
+              style={[
+                FONTS.fontMedium,
+                {
+                  fontSize: hp("1.9%"),
+                  color: COLORS.white,
+                  position: "relative",
+                  top: -2,
+                },
+              ]}>
+              Añadido
+            </Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={() => addItemToCart(item)}
+            style={{
+              marginLeft: wp("2.0%"),
+              marginRight: wp("2.0%"),
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#001A44",
+              padding: hp("0.625%"),
+              borderRadius: 10,
+              paddingHorizontal: wp("2.5%"),
+              height: hp("4.0%"),
+            }}>
+            <FontAwesome
+              name="cart-shopping"
+              size={hp("1.8%")}
+              color={COLORS.white}
+              style={{ marginRight: wp("2.5%") }}
+            />
+            <Text
+              style={[
+                FONTS.fontMedium,
+                {
+                  fontSize: hp("1.9%"),
+                  color: "white",
+                  position: "relative",
+                  top: -2,
+                },
+              ]}>
+              Añadir
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

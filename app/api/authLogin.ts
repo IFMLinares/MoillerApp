@@ -8,12 +8,36 @@ export const authLogin = async (username: string, password: string) => {
     console.log('Iniciando sesión con:', username, password);
     const response = await axios.post(`${BASE_URL}api/users/login/`, {
       username,
-      password
+      password,
     });
     console.log('Respuesta del servidor:', response.data);
-    const { access, refresh } = response.data;
-    await AsyncStorage.setItem('accessToken', access); // Guardar el token de acceso
-    await AsyncStorage.setItem('refreshToken', refresh); // Guardar el token de actualización
+
+    const { access, refresh, cliente_id, user_id } = response.data;
+
+    // Validar cliente_id
+    if (!cliente_id) {
+      console.warn('Advertencia: cliente_id no es válido:', cliente_id);
+      throw new Error('Error: cliente_id no es válido.');
+    }
+
+    // Manejar la ausencia de user_id
+    if (!user_id) {
+      console.warn('Advertencia: user_id no está presente en la respuesta.');
+    }
+
+    // Almacenar en AsyncStorage
+    await AsyncStorage.setItem('accessToken', access);
+    await AsyncStorage.setItem('refreshToken', refresh);
+    await AsyncStorage.setItem('clienteId', cliente_id.toString());
+    if (user_id) {
+      await AsyncStorage.setItem('userId', user_id.toString());
+    }
+
+    console.log('Datos almacenados en AsyncStorage:', {
+      cliente_id,
+      user_id: user_id || 'No disponible',
+    });
+
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -23,16 +47,17 @@ export const authLogin = async (username: string, password: string) => {
     } else {
       console.error('Error desconocido:', error);
     }
-    throw new Error("Error al iniciar sesión. Por favor, inténtelo de nuevo.");
+    throw new Error('Error al iniciar sesión. Por favor, inténtelo de nuevo.');
   }
 };
 
-// Función para refrescar el token de acceso
+// Función para refrescar el token de accesoen 
 export const refreshAccessToken = async () => {
   try {
-    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    const refreshToken = await AsyncStorage.getItem("refreshToken");
     if (!refreshToken) {
-      throw new Error('No se encontró el token de actualización.');
+      console.warn("No se encontró el token de actualización. No se puede refrescar el token.");
+      return null; // Retorna null en lugar de arrojar un error
     }
 
     const response = await axios.post(`${BASE_URL}api/users/token/refresh/`, {
@@ -40,16 +65,17 @@ export const refreshAccessToken = async () => {
     });
 
     const { access } = response.data;
-    await AsyncStorage.setItem('accessToken', access); // Actualiza el token de acceso
+    await AsyncStorage.setItem("accessToken", access); // Actualiza el token de acceso
     return access;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error('Error al refrescar el token:', error.response?.data || error.message);
+      console.error("Error al refrescar el token:", error.response?.data || error.message);
     } else if (error instanceof Error) {
-      console.error('Error inesperado:', error.message);
+      console.error("Error inesperado:", error.message);
     } else {
-      console.error('Error desconocido:', error);
+      console.error("Error desconocido:", error);
     }
-    throw new Error('Error al refrescar el token. Por favor, inicie sesión nuevamente.');
+    throw new Error("Error al refrescar los datos del usuario. Por favor, inicie sesión nuevamente.");
   }
 };
+ 

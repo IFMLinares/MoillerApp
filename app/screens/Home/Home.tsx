@@ -496,11 +496,11 @@ const Home = forwardRef(({ navigation }: HomeScreenProps, ref) => {
                       onPress={() =>
                         navigation.navigate("Ofertas", {
                           subcategoryId: "Ofertas",
-                          subcategoryName: "Ofertas",
+                          subcategoryName: "Novedades",
                         })
                       }>
                       <Text style={[FONTS.fontBold, { color: COLORS.white }]}>
-                        Ofertas
+                        Novedades
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity

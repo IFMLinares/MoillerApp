@@ -14,22 +14,23 @@ import React, { useState, useEffect } from "react";
 import { COLORS, FONTS } from "../../constants/theme";
 import { GlobalStyleSheet } from "../../constants/StyleSheet";
 import { useTheme } from "@react-navigation/native";
-import { Feather } from "@expo/vector-icons";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import Input from "../../components/Input/Input";
-import Button from "../../components/Button/Button";
-import ButtonOutline from "../../components/Button/ButtonOutline";
-import SelectCountery from "../../components/SelectCountery";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Entypo from "react-native-vector-icons/Entypo";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios"; // Asegúrate de tener axios instalado
-import { authLogin, refreshAccessToken } from "../../api/authLogin"; // Importa las funciones necesarias
-import { useDispatch } from "react-redux";
 import { setClienteId } from "../../redux/actions/drawerAction";
+import { useDispatch } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { RootState } from "../../redux/store";
+import {
+  authLogin,
+  refreshAccessToken, 
+} from "../../api/authLogin"; // Importa las funciones necesarias
 
 type SingInScreenProps = StackScreenProps<RootStackParamList, "SingIn">;
 
@@ -41,74 +42,84 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Estado de carga inicial
 
   // Verificar si el usuario ya está autenticado
-  const checkAuthentication = async () => {
-    setLoading(true);
-    try {
-      let accessToken = await AsyncStorage.getItem("accessToken");
-      if (!accessToken) {
-        // Intentar refrescar el token si no hay un token de acceso válido
-        accessToken = await refreshAccessToken();
-      }
-      if (accessToken) {
-        // Si el token es válido, redirigir al Home
-        navigation.navigate("DrawerNavigation", { screen: "Home" });
-      }
-    } catch (error) {
-      console.log("No se pudo autenticar automáticamente:", error.message);
-    } finally {
-      setLoading(false);
+const checkAuthentication = async () => {
+  setLoading(true);
+  try {
+    const refreshToken = await AsyncStorage.getItem("refreshToken");
+    if (!refreshToken) {
+      console.log("No se encontró el token de actualización. Redirigiendo a SingIn...");
+      setLoading(false); // Detener la carga
+      return; // Salir de la función
     }
-  };
+
+    // Intentar refrescar el token si hay un refreshToken
+    const accessToken = await refreshAccessToken();
+    if (accessToken) {
+      console.log("Token de acceso válido. Redirigiendo al Home...");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "DrawerNavigation", params: { screen: "Home" } }],
+      });
+    }
+  } catch (error) {
+    console.error("Error al verificar autenticación:", error);
+  } finally {
+    setLoading(false); // Detener la carga
+  }
+};
 
   // Ejecutar la verificación al cargar la pantalla
   useEffect(() => {
     checkAuthentication();
   }, []);
 
-  const dispatch = useDispatch(); // Inicializa el dispatch
+  const dispatch: ThunkDispatch<RootState, void, AnyAction> = useDispatch();
+  // Verificar si el usuario ya está autenticado
+ 
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setErrorMessage("");
-    try {
-      const data = await authLogin(username, password);
-      console.log("Respuesta de la API:", data); // Verifica que `cliente_id` sea correcto
-      setLoading(false);
-  
-      if (data.access) {
-        await AsyncStorage.setItem("username", username);
-        await AsyncStorage.setItem("accessToken", data.access);
-        await AsyncStorage.setItem("refreshToken", data.refresh);
-  
-        // Validar cliente_id antes de guardarlo
-        if (data.cliente_id && data.cliente_id !== 1) {
-          // Guarda el cliente_id en AsyncStorage
-          await AsyncStorage.setItem("clienteId", data.cliente_id.toString());
-  
-          // Despacha el cliente_id al estado global
-          console.log("Cliente ID antes de despachar:", data.cliente_id);
-          dispatch(setClienteId(data.cliente_id));
-  
-          // Redirigir al Home y limpiar el historial de navegación
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "DrawerNavigation", params: { screen: "Home" } }],
-          });
-        } else {
-          setErrorMessage("Error: Cliente ID inválido.");
-          console.error("Cliente ID inválido:", data.cliente_id);
-        }
-      } else {
-        setErrorMessage("Usuario o contraseña incorrectos");
-      }
-    } catch (error) {
-      setLoading(false);
-      setErrorMessage(error.message);
+
+const handleLogin = async () => {
+  setLoading(true);
+  setErrorMessage('');
+  try {
+    const data = await authLogin(username, password);
+    console.log('Respuesta de la API:', data);
+
+    const { cliente_id, user_id } = data;
+
+    if (!cliente_id) {
+      console.warn('Advertencia: cliente_id no es válido:', cliente_id);
+      setErrorMessage('Error: cliente_id no es válido.');
+      return;
     }
-  };
+
+    console.log('Guardando Cliente ID y User ID en Redux y AsyncStorage:', {
+      cliente_id,
+      user_id: user_id || 'No disponible',
+    });
+
+    // Guardar cliente_id en Redux
+    dispatch(setClienteId(cliente_id));
+
+    // Navegar al Home
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'DrawerNavigation', params: { screen: 'Home' } }],
+    });
+  } catch (error: unknown) {
+    setLoading(false);
+    if (error instanceof Error) {
+      setErrorMessage(error.message);
+    } else {
+      setErrorMessage('Ocurrió un error inesperado.');
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading) {
     return (
@@ -181,7 +192,7 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                   <Input
                     value={username}
                     autoCapitalize="none"
-                    placeholder="Nombre de usuario"
+                    placeholder="Rif"
                     onChangeText={(value) => setUsername(value)}
                     style={{
                       fontFamily: "RalewayRegular",
@@ -221,7 +232,8 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                     borderRadius: 10,
                     width: "100%",
                   }}>
-                  <TouchableOpacity onPress={() => navigation.navigate("ForgetPassword")}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("ForgetPassword")}>
                     <Text
                       style={[
                         FONTS.fontRegular,
@@ -257,14 +269,16 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                     width: "90%",
                   },
                 ]}>
-                <TouchableOpacity activeOpacity={0.8} onPress={handleLogin}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleLogin}
+                  disabled={loading}>
                   <View
                     style={{
                       backgroundColor: "white",
                       paddingVertical: 10,
                       borderRadius: 40,
                       borderWidth: 4,
-                      lineHeight: 24,
                       borderColor: "white",
                       width: "100%",
                       alignItems: "center",
@@ -279,6 +293,7 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                           fontFamily: "RalewayExtraBold",
                           fontSize: 20,
                           textTransform: "uppercase",
+                          lineHeight: 24,
                           textAlign: "center",
                         }}>
                         Iniciar sesión
@@ -324,9 +339,7 @@ const SingIn = ({ navigation }: SingInScreenProps) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.iconCircle}
-                  onPress={() =>
-                    Linking.openURL("mailto:ventas@mollierca.com")
-                  } // URL para enviar un correo
+                  onPress={() => Linking.openURL("mailto:ventas@mollierca.com")} // URL para enviar un correo
                 >
                   <MaterialIcons name="email" size={20} color="black" />
                 </TouchableOpacity>

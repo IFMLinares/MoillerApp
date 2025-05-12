@@ -1,16 +1,22 @@
- 
 const initialState = {
   clienteId: null, // Valor inicial
 };
 
 const userReducer = (state = initialState, action: any) => {
   switch (action.type) {
-    case "SET_CLIENTE_ID":
+    case 'SET_CLIENTE_ID':
       if (!action.payload || action.payload === 1) {
-        console.error("Cliente ID inválido en el reducer:", action.payload);
+        console.warn('Advertencia: clienteId inválido recibido en el reducer:', action.payload);
         return state;
       }
-      console.log("Cliente ID en el reducer:", action.payload);
+      if (state.clienteId && state.clienteId !== 1 && state.clienteId !== null) {
+        console.log(
+          'El clienteId ya está configurado en el estado y no será sobrescrito:',
+          state.clienteId
+        );
+        return state;
+      }
+      console.log('Actualizando clienteId en el reducer:', action.payload);
       return {
         ...state,
         clienteId: action.payload,

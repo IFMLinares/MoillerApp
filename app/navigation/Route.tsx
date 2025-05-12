@@ -9,34 +9,34 @@ import { setClienteId } from "../redux/actions/drawerAction";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { initializeCart } from "../redux/reducer/cartReducer"; // Asegúrate de que este sea el path correcto a tu reducer
-
+import { syncClienteId } from "../redux/actions/drawerAction";
 
 const Route = () => {
   const dispatch: ThunkDispatch<RootState, void, AnyAction> = useDispatch();
 
   useEffect(() => {
-    const loadClienteId = async () => {
-      try {
-        const storedClienteId = await AsyncStorage.getItem("clienteId");
-        if (storedClienteId && parseInt(storedClienteId, 10) !== 1) {
-          dispatch(setClienteId(parseInt(storedClienteId, 10))); // Actualiza Redux
-          console.log(
-            "Cliente ID cargado desde AsyncStorage:",
-            storedClienteId
-          );
-        } else {
-          console.error(
-            "Cliente ID inválido en AsyncStorage:",
-            storedClienteId
-          );
-        }
-      } catch (error) {
-        console.error("Error al cargar clienteId desde AsyncStorage:", error);
-      }
-    };
+    dispatch(syncClienteId()); // Sincroniza el clienteId al iniciar la app
+  }, []);
 
-    loadClienteId();
-  }, [dispatch]);
+useEffect(() => {
+  const loadClienteId = async () => {
+    try {
+      const storedClienteId = await AsyncStorage.getItem("clienteId");
+      const parsedClienteId = storedClienteId ? parseInt(storedClienteId, 10) : null;
+
+      if (parsedClienteId && parsedClienteId !== 1) {
+        console.log("Cliente ID cargado desde AsyncStorage:", parsedClienteId);
+        dispatch(setClienteId(parsedClienteId));
+      } else {
+        console.error("Cliente ID inválido en AsyncStorage:", storedClienteId);
+      }
+    } catch (error) {
+      console.error("Error al cargar clienteId desde AsyncStorage:", error);
+    }
+  };
+
+  loadClienteId();
+}, [dispatch]);
 
   useEffect(() => {
     const loadCartFromStorage = async () => {
@@ -52,7 +52,6 @@ const Route = () => {
 
     loadCartFromStorage();
   }, [dispatch]);
-
 
   const checkClienteId = async () => {
     const storedClienteId = await AsyncStorage.getItem("clienteId");
